@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Comercial Digital - Hap On</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* ── Fundos ── */
+  --navy:       #0f1e35;
+  --navy-2:     #162540;
+  --navy-3:     #1c2f4f;
+  --navy-4:     #243a60;
+  --body-bg:    #f0f4f9;
+  --surface:    #ffffff;
+  --surface-2:  #f7f9fc;
+
+  /* ── Cores primárias ── */
+  --blue:       #2563eb;
+  --blue-lt:    #3b82f6;
+  --blue-glow:  rgba(37,99,235,.1);
+  --blue-xlt:   #eff6ff;
+  --orange:     #f97316;
+  --orange-lt:  #fb923c;
+  --orange-bg:  #fff7ed;
+  --orange-brd: rgba(249,115,22,.25);
+
+  /* ── Status ── */
+  --green:      #16a34a;
+  --green-bg:   #f0fdf4;
+  --green-brd:  rgba(22,163,74,.2);
+  --yellow:     #d97706;
+  --yellow-bg:  #fffbeb;
+  --yellow-brd: rgba(217,119,6,.2);
+  --red:        #dc2626;
+  --red-bg:     #fef2f2;
+  --red-brd:    rgba(220,38,38,.2);
+
+  /* ── Texto ── */
+  --text-dark:  #0f172a;
+  --text-mid:   #334155;
+  --text-soft:  #64748b;
+  --text-faint: #94a3b8;
+
+  /* ── Bordas & sombras ── */
+  --border:     rgba(203,213,225,.8);
+  --border-md:  rgba(148,163,184,.5);
+  --shadow-sm:  0 1px 3px rgba(15,30,53,.06), 0 1px 2px rgba(15,30,53,.04);
+  --shadow-md:  0 4px 16px rgba(15,30,53,.08), 0 2px 6px rgba(15,30,53,.05);
+  --shadow-lg:  0 12px 36px rgba(15,30,53,.12), 0 4px 12px rgba(15,30,53,.07);
+
+  /* ── Navy text (para topbar/cards escuros) ── */
+  --navy-text:  #e2eaf6;
+  --navy-text2: #93aed0;
+  --navy-text3: #4d6d90;
+  --navy-border: rgba(255,255,255,.08);
+  --navy-border2: rgba(255,255,255,.14);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Inter', sans-serif;
+  background: var(--body-bg);
+  color: var(--text-dark);
+  min-height: 100vh;
+  font-size: 13px;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════
+   TOPBAR — azul marinho escuro
+══════════════════════════════════════════ */
+.topbar {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  border-bottom: 1px solid var(--navy-border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 36px; height: 68px;
+  position: sticky; top:0; z-index:200;
+  box-shadow: 0 4px 24px rgba(0,0,0,.35);
+}
+
+.brand { display:flex; align-items:center; gap:16px; }
+.brand-bar {
+  width:4px; height:40px; border-radius:2px;
+  background: linear-gradient(180deg, var(--blue-lt) 50%, var(--orange) 50%);
+}
+.brand-text { display:flex; flex-direction:column; gap:3px; }
+.brand-title {
+  font-size:17px; font-weight:800; color:#fff;
+  letter-spacing:-.4px; line-height:1;
+}
+.brand-title em { font-style:normal; color:var(--orange-lt); }
+.brand-sub {
+  font-size:10px; color:var(--navy-text3);
+  letter-spacing:2.5px; text-transform:uppercase; font-weight:500;
+}
+
+/* Mini KPIs no topo */
+.topbar-kpis { display:flex; gap:6px; }
+.topbar-kpi {
+  background: var(--navy-3);
+  border: 1px solid var(--navy-border2);
+  border-radius:10px; padding:7px 16px; text-align:center; min-width:130px;
+  position:relative; overflow:hidden;
+  transition: transform .18s;
+}
+.topbar-kpi::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+}
+.topbar-kpi.tk-orange::before { background:var(--orange); }
+.topbar-kpi.tk-blue::before   { background:var(--blue-lt); }
+.topbar-kpi.tk-green::before  { background:#22c55e; }
+.topbar-kpi:hover { transform:translateY(-1px); }
+.topbar-kpi .tk-lbl { font-size:8.5px; color:var(--navy-text3); text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-bottom:2px; }
+.topbar-kpi .tk-val { font-size:19px; font-weight:800; letter-spacing:-0.5px; line-height:1.1; }
+.topbar-kpi .tk-val.orange { color:var(--orange-lt); }
+.topbar-kpi .tk-val.blue   { color:#60a5fa; }
+.topbar-kpi .tk-val.green  { color:#4ade80; }
+
+/* Logo HapVida */
+.hapvida { font-size:26px; font-weight:800; letter-spacing:-1.5px; }
+.hapvida .h { color:#60a5fa; }
+.hapvida .v { color:var(--orange-lt); }
+
+/* ══════════════════════════════════════════
+   CONTAINER & LAYOUT
+══════════════════════════════════════════ */
+.container { max-width:1600px; margin:0 auto; padding:28px 36px 56px; }
+
+/* ══════════════════════════════════════════
+   TABS NAV — sobre fundo claro
+══════════════════════════════════════════ */
+.tabs-nav {
+  display:flex; gap:2px; margin-bottom:28px;
+  background:var(--surface); border-radius:12px; padding:5px;
+  border:1px solid var(--border); box-shadow:var(--shadow-sm);
+  width:fit-content;
+}
+.tab-btn {
+  padding:8px 22px; font-size:12.5px; font-weight:500; color:var(--text-soft);
+  background:none; border:none; cursor:pointer; border-radius:8px;
+  transition:all .18s; letter-spacing:.1px;
+}
+.tab-btn:hover { color:var(--blue); background:var(--blue-xlt); }
+.tab-btn.active {
+  background:var(--navy); color:#fff; font-weight:600;
+  box-shadow:0 2px 10px rgba(15,30,53,.2);
+}
+.tab-content { display:none; animation:fadeUp .22s ease; }
+.tab-content.active { display:block; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+/* ══════════════════════════════════════════
+   FILTER BAR
+══════════════════════════════════════════ */
+.equipe-bar {
+  display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap; align-items:center;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:10px 16px; box-shadow:var(--shadow-sm);
+}
+.filter-lbl { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-faint); font-weight:600; margin-right:4px; }
+.eq-btn {
+  padding:5px 16px; border-radius:20px; border:1.5px solid var(--border-md);
+  background:transparent; color:var(--text-soft); font-size:12px; font-weight:500;
+  cursor:pointer; transition:all .16s; font-family:'Inter',sans-serif;
+}
+.eq-btn:hover { border-color:var(--blue); color:var(--blue); background:var(--blue-xlt); }
+.eq-btn.active { background:var(--navy); border-color:var(--navy); color:#fff; box-shadow:0 2px 10px rgba(15,30,53,.25); }
+.eq-btn.eq-adm.active   { background:#7c3aed; border-color:#7c3aed; }
+.eq-btn.eq-benve.active { background:#059669; border-color:#059669; }
+.eq-btn.eq-alfa.active  { background:var(--blue); border-color:var(--blue); }
+.eq-btn.eq-fenix.active { background:#ea580c; border-color:#ea580c; }
+.eq-btn.eq-glad.active  { background:#db2777; border-color:#db2777; }
+.search-wrap { margin-left:auto; }
+.search-input {
+  padding:7px 14px 7px 36px; border-radius:8px; border:1.5px solid var(--border);
+  background:var(--surface-2); color:var(--text-dark); font-family:'Inter',sans-serif;
+  font-size:12px; outline:none; width:230px; transition:border .18s, box-shadow .18s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:10px center;
+}
+.search-input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(37,99,235,.1); background-color:var(--surface); }
+.search-input::placeholder { color:var(--text-faint); }
+
+/* ══════════════════════════════════════════
+   KPI CARDS — azul marinho com detalhes
+══════════════════════════════════════════ */
+.kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+
+.kpi-card {
+  background: linear-gradient(160deg, var(--navy-2) 0%, var(--navy-3) 100%);
+  border: 1px solid var(--navy-border2);
+  border-radius:16px; padding:22px 24px;
+  position:relative; overflow:hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .2s, box-shadow .2s;
+}
+.kpi-card:hover { transform:translateY(-3px); box-shadow:0 12px 36px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.08); }
+
+/* Linha de cor no topo */
+.kpi-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:16px 16px 0 0;
+}
+.kc-orange::before { background:linear-gradient(90deg,var(--orange),var(--orange-lt)); }
+.kc-blue::before   { background:linear-gradient(90deg,var(--blue),var(--blue-lt)); }
+.kc-green::before  { background:linear-gradient(90deg,#16a34a,#22c55e); }
+.kc-purple::before { background:linear-gradient(90deg,#7c3aed,#a78bfa); }
+
+/* Glow de fundo */
+.kpi-card::after {
+  content:''; position:absolute; bottom:-20px; right:-20px;
+  width:80px; height:80px; border-radius:50%;
+  opacity:.08;
+}
+.kc-orange::after { background:var(--orange); }
+.kc-blue::after   { background:var(--blue-lt); }
+.kc-green::after  { background:#22c55e; }
+.kc-purple::after { background:#a78bfa; }
+
+.kpi-label {
+  font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  color:var(--navy-text3); font-weight:700; margin-bottom:10px;
+  display:flex; align-items:center; gap:6px;
+}
+.kpi-icon-sm {
+  width:20px; height:20px; border-radius:5px; display:inline-flex;
+  align-items:center; justify-content:center; font-size:11px;
+}
+.kc-orange .kpi-icon-sm { background:rgba(249,115,22,.2); }
+.kc-blue   .kpi-icon-sm { background:rgba(59,130,246,.2); }
+.kc-green  .kpi-icon-sm { background:rgba(34,197,94,.2); }
+.kc-purple .kpi-icon-sm { background:rgba(167,139,250,.2); }
+
+.kpi-value {
+  font-size:40px; font-weight:800; line-height:1; letter-spacing:-2px;
+  color:#fff; margin-bottom:6px;
+}
+.kpi-value.cv-orange { color:var(--orange-lt); }
+.kpi-value.cv-blue   { color:#93c5fd; }
+.kpi-value.cv-green  { color:#86efac; }
+.kpi-value.cv-purple { color:#c4b5fd; }
+
+.kpi-sub { font-size:11px; color:var(--navy-text3); }
+
+/* Barra de progresso dentro do KPI */
+.kpi-bar {
+  margin-top:12px; height:3px; background:rgba(255,255,255,.1);
+  border-radius:3px; overflow:hidden;
+}
+.kpi-bar-fill { height:100%; border-radius:3px; }
+.kc-orange .kpi-bar-fill { background:linear-gradient(90deg,var(--orange),var(--orange-lt)); }
+.kc-blue   .kpi-bar-fill { background:linear-gradient(90deg,var(--blue),var(--blue-lt)); }
+.kc-green  .kpi-bar-fill { background:linear-gradient(90deg,#16a34a,#22c55e); }
+.kc-purple .kpi-bar-fill { background:linear-gradient(90deg,#7c3aed,#a78bfa); }
+
+/* ══════════════════════════════════════════
+   SECTION HEADERS
+══════════════════════════════════════════ */
+.section { margin-bottom:24px; }
+.section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.section-title { font-size:15px; font-weight:700; color:var(--text-dark); }
+.section-badge {
+  font-size:9px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700;
+  padding:3px 10px; border-radius:20px;
+}
+.sb-orange { color:var(--orange); background:var(--orange-bg); border:1px solid var(--orange-brd); }
+.sb-blue   { color:var(--blue); background:var(--blue-xlt); border:1px solid rgba(37,99,235,.2); }
+.sb-navy   { color:#fff; background:var(--navy); border:1px solid var(--navy); }
+
+/* ══════════════════════════════════════════
+   TABLE CARDS — fundo branco, bordas suaves
+══════════════════════════════════════════ */
+.table-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden; box-shadow:var(--shadow-md);
+}
+table { width:100%; border-collapse:collapse; }
+thead tr {
+  background:var(--navy);
+}
+th {
+  padding:12px 16px; text-align:left; font-size:9px; letter-spacing:2px;
+  text-transform:uppercase; color:var(--navy-text2); font-weight:700;
+  cursor:pointer; user-select:none; white-space:nowrap;
+  transition:color .15s;
+}
+th:hover { color:#fff; }
+th:first-child { border-radius:0; }
+tbody tr { border-bottom:1px solid var(--border); transition:background .12s; }
+tbody tr:hover { background:var(--blue-xlt); }
+tbody tr:last-child { border-bottom:none; }
+td { padding:11px 16px; color:var(--text-mid); font-size:12.5px; }
+tbody tr:hover td { color:var(--text-dark); }
+
+/* ══════════════════════════════════════════
+   RANK BADGES
+══════════════════════════════════════════ */
+.rank-badge {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border-radius:50%; font-size:10px; font-weight:800;
+}
+.rank-1 { background:linear-gradient(135deg,#f59e0b,#fcd34d); color:#78350f; box-shadow:0 2px 8px rgba(245,158,11,.4); }
+.rank-2 { background:linear-gradient(135deg,#94a3b8,#cbd5e1); color:#1e293b; box-shadow:0 2px 8px rgba(148,163,184,.4); }
+.rank-3 { background:linear-gradient(135deg,#b45309,#d97706); color:#fff; box-shadow:0 2px 8px rgba(180,83,9,.4); }
+.rank-other { background:var(--surface-2); color:var(--text-faint); border:1px solid var(--border); font-size:9px; }
+
+/* ══════════════════════════════════════════
+   TEAM TAGS
+══════════════════════════════════════════ */
+.tag { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:600; }
+.tag-alfa        { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+.tag-gladiadores { background:#fdf2f8; color:#be185d; border:1px solid #fbcfe8; }
+.tag-fenix       { background:#fff7ed; color:#c2410c; border:1px solid #fed7aa; }
+.tag-benve       { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; }
+.tag-adm         { background:#f5f3ff; color:#6d28d9; border:1px solid #ddd6fe; }
+
+/* ══════════════════════════════════════════
+   PROGRESS BARS
+══════════════════════════════════════════ */
+.progress-wrap { display:flex; align-items:center; gap:8px; }
+.progress-bar-bg {
+  flex:1; height:6px; background:var(--surface-2);
+  border-radius:99px; overflow:hidden; min-width:60px;
+  border:1px solid var(--border);
+}
+.progress-bar-fill { height:100%; border-radius:99px; transition:width .7s ease; }
+.fill-green  { background:linear-gradient(90deg,#16a34a,#4ade80); }
+.fill-yellow { background:linear-gradient(90deg,#d97706,#fbbf24); }
+.fill-red    { background:linear-gradient(90deg,#dc2626,#f87171); }
+.pct-text { font-size:11.5px; font-weight:700; min-width:52px; text-align:right; }
+.pct-green  { color:var(--green); }
+.pct-yellow { color:var(--yellow); }
+.pct-red    { color:var(--red); }
+
+/* ══════════════════════════════════════════
+   SUPERVISOR CARDS — azul marinho escuro
+══════════════════════════════════════════ */
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+.two-col   { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+.supervisor-card {
+  background: linear-gradient(160deg, var(--navy-2) 0%, var(--navy-3) 100%);
+  border: 1px solid var(--navy-border2);
+  border-radius:16px; padding:22px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.05);
+  transition: transform .2s, box-shadow .2s;
+  position:relative; overflow:hidden;
+}
+.supervisor-card::after {
+  content:''; position:absolute; bottom:-30px; right:-30px;
+  width:100px; height:100px; border-radius:50%;
+  background:var(--blue-lt); opacity:.04;
+}
+.supervisor-card:hover { transform:translateY(-3px); box-shadow:0 12px 36px rgba(0,0,0,.3); }
+.sup-card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.sup-name { font-size:13.5px; font-weight:700; color:#fff; margin-bottom:2px; }
+.sup-sub  { font-size:11px; color:var(--navy-text2); }
+.rank-pill-navy {
+  display:inline-flex; align-items:center; gap:4px; padding:4px 12px;
+  border-radius:20px; font-size:9px; font-weight:700; text-transform:uppercase;
+  background:rgba(249,115,22,.2); border:1px solid rgba(249,115,22,.35);
+  color:var(--orange-lt);
+}
+
+/* Mini stat grid dentro do card */
+.sup-stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0; }
+.ss-block {
+  background:var(--navy-4); border:1px solid var(--navy-border);
+  border-radius:10px; padding:10px 12px;
+}
+.ss-lbl { font-size:8.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--navy-text3); font-weight:700; margin-bottom:4px; }
+.ss-val { font-size:24px; font-weight:800; line-height:1; letter-spacing:-1px; }
+.ss-val.orange { color:var(--orange-lt); }
+.ss-val.blue   { color:#93c5fd; }
+.ss-val.green  { color:#86efac; }
+.ss-val.soft   { color:var(--navy-text); }
+
+.sup-progress-wrap { margin-bottom:10px; }
+.sup-progress-lbl { display:flex; justify-content:space-between; font-size:10px; color:var(--navy-text2); margin-bottom:5px; }
+.sup-progress-bg { height:6px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
+.sup-progress-fill { height:100%; border-radius:99px; }
+
+.sup-projection {
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--navy-4); border:1px solid var(--navy-border);
+  border-radius:8px; padding:8px 12px; margin-top:2px;
+}
+.sp-lbl { font-size:9px; color:var(--navy-text3); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+.sp-val { font-size:13px; font-weight:700; color:var(--orange-lt); }
+
+/* ══════════════════════════════════════════
+   TEAM BLOCKS
+══════════════════════════════════════════ */
+.team-block {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; overflow:hidden; box-shadow:var(--shadow-md); margin-bottom:16px;
+}
+.team-header {
+  padding:14px 20px; background:var(--navy);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.team-summary { font-size:11px; color:var(--navy-text2); }
+
+/* ══════════════════════════════════════════
+   PROJEÇÃO TAGS
+══════════════════════════════════════════ */
+.projecao-tag { font-size:9px; padding:3px 8px; border-radius:6px; font-weight:700; }
+.tag-alta  { background:var(--green-bg); color:var(--green); border:1px solid var(--green-brd); }
+.tag-media { background:var(--yellow-bg); color:var(--yellow); border:1px solid var(--yellow-brd); }
+.tag-baixa { background:var(--red-bg); color:var(--red); border:1px solid var(--red-brd); }
+
+/* ══════════════════════════════════════════
+   HIERARCHY
+══════════════════════════════════════════ */
+.hierarchy-wrap {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:16px; padding:36px; box-shadow:var(--shadow-md);
+}
+.hier-center { display:flex; flex-direction:column; align-items:center; }
+.hier-manager {
+  padding:16px 40px;
+  background:linear-gradient(135deg, var(--navy) 0%, var(--navy-3) 100%);
+  border-radius:14px; font-size:17px; font-weight:800; color:#fff;
+  letter-spacing:.3px; box-shadow:0 6px 24px rgba(15,30,53,.35);
+  margin-bottom:8px; cursor:default;
+  border:1px solid var(--navy-border2);
+  position:relative; overflow:hidden;
+}
+.hier-manager::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,var(--blue-lt),var(--orange));
+}
+.hier-role {
+  font-size:10px; color:var(--text-faint); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:24px; font-weight:500;
+}
+.hier-vert { width:2px; height:32px; background:linear-gradient(180deg,var(--blue),var(--orange)); }
+
+.hier-sup-row { display:flex; justify-content:center; gap:16px; flex-wrap:wrap; width:100%; margin-top:0; }
+
+.hier-sup-col { display:flex; flex-direction:column; align-items:center; min-width:170px; max-width:240px; flex:1; }
+
+.hier-sup-node {
+  width:100%;
+  background:linear-gradient(160deg, var(--navy-2), var(--navy-3));
+  border:1.5px solid var(--navy-border2);
+  border-radius:12px; padding:14px 18px; text-align:center;
+  cursor:pointer; transition:all .22s;
+  box-shadow:0 3px 12px rgba(0,0,0,.2), inset 0 1px 0 rgba(255,255,255,.05);
+  position:relative; overflow:hidden;
+}
+.hier-sup-node::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--navy-border2); transition:background .22s;
+}
+.hier-sup-node:hover {
+  border-color:rgba(59,130,246,.5);
+  box-shadow:0 6px 20px rgba(0,0,0,.3), 0 0 0 3px rgba(37,99,235,.12);
+  transform:translateY(-2px);
+}
+.hier-sup-node:hover::before { background:var(--blue-lt); }
+.hier-sup-node.active {
+  border-color:var(--blue-lt);
+  box-shadow:0 6px 24px rgba(0,0,0,.3), 0 0 0 3px rgba(37,99,235,.18);
+}
+.hier-sup-node.active::before { background:linear-gradient(90deg,var(--blue-lt),var(--blue)); }
+.hier-sup-name { font-size:12px; font-weight:700; color:#fff; margin:6px 0 4px; }
+.hier-sup-count { font-size:10px; color:var(--orange-lt); font-weight:600; }
+.hier-sup-vidas { font-size:10px; color:var(--navy-text2); margin-top:2px; }
+.hier-chevron { font-size:9px; color:var(--navy-text3); margin-top:7px; transition:transform .22s, color .22s; display:inline-block; }
+.hier-sup-node.active .hier-chevron { transform:rotate(180deg); color:var(--blue-lt); }
+
+/* Accordion promotores */
+.hier-promotor-panel {
+  overflow:hidden; max-height:0; transition:max-height .38s cubic-bezier(0.4,0,0.2,1);
+  width:100%; margin-top:8px;
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; box-shadow:var(--shadow-sm);
+}
+.hier-promotor-panel.open { max-height:1200px; }
+.hier-promotor-inner { padding:8px 0; }
+
+.hier-promotor-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 16px; border-bottom:1px solid var(--border);
+  transition:background .12s; cursor:default;
+}
+.hier-promotor-item:last-child { border-bottom:none; }
+.hier-promotor-item:hover { background:var(--blue-xlt); }
+.hip-name { font-weight:600; color:var(--text-dark); font-size:12px; }
+.hip-stats { display:flex; gap:14px; align-items:center; }
+.hip-chip {
+  display:flex; flex-direction:column; align-items:center;
+  background:var(--surface-2); border:1px solid var(--border);
+  border-radius:8px; padding:4px 10px; min-width:52px;
+  transition:background .12s;
+}
+.hier-promotor-item:hover .hip-chip { background:#fff; }
+.hip-chip-val { font-size:13px; font-weight:800; line-height:1.1; }
+.hip-chip-lbl { font-size:8px; color:var(--text-faint); text-transform:uppercase; letter-spacing:1px; font-weight:600; }
+
+/* Grid de equipes no fundo */
+.hier-team-grid {
+  display:grid; grid-template-columns:repeat(5,1fr); gap:12px;
+  margin-top:32px; padding-top:28px; border-top:1px solid var(--border);
+}
+.hier-team-tile {
+  background:linear-gradient(160deg,var(--navy-2),var(--navy-3));
+  border:1px solid var(--navy-border2); border-radius:12px; padding:16px;
+  text-align:center; position:relative; overflow:hidden;
+  box-shadow:0 3px 12px rgba(0,0,0,.18);
+}
+.hier-team-tile::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+}
+.htt-alfa::before       { background:var(--blue-lt); }
+.htt-gladiadores::before{ background:#f472b6; }
+.htt-fenix::before      { background:#fb923c; }
+.htt-adm::before        { background:#a78bfa; }
+.htt-benve::before      { background:#34d399; }
+.htt-lbl { font-size:8.5px; color:var(--navy-text3); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; font-weight:700; }
+.htt-val { font-size:28px; font-weight:800; line-height:1; letter-spacing:-1px; }
+.htt-sub-lbl { font-size:9px; color:var(--navy-text3); margin:2px 0 10px; }
+.htt-val2 { font-size:22px; font-weight:800; color:var(--orange-lt); letter-spacing:-0.5px; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:1200px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .three-col{grid-template-columns:1fr 1fr;} .hier-team-grid{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:780px){  .kpi-grid{grid-template-columns:1fr;} .three-col,.two-col{grid-template-columns:1fr;} .topbar-kpis{display:none;} .hier-team-grid{grid-template-columns:repeat(2,1fr);} .brand-title{font-size:14px;} }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ TOPBAR ════════════════════ -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-bar"></div>
+    <div class="brand-text">
+      <div class="brand-title">Dashboard &mdash; <em>Comercial Digital</em> &mdash; Hap On</div>
+      <div class="brand-sub">Ribeirão Preto &nbsp;·&nbsp; Visão Analítica de Desempenho</div>
+    </div>
+  </div>
+  <div class="topbar-kpis" id="topbar-kpis"></div>
+  <div class="hapvida"><span class="h">Hap</span><span class="v">Vida</span></div>
+</div>
+
+<div class="container">
+
+<!-- ════════════════════ TABS ════════════════════ -->
+<div class="tabs-nav">
+  <button class="tab-btn active" onclick="showTab('tgeral',this)">Visão Geral</button>
+  <button class="tab-btn" onclick="showTab('tranking',this)">Ranking Top 10</button>
+  <button class="tab-btn" onclick="showTab('ttop5',this)">Top 5 por Equipe</button>
+  <button class="tab-btn" onclick="showTab('tsups',this)">Supervisores</button>
+  <button class="tab-btn" onclick="showTab('thier',this)">Hierarquia</button>
+</div>
+
+<!-- ════════════════════ VISÃO GERAL ════════════════════ -->
+<div class="tab-content active" id="tgeral">
+
+  <div class="kpi-grid">
+    <div class="kpi-card kc-orange">
+      <div class="kpi-label"><span class="kpi-icon-sm">❤️</span>Total de Vidas</div>
+      <div class="kpi-value cv-orange" id="kv">—</div>
+      <div class="kpi-sub">Vendas consolidadas</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="kv-bar" style="width:0%"></div></div>
+    </div>
+    <div class="kpi-card kc-blue">
+      <div class="kpi-label"><span class="kpi-icon-sm">🎯</span>Meta Total</div>
+      <div class="kpi-value cv-blue" id="km">—</div>
+      <div class="kpi-sub">Meta consolidada</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="km-bar" style="width:100%"></div></div>
+    </div>
+    <div class="kpi-card kc-green">
+      <div class="kpi-label"><span class="kpi-icon-sm">📈</span>% Atingimento Médio</div>
+      <div class="kpi-value cv-green" id="kp">—</div>
+      <div class="kpi-sub">Média dos promotores</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="kp-bar" style="width:0%"></div></div>
+    </div>
+    <div class="kpi-card kc-purple">
+      <div class="kpi-label"><span class="kpi-icon-sm">🔄</span>Conversão Média</div>
+      <div class="kpi-value cv-purple" id="kc">—</div>
+      <div class="kpi-sub">Taxa média de conversão</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" id="kc-bar" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="equipe-bar">
+    <span class="filter-lbl">Filtrar:</span>
+    <button class="eq-btn active"   onclick="filterSup('all',this)">Todas as Equipes</button>
+    <button class="eq-btn eq-adm"  onclick="filterSup('VENDEDOR ADM',this)">Administrativo</button>
+    <button class="eq-btn eq-benve" onclick="filterSup('BENVE',this)">Benve</button>
+    <button class="eq-btn eq-alfa" onclick="filterSup('HUMBERTO BANQUERI',this)">Equipe Alfa</button>
+    <button class="eq-btn eq-fenix" onclick="filterSup('REBECA MOURA',this)">Equipe Fênix</button>
+    <button class="eq-btn eq-glad" onclick="filterSup('LUIZ ROBERTO',this)">Equipe Gladiadores</button>
+    <div class="search-wrap"><input class="search-input" id="srch" type="text" placeholder="Buscar promotor..." oninput="renderMain()"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Todos os Promotores</div>
+      <div class="section-badge sb-blue" id="pcount">—</div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th onclick="srt(0)">#</th>
+          <th onclick="srt(1)">Promotor ↕</th>
+          <th onclick="srt(2)">Supervisor ↕</th>
+          <th onclick="srt(3)">Equipe ↕</th>
+          <th onclick="srt(4)">Vidas ↕</th>
+          <th onclick="srt(5)">Meta ↕</th>
+          <th onclick="srt(6)">% Meta ↕</th>
+          <th onclick="srt(7)">Conversão ↕</th>
+        </tr></thead>
+        <tbody id="mtbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ RANKING ════════════════════ -->
+<div class="tab-content" id="tranking">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">🏆 Ranking Geral — Top 10</div>
+      <div class="section-badge sb-orange">Por Conversão</div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>#</th><th>Promotor</th><th>Supervisor</th><th>Equipe</th><th>Vidas</th><th>Meta</th><th>% Meta</th><th>Conversão</th></tr></thead>
+        <tbody id="rbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ TOP 5 EQUIPE ════════════════════ -->
+<div class="tab-content" id="ttop5">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Top 5 por Equipe</div>
+      <div class="section-badge sb-orange">Melhor Conversão</div>
+    </div>
+    <div id="teamblocks"></div>
+  </div>
+</div>
+
+<!-- ════════════════════ SUPERVISORES ════════════════════ -->
+<div class="tab-content" id="tsups">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Classificação dos Supervisores</div>
+      <div class="section-badge sb-navy">Resultados Consolidados</div>
+    </div>
+    <div id="supcards" class="three-col"></div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Detalhamento por Supervisor</div>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Rank</th><th>Supervisor</th><th>Promotores</th><th>Total Vidas</th><th>Meta Equipe</th><th>% Atingimento</th><th>Conversão Média</th><th>Projeção Mês</th></tr></thead>
+        <tbody id="suptbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ HIERARQUIA ════════════════════ -->
+<div class="tab-content" id="thier">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Estrutura Hierárquica</div>
+      <div class="section-badge sb-blue">Clique no supervisor para ver os promotores</div>
+    </div>
+    <div class="hierarchy-wrap">
+      <div class="hier-center">
+        <div class="hier-manager">👑 JOSY BOMFIM</div>
+        <div class="hier-role">Gerente Regional — Responsável por todas as equipes</div>
+        <div class="hier-vert"></div>
+        <div style="font-size:9px;color:var(--text-faint);letter-spacing:2px;text-transform:uppercase;margin:8px 0 18px;font-weight:600">Supervisores subordinados</div>
+        <div class="hier-sup-row" id="hiersups"></div>
+      </div>
+      <div class="hier-team-grid" id="hierteams"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+/* ══ DADOS ══ */
+const D = [
+{s:"HUMBERTO BANQUERI",p:"JAQUELINE SILVA",t:134,m:100,pm:134.00,cv:7.33},
+{s:"HUMBERTO BANQUERI",p:"BRUNA CAMPASSI",t:121,m:100,pm:121.00,cv:5.63},
+{s:"HUMBERTO BANQUERI",p:"MARIANA FELIX",t:112,m:100,pm:112.00,cv:8.68},
+{s:"HUMBERTO BANQUERI",p:"JULIA SILVA",t:89,m:80,pm:111.25,cv:5.18},
+{s:"HUMBERTO BANQUERI",p:"ROBSON FERRARI",t:88,m:90,pm:97.78,cv:11.96},
+{s:"HUMBERTO BANQUERI",p:"DELIANE GONZAGA GOMES",t:71,m:100,pm:71.00,cv:5.47},
+{s:"HUMBERTO BANQUERI",p:"ALINE RIBEIRO",t:65,m:60,pm:108.33,cv:7.53},
+{s:"HUMBERTO BANQUERI",p:"ALINE GUNELLO",t:65,m:70,pm:92.86,cv:5.36},
+{s:"HUMBERTO BANQUERI",p:"ISABELLA MATTOS",t:58,m:60,pm:96.67,cv:6.30},
+{s:"HUMBERTO BANQUERI",p:"SUELLEN GUIMARAES",t:55,m:90,pm:61.11,cv:14.44},
+{s:"HUMBERTO BANQUERI",p:"MOOARA VIEIRA RODRIGUES",t:48,m:90,pm:53.33,cv:5.45},
+{s:"HUMBERTO BANQUERI",p:"GLEIRE VALERIO",t:44,m:100,pm:44.00,cv:4.07},
+{s:"HUMBERTO BANQUERI",p:"ANA PAULA A CAMPANA",t:35,m:80,pm:43.75,cv:7.66},
+{s:"HUMBERTO BANQUERI",p:"GIOVANNA BARBIERI",t:22,m:15,pm:146.67,cv:3.45},
+{s:"HUMBERTO BANQUERI",p:"LARISSA PAES",t:22,m:75,pm:29.33,cv:4.04},
+{s:"HUMBERTO BANQUERI",p:"ANA JULIA",t:15,m:15,pm:100.00,cv:2.16},
+{s:"HUMBERTO BANQUERI",p:"LUZINETE FERREIRA",t:13,m:60,pm:21.67,cv:4.59},
+{s:"HUMBERTO BANQUERI",p:"LUCIANA TRIPICCHIO",t:13,m:60,pm:21.67,cv:4.09},
+{s:"HUMBERTO BANQUERI",p:"ISABELLA SOUZA",t:11,m:65,pm:16.92,cv:5.82},
+{s:"HUMBERTO BANQUERI",p:"ISAQUE VICTOR ALVES FERREIRA",t:9,m:15,pm:60.00,cv:2.38},
+{s:"VENDEDOR ADM",p:"GIOVANNA SANTANA",t:68,m:60,pm:113.33,cv:31.34},
+{s:"VENDEDOR ADM",p:"TATI SILVA",t:46,m:60,pm:76.67,cv:9.27},
+{s:"VENDEDOR ADM",p:"PATRICIA LIMA",t:20,m:34,pm:58.82,cv:7.75},
+{s:"VENDEDOR ADM",p:"ANDREA ANTUNES",t:20,m:34,pm:58.82,cv:14.81},
+{s:"VENDEDOR ADM",p:"BRUNO IGNACIO",t:20,m:34,pm:58.82,cv:3.59},
+{s:"VENDEDOR ADM",p:"AMANDA SOUZA",t:10,m:33,pm:30.30,cv:0.00},
+{s:"LUIZ ROBERTO",p:"CAROLINA RIBEIRO",t:108,m:90,pm:120.00,cv:7.46},
+{s:"LUIZ ROBERTO",p:"ANDREZZA MACHINI",t:96,m:90,pm:106.67,cv:7.03},
+{s:"LUIZ ROBERTO",p:"MARCELA SILVA",t:59,m:70,pm:84.29,cv:4.88},
+{s:"LUIZ ROBERTO",p:"RAYANE LOPES",t:56,m:70,pm:80.00,cv:5.59},
+{s:"LUIZ ROBERTO",p:"UNILDO FERREIRA GOIS JUNIOR",t:55,m:70,pm:78.57,cv:3.87},
+{s:"LUIZ ROBERTO",p:"RAIANE LIMA",t:54,m:70,pm:77.14,cv:3.62},
+{s:"LUIZ ROBERTO",p:"LIGIVANIA SILVA",t:50,m:70,pm:71.43,cv:2.78},
+{s:"LUIZ ROBERTO",p:"THAISA ALMEIDA",t:40,m:70,pm:57.14,cv:3.39},
+{s:"LUIZ ROBERTO",p:"JANEILA FIGUEIREDO",t:38,m:70,pm:54.29,cv:4.92},
+{s:"LUIZ ROBERTO",p:"SOFIA LUNGA",t:36,m:60,pm:60.00,cv:3.64},
+{s:"LUIZ ROBERTO",p:"MIRIAM FERREIRA",t:35,m:70,pm:50.00,cv:3.14},
+{s:"LUIZ ROBERTO",p:"SONIA LINO",t:34,m:70,pm:48.57,cv:4.00},
+{s:"LUIZ ROBERTO",p:"DANILO FOGAÇA",t:32,m:70,pm:45.71,cv:4.25},
+{s:"LUIZ ROBERTO",p:"THAMI FRANCISQUELLI",t:30,m:70,pm:42.86,cv:3.82},
+{s:"LUIZ ROBERTO",p:"JADY QUEIROZ",t:27,m:60,pm:45.00,cv:3.50},
+{s:"LUIZ ROBERTO",p:"SABRINA GIOLO",t:23,m:70,pm:32.86,cv:4.85},
+{s:"LUIZ ROBERTO",p:"RAISSA BURIN",t:23,m:60,pm:38.33,cv:3.52},
+{s:"LUIZ ROBERTO",p:"RENATO JESUS",t:13,m:70,pm:18.57,cv:10.40},
+{s:"LUIZ ROBERTO",p:"ISABELLE SCHANZ",t:0,m:80,pm:0.00,cv:0.00},
+{s:"REBECA MOURA",p:"GUSTAVO BARROS",t:73,m:80,pm:91.25,cv:6.30},
+{s:"REBECA MOURA",p:"ELISAMA GIZZI",t:72,m:100,pm:72.00,cv:15.79},
+{s:"REBECA MOURA",p:"FELIPE ALVES DE SOUZA",t:68,m:90,pm:75.56,cv:5.35},
+{s:"REBECA MOURA",p:"THAINA VITORIA",t:60,m:90,pm:66.67,cv:5.23},
+{s:"REBECA MOURA",p:"GABRIELA REIS",t:51,m:80,pm:63.75,cv:6.42},
+{s:"REBECA MOURA",p:"LUAN RIBEIRO",t:50,m:80,pm:62.50,cv:3.68},
+{s:"REBECA MOURA",p:"KEILA OLIVEIRA",t:43,m:50,pm:86.00,cv:7.49},
+{s:"REBECA MOURA",p:"PAULA JESUS",t:42,m:80,pm:52.50,cv:12.88},
+{s:"REBECA MOURA",p:"BRUNO FERREIRA",t:33,m:80,pm:41.25,cv:4.71},
+{s:"REBECA MOURA",p:"NATALIA BORGES",t:31,m:80,pm:38.75,cv:5.48},
+{s:"REBECA MOURA",p:"MARIA APARECIDA CORREA",t:30,m:70,pm:42.86,cv:6.17},
+{s:"REBECA MOURA",p:"JESSICA COSTA",t:28,m:80,pm:35.00,cv:4.40},
+{s:"REBECA MOURA",p:"BEATRIZ CORDEIRO",t:25,m:90,pm:27.78,cv:4.11},
+{s:"REBECA MOURA",p:"FERNANDA CARRARO",t:24,m:70,pm:34.29,cv:3.80},
+{s:"REBECA MOURA",p:"KAMILA KUNER",t:23,m:50,pm:46.00,cv:2.25},
+{s:"REBECA MOURA",p:"MIKAELLY MICHELINI",t:13,m:30,pm:43.33,cv:2.93},
+{s:"REBECA MOURA",p:"FERNANDA FRANCISCO",t:1,m:0,pm:0.00,cv:5.00},
+{s:"BENVE",p:"TAIS SILVEIRA",t:36,m:57,pm:63.16,cv:8.53},
+{s:"BENVE",p:"DANIELLE MUZELL",t:36,m:57,pm:63.16,cv:7.73},
+{s:"BENVE",p:"CAMILA MOREIRA",t:34,m:57,pm:59.65,cv:5.35},
+{s:"BENVE",p:"ANA BEATRIZ",t:33,m:58,pm:56.90,cv:4.69},
+{s:"BENVE",p:"JULIA MARQUES",t:31,m:57,pm:54.39,cv:5.07},
+{s:"BENVE",p:"TAIS LOPES",t:21,m:57,pm:36.84,cv:5.21},
+{s:"BENVE",p:"CRISTINA LOPES",t:21,m:57,pm:36.84,cv:3.09},
+];
+
+const TM = {"HUMBERTO BANQUERI":"EQUIPE ALFA","LUIZ ROBERTO":"EQUIPE GLADIADORES","REBECA MOURA":"EQUIPE FÊNIX","VENDEDOR ADM":"ADMINISTRATIVO","BENVE":"BENVE"};
+const TC = {"EQUIPE ALFA":"tag-alfa","EQUIPE GLADIADORES":"tag-gladiadores","EQUIPE FÊNIX":"tag-fenix","ADMINISTRATIVO":"tag-adm","BENVE":"tag-benve"};
+const TEAM_COLORS = {"EQUIPE ALFA":"#3b82f6","EQUIPE GLADIADORES":"#f472b6","EQUIPE FÊNIX":"#fb923c","ADMINISTRATIVO":"#a78bfa","BENVE":"#34d399"};
+
+const gt = s => TM[s] || s;
+const gc = t => TC[t] || "tag-alfa";
+const cc = c => c >= 10 ? "pct-green" : c >= 5 ? "pct-yellow" : "pct-red";
+const mc = p => p >= 100 ? "pct-green" : p >= 70 ? "pct-yellow" : "pct-red";
+const fc = p => p >= 100 ? "fill-green" : p >= 70 ? "fill-yellow" : "fill-red";
+const pb = (v,mx,cl) => `<div class="progress-bar-bg"><div class="progress-bar-fill ${cl}" style="width:${Math.min(v/mx*100,100)}%"></div></div>`;
+const fmt = n => (+n).toLocaleString('pt-BR');
+
+let CF = 'all', SD = {c:-1, a:true};
+
+function getFilt() {
+  let d = [...D];
+  if (CF !== 'all') d = d.filter(r => r.s === CF);
+  const q = (document.getElementById('srch')||{}).value||'';
+  const ql = q.trim().toLowerCase();
+  if (ql) d = d.filter(r => r.p.toLowerCase().includes(ql) || r.s.toLowerCase().includes(ql));
+  return d;
+}
+
+function renderMain() {
+  const d = getFilt();
+  document.getElementById('pcount').textContent = d.length + ' Promotores';
+
+  const tv = d.reduce((a,r)=>a+r.t,0);
+  const tm = d.reduce((a,r)=>a+r.m,0);
+  const ap = d.length ? d.reduce((a,r)=>a+r.pm,0)/d.length : 0;
+  const vc = d.filter(r=>r.cv>0);
+  const ac = vc.length ? vc.reduce((a,r)=>a+r.cv,0)/vc.length : 0;
+
+  document.getElementById('kv').textContent = fmt(tv);
+  document.getElementById('km').textContent = fmt(tm);
+  document.getElementById('kp').textContent = ap.toFixed(1)+'%';
+  document.getElementById('kc').textContent = ac.toFixed(2)+'%';
+
+  // KPI bars
+  const globalMax = D.reduce((a,r)=>a+r.m,0);
+  document.getElementById('kv-bar').style.width = Math.min(tv/globalMax*100,100)+'%';
+  document.getElementById('kp-bar').style.width = Math.min(ap,100)+'%';
+  document.getElementById('kc-bar').style.width = Math.min(ac*4,100)+'%';
+
+  document.getElementById('mtbody').innerHTML = d.map((r,i) => {
+    const team = gt(r.s), tc = gc(team);
+    return `<tr>
+      <td><span class="rank-badge ${i<3?'rank-'+(i+1):'rank-other'}">${i+1}</span></td>
+      <td style="font-weight:600;color:var(--text-dark)">${r.p}</td>
+      <td style="color:var(--text-soft)">${r.s}</td>
+      <td><span class="tag ${tc}">${team}</span></td>
+      <td style="font-weight:700;color:var(--orange)">${r.t}</td>
+      <td style="color:var(--text-soft)">${r.m}</td>
+      <td><div class="progress-wrap">${pb(r.pm,150,fc(r.pm))}<span class="pct-text ${mc(r.pm)}">${r.pm.toFixed(1)}%</span></div></td>
+      <td><span class="pct-text ${cc(r.cv)}">${r.cv.toFixed(2)}%</span></td>
+    </tr>`;
+  }).join('');
+
+  renderTopKPIs();
+}
+
+function renderTopKPIs() {
+  const tv = D.reduce((a,r)=>a+r.t,0);
+  const tm = D.reduce((a,r)=>a+r.m,0);
+  const ap = D.reduce((a,r)=>a+r.pm,0)/D.length;
+  const vc = D.filter(r=>r.cv>0);
+  const ac = vc.reduce((a,r)=>a+r.cv,0)/vc.length;
+  document.getElementById('topbar-kpis').innerHTML = `
+    <div class="topbar-kpi tk-orange"><div class="tk-lbl">Total Vidas</div><div class="tk-val orange">${fmt(tv)}</div></div>
+    <div class="topbar-kpi tk-blue"><div class="tk-lbl">Meta Total</div><div class="tk-val blue">${fmt(tm)}</div></div>
+    <div class="topbar-kpi tk-green"><div class="tk-lbl">% Atingimento</div><div class="tk-val green">${ap.toFixed(1)}%</div></div>
+    <div class="topbar-kpi tk-blue"><div class="tk-lbl">Conversão Média</div><div class="tk-val blue">${ac.toFixed(2)}%</div></div>
+  `;
+}
+
+function renderRanking() {
+  const sorted = [...D].sort((a,b)=>b.cv-a.cv).slice(0,10);
+  document.getElementById('rbody').innerHTML = sorted.map((r,i) => {
+    const team = gt(r.s), tc = gc(team);
+    return `<tr>
+      <td><span class="rank-badge ${i<3?'rank-'+(i+1):'rank-other'}">${i+1}</span></td>
+      <td style="font-weight:700;color:var(--text-dark)">${r.p}</td>
+      <td style="color:var(--text-soft)">${r.s}</td>
+      <td><span class="tag ${tc}">${team}</span></td>
+      <td style="font-weight:800;color:var(--orange);font-size:14px">${r.t}</td>
+      <td style="color:var(--text-soft)">${r.m}</td>
+      <td><span class="pct-text ${mc(r.pm)}">${r.pm.toFixed(1)}%</span></td>
+      <td style="font-size:15px;font-weight:800"><span class="pct-text ${cc(r.cv)}">${r.cv.toFixed(2)}%</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderTop5() {
+  const teams = {};
+  D.forEach(r => { const t=gt(r.s); if(!teams[t]) teams[t]=[]; teams[t].push(r); });
+  const order = ["EQUIPE ALFA","EQUIPE GLADIADORES","EQUIPE FÊNIX","ADMINISTRATIVO","BENVE"];
+  const cont = document.getElementById('teamblocks');
+  cont.innerHTML = '';
+  order.forEach(team => {
+    if (!teams[team]) return;
+    const sorted = [...teams[team]].sort((a,b)=>b.cv-a.cv).slice(0,5);
+    const tv = teams[team].reduce((a,r)=>a+r.t,0);
+    const tc = gc(team);
+    const rows = sorted.map((r,i) => `<tr>
+      <td><span class="rank-badge ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other'}">${i+1}</span></td>
+      <td style="font-weight:600;color:var(--text-dark)">${r.p}</td>
+      <td style="font-weight:700;color:var(--orange)">${r.t}</td>
+      <td style="color:var(--text-soft)">${r.m}</td>
+      <td><span class="pct-text ${mc(r.pm)}">${r.pm.toFixed(1)}%</span></td>
+      <td><span class="pct-text ${cc(r.cv)}">${r.cv.toFixed(2)}%</span></td>
+    </tr>`).join('');
+    const el = document.createElement('div');
+    el.className = 'team-block';
+    el.innerHTML = `<div class="team-header"><span class="tag ${tc}" style="font-size:12px;padding:4px 14px">${team}</span><div class="team-summary">${teams[team].length} promotores &nbsp;·&nbsp; ${tv} vidas totais</div></div>
+    <table><thead><tr><th>#</th><th>Promotor</th><th>Vidas</th><th>Meta</th><th>% Meta</th><th>Conversão</th></tr></thead><tbody>${rows}</tbody></table>`;
+    cont.appendChild(el);
+  });
+}
+
+function renderSups() {
+  const ss = {};
+  D.forEach(r => {
+    if (!ss[r.s]) ss[r.s] = {v:0,m:0,cs:0,cn:0,team:gt(r.s),count:0};
+    ss[r.s].v+=r.t; ss[r.s].m+=r.m; ss[r.s].count++;
+    if (r.cv>0) { ss[r.s].cs+=r.cv; ss[r.s].cn++; }
+  });
+  const list = Object.entries(ss).map(([name,s])=>({
+    name, team:s.team, v:s.v, m:s.m,
+    pm: s.m>0 ? s.v/s.m*100 : 0,
+    conv: s.cn>0 ? s.cs/s.cn : 0, cnt:s.count
+  })).sort((a,b)=>b.conv-a.conv);
+
+  document.getElementById('supcards').innerHTML = list.map((s,i) => {
+    const tc = gc(s.team);
+    const proj = Math.round(s.v*(30/22));
+    const pfill = Math.min(s.pm,150)/150*100;
+    const pfcol = s.pm>=100 ? 'fill-green' : s.pm>=70 ? 'fill-yellow' : 'fill-red';
+    return `<div class="supervisor-card">
+      <div class="sup-card-top">
+        <span class="tag ${tc}">${s.team}</span>
+        <span class="rank-pill-navy">🏅 #${i+1}</span>
+      </div>
+      <div class="sup-name">${s.name}</div>
+      <div class="sup-sub">${s.cnt} promotores sob supervisão</div>
+      <div class="sup-stats-grid">
+        <div class="ss-block">
+          <div class="ss-lbl">Total Vidas</div>
+          <div class="ss-val orange">${s.v}</div>
+        </div>
+        <div class="ss-block">
+          <div class="ss-lbl">Conv. Média</div>
+          <div class="ss-val blue">${s.conv.toFixed(2)}%</div>
+        </div>
+        <div class="ss-block">
+          <div class="ss-lbl">Meta</div>
+          <div class="ss-val soft">${s.m}</div>
+        </div>
+        <div class="ss-block">
+          <div class="ss-lbl">% Atingimento</div>
+          <div class="ss-val ${s.pm>=100?'green':s.pm>=70?'orange':'' }" style="${s.pm<70?'color:#f87171':''}">${s.pm.toFixed(1)}%</div>
+        </div>
+      </div>
+      <div class="sup-progress-wrap">
+        <div class="sup-progress-lbl"><span>Progresso da Meta</span><span>${s.pm.toFixed(1)}%</span></div>
+        <div class="sup-progress-bg"><div class="sup-progress-fill ${pfcol}" style="width:${pfill}%"></div></div>
+      </div>
+      <div class="sup-projection">
+        <span class="sp-lbl">📅 Projeção do mês</span>
+        <span class="sp-val">${proj} vidas</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('suptbody').innerHTML = list.map((s,i) => {
+    const proj = Math.round(s.v*(30/22));
+    const ptag = s.pm>=80 ? '<span class="projecao-tag tag-alta">Alta</span>'
+               : s.pm>=50 ? '<span class="projecao-tag tag-media">Média</span>'
+               : '<span class="projecao-tag tag-baixa">Baixa</span>';
+    return `<tr>
+      <td><span class="rank-badge ${i<3?'rank-'+(i+1):'rank-other'}">${i+1}</span></td>
+      <td style="font-weight:700;color:var(--text-dark)">${s.name}</td>
+      <td>${s.cnt}</td>
+      <td style="color:var(--orange);font-weight:800">${s.v}</td>
+      <td style="color:var(--text-soft)">${s.m}</td>
+      <td><span class="pct-text ${mc(s.pm)}">${s.pm.toFixed(1)}%</span></td>
+      <td><span class="pct-text ${cc(s.conv)}">${s.conv.toFixed(2)}%</span></td>
+      <td>${ptag}<span style="font-size:11px;color:var(--text-soft);margin-left:6px">${proj} vidas</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHier() {
+  const byS = {};
+  D.forEach(r => { if(!byS[r.s]) byS[r.s]=[]; byS[r.s].push(r); });
+
+  const hiersups = document.getElementById('hiersups');
+  hiersups.innerHTML = '';
+
+  Object.keys(byS).forEach(sup => {
+    const promotors = byS[sup];
+    const team = gt(sup), tc = gc(team);
+    const tv = promotors.reduce((a,r)=>a+r.t,0);
+    const tcolor = TEAM_COLORS[team] || '#3b82f6';
+
+    const col = document.createElement('div');
+    col.className = 'hier-sup-col';
+
+    const node = document.createElement('div');
+    node.className = 'hier-sup-node';
+    node.innerHTML = `
+      <span class="tag ${tc}" style="font-size:9px;padding:2px 8px">${team}</span>
+      <div class="hier-sup-name">${sup}</div>
+      <div class="hier-sup-count">${promotors.length} promotores</div>
+      <div class="hier-sup-vidas">${tv} vidas no total</div>
+      <div class="hier-chevron">▼</div>`;
+
+    const panel = document.createElement('div');
+    panel.className = 'hier-promotor-panel';
+
+    const sorted = [...promotors].sort((a,b)=>b.t-a.t);
+    panel.innerHTML = `<div class="hier-promotor-inner">
+      ${sorted.map(r => {
+        const mCl = mc(r.pm), cvCl = cc(r.cv);
+        return `<div class="hier-promotor-item">
+          <span class="hip-name">${r.p}</span>
+          <div class="hip-stats">
+            <div class="hip-chip">
+              <span class="hip-chip-val" style="color:var(--orange)">${r.t}</span>
+              <span class="hip-chip-lbl">Vidas</span>
+            </div>
+            <div class="hip-chip">
+              <span class="hip-chip-val ${mCl}">${r.pm.toFixed(0)}%</span>
+              <span class="hip-chip-lbl">Meta</span>
+            </div>
+            <div class="hip-chip">
+              <span class="hip-chip-val ${cvCl}">${r.cv.toFixed(1)}%</span>
+              <span class="hip-chip-lbl">Conv.</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+    node.addEventListener('click', () => {
+      const isOpen = panel.classList.contains('open');
+      document.querySelectorAll('.hier-promotor-panel').forEach(p=>p.classList.remove('open'));
+      document.querySelectorAll('.hier-sup-node').forEach(n=>n.classList.remove('active'));
+      if (!isOpen) { panel.classList.add('open'); node.classList.add('active'); }
+    });
+
+    col.appendChild(node);
+    col.appendChild(panel);
+    hiersups.appendChild(col);
+  });
+
+  // Team grid
+  const teams = {};
+  D.forEach(r => { const t=gt(r.s); if(!teams[t]) teams[t]={cnt:0,v:0,cls:''}; teams[t].cnt++; teams[t].v+=r.t; });
+  const htt = {"EQUIPE ALFA":"htt-alfa","EQUIPE GLADIADORES":"htt-gladiadores","EQUIPE FÊNIX":"htt-fenix","ADMINISTRATIVO":"htt-adm","BENVE":"htt-benve"};
+  document.getElementById('hierteams').innerHTML = Object.entries(teams).map(([team,d]) => {
+    const color = TEAM_COLORS[team]||'#3b82f6';
+    const cls = htt[team]||'';
+    return `<div class="hier-team-tile ${cls}">
+      <div class="htt-lbl">${team}</div>
+      <div class="htt-val" style="color:${color}">${d.cnt}</div>
+      <div class="htt-sub-lbl">promotores</div>
+      <div class="htt-val2">${d.v}</div>
+      <div class="htt-sub-lbl">vidas</div>
+    </div>`;
+  }).join('');
+}
+
+function filterSup(sup, btn) {
+  CF = sup;
+  document.querySelectorAll('.eq-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMain();
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function srt(col) {
+  if (SD.c===col) SD.a=!SD.a; else { SD.c=col; SD.a=true; }
+  const keys=['','p','s','team','t','m','pm','cv'];
+  const key=keys[col]; if(!key) return;
+  D.sort((a,b)=>{
+    let va=key==='team'?gt(a.s):a[key], vb=key==='team'?gt(b.s):b[key];
+    if(typeof va==='string') return SD.a?va.localeCompare(vb):vb.localeCompare(va);
+    return SD.a?va-vb:vb-va;
+  });
+  renderMain();
+}
+
+/* Init */
+renderMain();
+renderRanking();
+renderTop5();
+renderSups();
+renderHier();
+</script>
+</body>
+</html>
