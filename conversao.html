@@ -482,15 +482,41 @@ tbody tr:hover td { color:var(--text-dark); }
 .hier-promotor-panel.open { max-height:1200px; }
 .hier-promotor-inner { padding:8px 0; }
 
+/* ====== ALTERAÇÃO APLICADA AQUI (PROMOTORES NA HIERARQUIA) ====== */
 .hier-promotor-item {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:9px 16px; border-bottom:1px solid var(--border);
-  transition:background .12s; cursor:default;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding:10px 16px;
+  border-bottom:1px solid var(--border);
+  transition:background .12s;
+  cursor:default;
 }
 .hier-promotor-item:last-child { border-bottom:none; }
 .hier-promotor-item:hover { background:var(--blue-xlt); }
-.hip-name { font-weight:600; color:var(--text-dark); font-size:12px; }
-.hip-stats { display:flex; gap:14px; align-items:center; }
+
+.hip-name {
+  font-weight:600;
+  color:var(--text-dark);
+  font-size:12px;
+
+  flex:1;
+  min-width:220px;
+  max-width:100%;
+  white-space:normal;
+  word-break:break-word;
+  line-height:1.25;
+}
+
+.hip-stats {
+  display:flex;
+  gap:14px;
+  align-items:center;
+  flex-shrink:0;
+}
+/* =============================================================== */
+
 .hip-chip {
   display:flex; flex-direction:column; align-items:center;
   background:var(--surface-2); border:1px solid var(--border);
@@ -969,7 +995,6 @@ function renderHier() {
     const promotors = byS[sup];
     const team = gt(sup), tc = gc(team);
     const tv = promotors.reduce((a,r)=>a+r.t,0);
-    const tcolor = TEAM_COLORS[team] || '#3b82f6';
 
     const col = document.createElement('div');
     col.className = 'hier-sup-col';
