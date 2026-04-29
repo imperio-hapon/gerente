@@ -277,9 +277,7 @@ body {
   border-radius:14px; overflow:hidden; box-shadow:var(--shadow-md);
 }
 table { width:100%; border-collapse:collapse; }
-thead tr {
-  background:var(--navy);
-}
+thead tr { background:var(--navy); }
 th {
   padding:12px 16px; text-align:left; font-size:9px; letter-spacing:2px;
   text-transform:uppercase; color:var(--navy-text2); font-weight:700;
@@ -287,7 +285,6 @@ th {
   transition:color .15s;
 }
 th:hover { color:#fff; }
-th:first-child { border-radius:0; }
 tbody tr { border-bottom:1px solid var(--border); transition:background .12s; }
 tbody tr:hover { background:var(--blue-xlt); }
 tbody tr:last-child { border-bottom:none; }
@@ -474,15 +471,27 @@ tbody tr:hover td { color:var(--text-dark); }
 
 /* Accordion promotores */
 .hier-promotor-panel {
-  overflow:hidden; max-height:0; transition:max-height .38s cubic-bezier(0.4,0,0.2,1);
-  width:100%; margin-top:8px;
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:12px; box-shadow:var(--shadow-sm);
+  overflow:hidden;
+  max-height:0;
+  transition:max-height .38s cubic-bezier(0.4,0,0.2,1);
+  width:100%;
+  margin-top:8px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:12px;
+  box-shadow:var(--shadow-sm);
 }
-.hier-promotor-panel.open { max-height:1200px; }
+
+/* ===== ALTERAÇÃO: LIMITE VISUAL 5 PROMOTORES (SCROLL) ===== */
+.hier-promotor-panel.open {
+  max-height: 310px;        /* altura aproximada para 5 promotores */
+  overflow-y: auto;         /* rolagem vertical */
+}
+/* ========================================================= */
+
 .hier-promotor-inner { padding:8px 0; }
 
-/* ====== ALTERAÇÃO APLICADA AQUI (PROMOTORES NA HIERARQUIA) ====== */
+/* ====== PROMOTORES NA HIERARQUIA ====== */
 .hier-promotor-item {
   display:flex;
   align-items:flex-start;
@@ -515,7 +524,6 @@ tbody tr:hover td { color:var(--text-dark); }
   align-items:center;
   flex-shrink:0;
 }
-/* =============================================================== */
 
 .hip-chip {
   display:flex; flex-direction:column; align-items:center;
@@ -554,13 +562,22 @@ tbody tr:hover td { color:var(--text-dark); }
 /* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
-@media(max-width:1200px){ .kpi-grid{grid-template-columns:repeat(2,1fr);} .three-col{grid-template-columns:1fr 1fr;} .hier-team-grid{grid-template-columns:repeat(3,1fr);} }
-@media(max-width:780px){  .kpi-grid{grid-template-columns:1fr;} .three-col,.two-col{grid-template-columns:1fr;} .topbar-kpis{display:none;} .hier-team-grid{grid-template-columns:repeat(2,1fr);} .brand-title{font-size:14px;} }
+@media(max-width:1200px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .three-col{grid-template-columns:1fr 1fr;}
+  .hier-team-grid{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:780px){
+  .kpi-grid{grid-template-columns:1fr;}
+  .three-col,.two-col{grid-template-columns:1fr;}
+  .topbar-kpis{display:none;}
+  .hier-team-grid{grid-template-columns:repeat(2,1fr);}
+  .brand-title{font-size:14px;}
+}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════ TOPBAR ════════════════════ -->
 <div class="topbar">
   <div class="brand">
     <div class="brand-bar"></div>
@@ -575,7 +592,6 @@ tbody tr:hover td { color:var(--text-dark); }
 
 <div class="container">
 
-<!-- ════════════════════ TABS ════════════════════ -->
 <div class="tabs-nav">
   <button class="tab-btn active" onclick="showTab('tgeral',this)">Visão Geral</button>
   <button class="tab-btn" onclick="showTab('tranking',this)">Ranking Top 10</button>
@@ -584,7 +600,6 @@ tbody tr:hover td { color:var(--text-dark); }
   <button class="tab-btn" onclick="showTab('thier',this)">Hierarquia</button>
 </div>
 
-<!-- ════════════════════ VISÃO GERAL ════════════════════ -->
 <div class="tab-content active" id="tgeral">
 
   <div class="kpi-grid">
@@ -648,7 +663,6 @@ tbody tr:hover td { color:var(--text-dark); }
   </div>
 </div>
 
-<!-- ════════════════════ RANKING ════════════════════ -->
 <div class="tab-content" id="tranking">
   <div class="section">
     <div class="section-header">
@@ -664,7 +678,6 @@ tbody tr:hover td { color:var(--text-dark); }
   </div>
 </div>
 
-<!-- ════════════════════ TOP 5 EQUIPE ════════════════════ -->
 <div class="tab-content" id="ttop5">
   <div class="section">
     <div class="section-header">
@@ -675,7 +688,6 @@ tbody tr:hover td { color:var(--text-dark); }
   </div>
 </div>
 
-<!-- ════════════════════ SUPERVISORES ════════════════════ -->
 <div class="tab-content" id="tsups">
   <div class="section">
     <div class="section-header">
@@ -697,7 +709,6 @@ tbody tr:hover td { color:var(--text-dark); }
   </div>
 </div>
 
-<!-- ════════════════════ HIERARQUIA ════════════════════ -->
 <div class="tab-content" id="thier">
   <div class="section">
     <div class="section-header">
@@ -717,10 +728,9 @@ tbody tr:hover td { color:var(--text-dark); }
   </div>
 </div>
 
-</div><!-- /container -->
+</div>
 
 <script>
-/* ══ DADOS ══ */
 const D = [
 {s:"HUMBERTO BANQUERI",p:"JAQUELINE SILVA",t:134,m:100,pm:134.00,cv:7.33},
 {s:"HUMBERTO BANQUERI",p:"BRUNA CAMPASSI",t:121,m:100,pm:121.00,cv:5.63},
@@ -783,7 +793,6 @@ const D = [
 {s:"REBECA MOURA",p:"FERNANDA CARRARO",t:24,m:70,pm:34.29,cv:3.80},
 {s:"REBECA MOURA",p:"KAMILA KUNER",t:23,m:50,pm:46.00,cv:2.25},
 {s:"REBECA MOURA",p:"MIKAELLY MICHELINI",t:13,m:30,pm:43.33,cv:2.93},
-{s:"REBECA MOURA",p:"FERNANDA FRANCISCO",t:1,m:0,pm:0.00,cv:5.00},
 {s:"BENVE",p:"TAIS SILVEIRA",t:36,m:57,pm:63.16,cv:8.53},
 {s:"BENVE",p:"DANIELLE MUZELL",t:36,m:57,pm:63.16,cv:7.73},
 {s:"BENVE",p:"CAMILA MOREIRA",t:34,m:57,pm:59.65,cv:5.35},
@@ -831,7 +840,6 @@ function renderMain() {
   document.getElementById('kp').textContent = ap.toFixed(1)+'%';
   document.getElementById('kc').textContent = ac.toFixed(2)+'%';
 
-  // KPI bars
   const globalMax = D.reduce((a,r)=>a+r.m,0);
   document.getElementById('kv-bar').style.width = Math.min(tv/globalMax*100,100)+'%';
   document.getElementById('kp-bar').style.width = Math.min(ap,100)+'%';
@@ -993,6 +1001,11 @@ function renderHier() {
 
   Object.keys(byS).forEach(sup => {
     const promotors = byS[sup];
+
+    /* ===== ALTERAÇÃO: ORDEM ALFABÉTICA DOS PROMOTORES ===== */
+    const sortedPromotors = [...promotors].sort((a,b)=>a.p.localeCompare(b.p,'pt-BR'));
+    /* ===================================================== */
+
     const team = gt(sup), tc = gc(team);
     const tv = promotors.reduce((a,r)=>a+r.t,0);
 
@@ -1011,9 +1024,8 @@ function renderHier() {
     const panel = document.createElement('div');
     panel.className = 'hier-promotor-panel';
 
-    const sorted = [...promotors].sort((a,b)=>b.t-a.t);
     panel.innerHTML = `<div class="hier-promotor-inner">
-      ${sorted.map(r => {
+      ${sortedPromotors.map(r => {
         const mCl = mc(r.pm), cvCl = cc(r.cv);
         return `<div class="hier-promotor-item">
           <span class="hip-name">${r.p}</span>
@@ -1047,7 +1059,6 @@ function renderHier() {
     hiersups.appendChild(col);
   });
 
-  // Team grid
   const teams = {};
   D.forEach(r => { const t=gt(r.s); if(!teams[t]) teams[t]={cnt:0,v:0,cls:''}; teams[t].cnt++; teams[t].v+=r.t; });
   const htt = {"EQUIPE ALFA":"htt-alfa","EQUIPE GLADIADORES":"htt-gladiadores","EQUIPE FÊNIX":"htt-fenix","ADMINISTRATIVO":"htt-adm","BENVE":"htt-benve"};
@@ -1084,13 +1095,12 @@ function srt(col) {
   const key=keys[col]; if(!key) return;
   D.sort((a,b)=>{
     let va=key==='team'?gt(a.s):a[key], vb=key==='team'?gt(b.s):b[key];
-    if(typeof va==='string') return SD.a?va.localeCompare(vb):vb.localeCompare(va);
+    if(typeof va==='string') return SD.a?va.localeCompare(vb,'pt-BR'):vb.localeCompare(va,'pt-BR');
     return SD.a?va-vb:vb-va;
   });
   renderMain();
 }
 
-/* Init */
 renderMain();
 renderRanking();
 renderTop5();
