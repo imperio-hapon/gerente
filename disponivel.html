@@ -694,7 +694,12 @@ async function loadData() {
     // ── DATAS E SUPERVISORES ──────────────────────────────────────────────────
     const dateSet = new Set([...RAW_BY_DAY.map(r=>r.date_str), ...RAW_AVAIL.map(r=>r.date_str)]);
     ALL_DATES = [...dateSet].filter(Boolean).sort();
-    const supSet = new Set([...RAW_BY_DAY.map(r=>r.SUPERVISOR), ...RAW_AVAIL.map(r=>r.SUPERVISOR)]);
+    // Só inclui supervisores que têm ao menos 1 lead válido ou 1 registro de disponibilidade
+    const supsComDados = new Set([
+      ...RAW_BY_DAY.filter(r=>r.total_leads>0||r.ate1||r.ate2||r.gt2||r.sem_resp).map(r=>r.SUPERVISOR),
+      ...RAW_AVAIL.filter(r=>r.date_str).map(r=>r.SUPERVISOR)
+    ]);
+    const supSet = supsComDados;
     const supArr=[...supSet].filter(s=>s&&!EQUIPES_REMOVIDAS.includes(s.toUpperCase()));
     // Ordena: não-BENVE alfabético primeiro, BENVE ao final
     supArr.sort((a,b)=>{
@@ -907,10 +912,21 @@ function periodLabel(){
 function renderEquipeBtns(t){
   const container=document.getElementById(`equipe-btns-${t}`);
   const cur=state.selSup[t];
-  const sups=['Todos',...ALL_SUPS.filter(s=>!EQUIPES_OCULTAS.includes(s))];
+  // Filtra equipes que têm dados reais (ao menos 1 registro)
+  const rawData=t===0?RAW_BY_DAY:RAW_AVAIL;
+  const supsComDados=new Set(
+    t===0
+      ? RAW_BY_DAY.filter(r=>r.total_leads>0||r.ate1||r.ate2||r.gt2||r.sem_resp).map(r=>r.SUPERVISOR)
+      : RAW_AVAIL.filter(r=>r.date_str).map(r=>r.SUPERVISOR)
+  );
+  const sups=['Todos',...ALL_SUPS.filter(s=>!EQUIPES_OCULTAS.includes(s)&&supsComDados.has(s))];
+  // Se equipe selecionada sumiu, volta para Todos
+  if(cur!=='Todos'&&!sups.includes(cur)){
+    state.selSup[t]='Todos';
+  }
   container.innerHTML=sups.map(s=>{
     const sc=s==='Todos'?{bg:'#E2E8F0',tc:'#1A2332'}:(SUP_C[s]||{bg:'#EEE',tc:'#666'});
-    const isActive=cur===s;
+    const isActive=state.selSup[t]===s;
     return `<button class="equipe-btn${isActive?' active':''}"
       style="background:${sc.bg};color:${sc.tc};border-color:${isActive?sc.tc:'transparent'}"
       onclick="selectEquipe('${s}',${t})">${s==='Todos'?'Todas as Equipes':s}</button>`;
@@ -947,14 +963,12 @@ function setPeriod(mode,t){
   // For 2dias: auto-seleciona os 2 últimos dias úteis (excluindo hoje)
   if(mode==='2dias'){
     document.getElementById(`date-wrap-${t}`).style.display='';
-    // Calcula os 2 últimos dias úteis excluindo hoje
-    const allDates=(t===0?ALL_DATES:ALL_AVAIL_DATES||ALL_DATES).filter(Boolean);
+    const allDates=(t===0?ALL_DATES:(ALL_AVAIL_DATES||ALL_DATES)).filter(Boolean);
     const todayStr=new Date().toISOString().slice(0,10);
-    // Filtra datas passadas (sem hoje) e dias úteis (seg-sex)
     const workdays=allDates.filter(d=>{
-      if(d>=todayStr) return false; // exclui hoje e futuros
+      if(d>=todayStr) return false;
       const wd=new Date(d+'T12:00:00').getDay();
-      return wd>=1&&wd<=5; // apenas seg(1) a sex(5)
+      return wd>=1&&wd<=5;
     }).sort();
     const last2=workdays.slice(-2);
     if(last2.length>=1){
