@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vendas — Maio 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f2f7;
+    --surface: #ffffff;
+    --surface2: #e8ecf4;
+    --border: rgba(0,0,0,0.09);
+    --text: #111827;
+    --muted: #6b7591;
+    --accent-blue: #2563eb;
+    --accent-green: #16a34a;
+    --accent-red: #dc2626;
+    --accent-amber: #d97706;
+    --pf: #2563eb;
+    --pme: #16a34a;
+    --adesao: #dc2626;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 28px 32px;
+  }
+
+  .header { display:flex; align-items:baseline; gap:16px; margin-bottom:6px; }
+  .header h1 { font-size:26px; font-weight:700; letter-spacing:-0.5px; color:var(--text); }
+  .header .sub { font-size:13px; color:var(--muted); font-family:'DM Mono',monospace; }
+
+  .tabs { display:flex; gap:4px; margin:18px 0 8px; flex-wrap:wrap; align-items:center; }
+  .tab {
+    padding:6px 16px; border-radius:6px; font-size:13px; font-weight:500;
+    cursor:pointer; border:1px solid var(--border); background:var(--surface2);
+    color:var(--muted); transition:all 0.15s; user-select:none;
+  }
+  .tab:hover { color:var(--text); border-color:rgba(0,0,0,0.2); }
+  .tab.active { background:var(--accent-blue); border-color:var(--accent-blue); color:#fff; }
+  .tabs-separator { width:1px; height:24px; background:var(--border); margin:0 4px; }
+
+  /* Period bar */
+  .period-bar {
+    display:flex; align-items:center; gap:10px; margin-bottom:20px;
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:10px 16px; flex-wrap:wrap;
+  }
+  .period-label { font-size:12px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:0.5px; margin-right:4px; }
+  .period-bar input[type=range] {
+    -webkit-appearance:none; width:130px; height:4px; border-radius:2px;
+    background:var(--surface2); outline:none; cursor:pointer;
+  }
+  .period-bar input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+    background:var(--accent-blue); border:2px solid #fff;
+    box-shadow:0 1px 3px rgba(0,0,0,0.2); cursor:pointer;
+  }
+  .period-display { font-family:'DM Mono',monospace; font-size:12px; color:var(--accent-blue); font-weight:500; min-width:110px; }
+  .period-presets { display:flex; gap:4px; margin-left:auto; }
+  .preset-btn {
+    padding:4px 10px; border-radius:5px; font-size:11.5px; font-weight:500;
+    cursor:pointer; border:1px solid var(--border); background:var(--surface2);
+    color:var(--muted); transition:all 0.12s;
+  }
+  .preset-btn:hover, .preset-btn.active { background:var(--accent-blue); border-color:var(--accent-blue); color:#fff; }
+
+  /* KPI */
+  .kpi-row { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px; }
+  .kpi {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px 20px; position:relative; overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  }
+  .kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--accent-blue); opacity:0.4; }
+  .kpi.good::before { background:var(--accent-green); opacity:1; }
+  .kpi.warn::before { background:var(--accent-red); opacity:1; }
+  .kpi.neutral::before { background:var(--accent-amber); opacity:0.9; }
+  .kpi-label { font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px; font-weight:500; }
+  .kpi-value { font-size:30px; font-weight:700; letter-spacing:-1px; line-height:1; color:var(--text); }
+  .kpi-value.warn { color:var(--accent-red); }
+  .kpi-value.good { color:var(--accent-green); }
+  .kpi-meta { margin-top:6px; font-size:12px; color:var(--muted); font-family:'DM Mono',monospace; }
+
+  /* Charts */
+  .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  .chart-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:20px 22px 16px; box-shadow:0 1px 3px rgba(0,0,0,0.04);
+    /* CRITICAL: fixed width so chart never reflows */
+    min-width:0; overflow:hidden;
+  }
+  .chart-card.full { grid-column:1/-1; }
+  .chart-title { font-size:13.5px; font-weight:600; margin-bottom:4px; }
+  .chart-sub { font-size:11.5px; color:var(--muted); margin-bottom:18px; }
+  .legend { display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+  .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .legend-line { width:20px; height:3px; border-radius:2px; }
+
+  /* Fixed-height wrappers prevent chart resize on re-render */
+  .chart-wrap { position:relative; width:100%; }
+  .chart-wrap canvas { display:block !important; }
+
+  /* Table */
+  .table-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:20px 22px; margin-bottom:14px; overflow-x:auto;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; font-family:'DM Mono',monospace; }
+  th { text-align:right; padding:6px 8px; color:var(--muted); font-size:11px; font-weight:500; border-bottom:1px solid var(--border); white-space:nowrap; }
+  th:first-child { text-align:left; }
+  td { text-align:right; padding:5px 8px; border-bottom:1px solid rgba(0,0,0,0.03); color:var(--text); }
+  td:first-child { text-align:left; color:var(--muted); font-size:11px; }
+  tr.total-row td { border-top:1px solid var(--border); font-weight:600; color:var(--text); background:rgba(0,0,0,0.02); }
+  td.zero { color:rgba(0,0,0,0.15); }
+  td.high { color:var(--accent-green); }
+
+  @media (max-width:900px) {
+    .kpi-row { grid-template-columns:repeat(3,1fr); }
+    .charts-row { grid-template-columns:1fr; }
+    .chart-card.full { grid-column:1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Vendas — Maio 2026</h1>
+  <span class="sub" id="header-sub">Meta: 11.600 · Dias 1 → 24</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-view="total" onclick="setView('total')">Total Geral</div>
+  <div class="tab" data-view="fabio" onclick="setView('fabio')">Fábio</div>
+  <div class="tab" data-view="josy" onclick="setView('josy')">Josy</div>
+  <div class="tab" data-view="admin" onclick="setView('admin')">Administrativo</div>
+  <div class="tab" data-view="actionline" onclick="setView('actionline')">Actionline</div>
+  <div class="tabs-separator"></div>
+  <div class="tab" data-product="pf" onclick="toggleProduct('pf')">PF</div>
+  <div class="tab" data-product="pme" onclick="toggleProduct('pme')">PME</div>
+  <div class="tab" data-product="ades" onclick="toggleProduct('ades')">Adesão</div>
+</div>
+
+<div class="period-bar">
+  <span class="period-label">Período</span>
+  <span style="font-size:12px;color:var(--muted)">De</span>
+  <input type="range" id="range-start" min="1" max="31" value="1" oninput="onRangeChange()">
+  <span style="font-size:12px;color:var(--muted)">Até</span>
+  <input type="range" id="range-end" min="1" max="31" value="24" oninput="onRangeChange()">
+  <span class="period-display" id="period-display">Dias 1 → 24</span>
+  <div class="period-presets">
+    <div class="preset-btn" onclick="setPreset(1,7)">Sem 1</div>
+    <div class="preset-btn" onclick="setPreset(8,14)">Sem 2</div>
+    <div class="preset-btn" onclick="setPreset(15,21)">Sem 3</div>
+    <div class="preset-btn" onclick="setPreset(22,31)">Sem 4</div>
+    <div class="preset-btn active" onclick="setPreset(1,24)">Realizado</div>
+    <div class="preset-btn" onclick="setPreset(1,31)">Mês todo</div>
+  </div>
+</div>
+
+<div id="kpi-container"></div>
+
+<div class="charts-row">
+  <div class="chart-card full">
+    <div class="chart-title">Volume de vendas acumulado por dia</div>
+    <div class="chart-sub">Realizado vs meta proporcional diária</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-line" style="background:var(--accent-blue)"></div> Realizado</div>
+      <div class="legend-item"><div class="legend-line" style="background:var(--accent-green);opacity:0.7"></div> Meta proporcional</div>
+    </div>
+    <div class="chart-wrap" style="height:200px">
+      <canvas id="chartAcum"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="charts-row">
+  <div class="chart-card">
+    <div class="chart-title">Participação % diária por produto</div>
+    <div class="chart-sub">Peso de cada tipo no total do dia</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--pf)"></div> PF</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--pme)"></div> PME</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--adesao)"></div> Adesão</div>
+    </div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="chartStack"></canvas>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Vendas por tipo — diário</div>
+    <div class="chart-sub">Vendas de cada tipo em cada dia do período</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--pf)"></div> PF</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--pme)"></div> PME</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--adesao)"></div> Adesão</div>
+    </div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="chartLine"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="table-card">
+  <table>
+    <thead id="table-head"></thead>
+    <tbody id="table-body"></tbody>
+  </table>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const ALL_DAYS = Array.from({length:31},(_,i)=>i+1);
+
+const raw = {
+  fabio: {
+    pf:   [6,9,2,123,115,94,130,84,14,4,137,138,113,94,105,12,6,116,99,91,115,85,15,9,0,0,0,0,0,0,0],
+    pme:  [101,34,40,75,124,103,122,86,102,97,88,131,112,89,96,67,73,97,183,129,96,51,117,68,0,0,0,0,0,0,0],
+    ades: [372,0,0,0,0,0,0,0,0,13,0,0,0,0,1,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  josy: {
+    pf:   [18,17,9,166,177,169,154,150,22,14,205,142,177,148,136,29,11,192,176,144,164,121,20,6,0,0,0,0,0,0,0],
+    pme:  [3,14,4,7,7,25,38,2,13,12,8,26,35,9,7,6,2,20,28,10,4,0,13,3,0,0,0,0,0,0,0],
+    ades: [0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,26,0,0,0,0,0,0,0,0,0,0]
+  },
+  admin: {
+    pf:   [6,10,19,27,28,36,24,23,3,4,14,18,19,32,32,8,6,25,12,37,20,29,15,5,0,0,0,0,0,0,0],
+    pme:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ades: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  actionline: {
+    pf:   [0,0,0,3,1,1,1,3,0,0,3,1,4,0,2,0,0,3,0,2,0,3,0,0,0,0,0,0,0,0,0],
+    pme:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    ades: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  }
+};
+
+function sumArr(a,b){ return a.map((v,i)=>v+(b[i]||0)); }
+const total = {
+  pf:   sumArr(sumArr(sumArr(raw.fabio.pf,raw.josy.pf),raw.admin.pf),raw.actionline.pf),
+  pme:  sumArr(sumArr(raw.fabio.pme, raw.josy.pme), raw.admin.pme),
+  ades: sumArr(raw.fabio.ades, raw.josy.ades)
+};
+
+const views = {
+  total:      { label:'Total Geral',    meta:11600, data:total,           abril:8037 },
+  fabio:      { label:'Fábio',          meta:6000,  data:raw.fabio,       abril:4794 },
+  josy:       { label:'Josy',           meta:4700,  data:raw.josy,        abril:3612 },
+  admin:      { label:'Administrativo', meta:700,   data:raw.admin,       abril:548  },
+  actionline: { label:'Actionline',     meta:200,   data:raw.actionline,  abril:42   }
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentView    = 'josy';
+let activeProducts = new Set(['pf','pme','ades']);
+let periodStart    = 1;
+let periodEnd      = 24;
+let chartAcum, chartStack, chartLine;
+
+Chart.defaults.color = '#6b7591';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 11;
+
+// ── DIAS UTEIS MAIO 2026 ──────────────────────────────────────────────────────
+// Fds: 2,3,9,10,16,17,23,24,30,31 | Feriado: 1 (Dia do Trabalho)
+const WEEKENDS_MAY = new Set([2,3,9,10,16,17,23,24,30,31]);
+const HOLIDAYS_MAY = new Set([1]);
+function isBusinessDay(day) { return !WEEKENDS_MAY.has(day) && !HOLIDAYS_MAY.has(day); }
+const ALL_BUSINESS_DAYS = ALL_DAYS.filter(isBusinessDay);
+
+// ── BUILD DATA ────────────────────────────────────────────────────────────────
+function buildData(viewKey) {
+  const v    = views[viewKey];
+  const d    = v.data;
+  const DAYS = ALL_DAYS.filter(x => x >= periodStart && x <= periodEnd);
+  const si   = periodStart - 1;
+
+  const pfS   = activeProducts.has('pf')   ? d.pf.slice(si, periodEnd)   : DAYS.map(()=>0);
+  const pmeS  = activeProducts.has('pme')  ? d.pme.slice(si, periodEnd)  : DAYS.map(()=>0);
+  const adesS = activeProducts.has('ades') ? d.ades.slice(si, periodEnd) : DAYS.map(()=>0);
+
+  const daily = DAYS.map((_,i) => (pfS[i]||0)+(pmeS[i]||0)+(adesS[i]||0));
+  const acum  = daily.reduce((a,v,i) => { a.push((a[i-1]||0)+v); return a; }, []);
+  const metaProp = DAYS.map(d_i => Math.round(v.meta * d_i / 31));
+
+  const totalReal = acum[acum.length-1] || 0;
+  const numDays   = DAYS.length;
+
+  // Dias uteis dentro do periodo selecionado
+  const bizInPeriod   = DAYS.filter(isBusinessDay).length;
+  // Media por dia util no periodo
+  const mediaBiz      = bizInPeriod > 0 ? totalReal / bizInPeriod : 0;
+  // Dias uteis restantes apos o fim do periodo
+  const bizRemaining  = ALL_BUSINESS_DAYS.filter(x => x > periodEnd).length;
+  // Projecao = realizado + (media/dia util * dias uteis restantes)
+  const projMes       = Math.round(totalReal + mediaBiz * bizRemaining);
+  const pctMeta       = totalReal / v.meta;
+  const varAbril      = v.abril > 0 ? (totalReal - v.abril) / v.abril : 0;
+
+  return { d:{pf:pfS,pme:pmeS,ades:adesS}, daily, acum, metaProp,
+           totalReal, pctMeta,
+           mediaDay: Math.round(mediaBiz),
+           projMes, varAbril, meta:v.meta, DAYS, numDays,
+           bizInPeriod, bizRemaining };
+}
+
+// ── TOOLTIP CONFIG (shared) ───────────────────────────────────────────────────
+const TOOLTIP = { backgroundColor:'#fff', borderColor:'rgba(0,0,0,0.12)', borderWidth:1, titleColor:'#111827', bodyColor:'#6b7591' };
+
+// ── RENDER KPI ────────────────────────────────────────────────────────────────
+function renderKPI(data, viewKey) {
+  const pctStr  = (data.pctMeta*100).toFixed(0)+'%';
+  const refProp = data.DAYS.length > 0 ? (data.metaProp[data.DAYS.length-1]/data.meta*100).toFixed(0)+'%' : '—';
+  const varStr  = (data.varAbril>=0?'+':'')+(data.varAbril*100).toFixed(0)+'%';
+  const vc      = data.varAbril>=0?'good':'warn';
+
+  document.getElementById('kpi-container').innerHTML = `
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Vendas realizadas</div>
+      <div class="kpi-value">${data.totalReal.toLocaleString('pt-BR')}</div>
+      <div class="kpi-meta">Meta: ${data.meta.toLocaleString('pt-BR')}</div>
+    </div>
+    <div class="kpi warn">
+      <div class="kpi-label">% da meta</div>
+      <div class="kpi-value warn">${pctStr}</div>
+      <div class="kpi-meta">Ref. proporcional: ~${refProp}</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Média/dia útil</div>
+      <div class="kpi-value">${data.mediaDay}</div>
+      <div class="kpi-meta">${data.bizInPeriod} d.u. no período</div>
+    </div>
+    <div class="kpi neutral">
+      <div class="kpi-label">Projeção mês</div>
+      <div class="kpi-value">${data.projMes.toLocaleString('pt-BR')}</div>
+      <div class="kpi-meta">+${data.bizRemaining} d.u. restantes · ${(data.projMes/data.meta*100).toFixed(0)}% meta</div>
+    </div>
+    <div class="kpi good">
+      <div class="kpi-label">Var. vs abril</div>
+      <div class="kpi-value ${vc}">${varStr}</div>
+      <div class="kpi-meta">Abril: ${views[viewKey].abril.toLocaleString('pt-BR')}</div>
+    </div>
+  </div>`;
+}
+
+// ── RENDER CHARTS ─────────────────────────────────────────────────────────────
+function renderChartAcum(data) {
+  if (chartAcum) { chartAcum.data.labels = data.DAYS; chartAcum.data.datasets[0].data = data.acum; chartAcum.data.datasets[1].data = data.metaProp; chartAcum.update('none'); return; }
+  const ctx  = document.getElementById('chartAcum').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,'rgba(37,99,235,0.15)'); grad.addColorStop(1,'rgba(37,99,235,0)');
+  chartAcum = new Chart(ctx, {
+    type:'line',
+    data:{ labels:data.DAYS, datasets:[
+      { label:'Realizado', data:data.acum, borderColor:'#2563eb', borderWidth:2.5, fill:true, backgroundColor:grad, tension:0.3, pointRadius:4, pointBackgroundColor:'#2563eb', pointBorderColor:'#fff', pointBorderWidth:2, pointHoverRadius:6 },
+      { label:'Meta proporcional', data:data.metaProp, borderColor:'rgba(22,163,74,0.6)', borderWidth:1.5, borderDash:[6,4], fill:false, tension:0.3, pointRadius:0 }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{display:false}, tooltip:{...TOOLTIP, padding:10, callbacks:{ label:c=>` ${c.dataset.label}: ${c.parsed.y.toLocaleString('pt-BR')}` }} },
+      scales:{
+        x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#6b7591'} },
+        y:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#6b7591', callback:v=>v.toLocaleString('pt-BR')}, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderChartStack(data) {
+  const pfP   = data.DAYS.map((_,i)=>{ const t=(data.d.pf[i]||0)+(data.d.pme[i]||0)+(data.d.ades[i]||0); return t?Math.round((data.d.pf[i]||0)/t*100):0; });
+  const pmeP  = data.DAYS.map((_,i)=>{ const t=(data.d.pf[i]||0)+(data.d.pme[i]||0)+(data.d.ades[i]||0); return t?Math.round((data.d.pme[i]||0)/t*100):0; });
+  const adesP = data.DAYS.map((_,i)=>{ const t=(data.d.pf[i]||0)+(data.d.pme[i]||0)+(data.d.ades[i]||0); return t?Math.round((data.d.ades[i]||0)/t*100):0; });
+  if (chartStack) { chartStack.data.labels=data.DAYS; chartStack.data.datasets[0].data=pfP; chartStack.data.datasets[1].data=pmeP; chartStack.data.datasets[2].data=adesP; chartStack.update('none'); return; }
+  const ctx = document.getElementById('chartStack').getContext('2d');
+  chartStack = new Chart(ctx, {
+    type:'bar',
+    data:{ labels:data.DAYS, datasets:[
+      { label:'PF', data:pfP, backgroundColor:'#2563eb', stack:'s' },
+      { label:'PME', data:pmeP, backgroundColor:'#16a34a', stack:'s' },
+      { label:'Adesão', data:adesP, backgroundColor:'#dc2626', stack:'s' }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{...TOOLTIP, callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}%`}} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:'#6b7591'}, stacked:true },
+        y:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#6b7591', callback:v=>v+'%'}, stacked:true, max:100 }
+      }
+    }
+  });
+}
+
+function renderChartLine(data) {
+  if (chartLine) { chartLine.data.labels=data.DAYS; chartLine.data.datasets[0].data=data.d.pf; chartLine.data.datasets[1].data=data.d.pme; chartLine.data.datasets[2].data=data.d.ades; chartLine.update('none'); return; }
+  const ctx = document.getElementById('chartLine').getContext('2d');
+  chartLine = new Chart(ctx, {
+    type:'line',
+    data:{ labels:data.DAYS, datasets:[
+      { label:'PF', data:data.d.pf, borderColor:'#2563eb', borderWidth:2, fill:true, backgroundColor:'rgba(37,99,235,0.08)', tension:0.4, pointRadius:3, pointBackgroundColor:'#2563eb', pointBorderColor:'#fff', pointBorderWidth:1.5 },
+      { label:'PME', data:data.d.pme, borderColor:'#16a34a', borderWidth:2, fill:true, backgroundColor:'rgba(22,163,74,0.07)', tension:0.4, pointRadius:3, pointBackgroundColor:'#16a34a', pointBorderColor:'#fff', pointBorderWidth:1.5 },
+      { label:'Adesão', data:data.d.ades, borderColor:'#dc2626', borderWidth:2, fill:true, backgroundColor:'rgba(220,38,38,0.06)', tension:0.4, pointRadius:3, pointBackgroundColor:'#dc2626', pointBorderColor:'#fff', pointBorderWidth:1.5 }
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{ legend:{display:false}, tooltip:{...TOOLTIP, callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y}`}} },
+      scales:{
+        x:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#6b7591'} },
+        y:{ grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#6b7591'}, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderTable(data) {
+  const d = data.d;
+  document.getElementById('table-head').innerHTML = `<tr><th>Tipo</th>${data.DAYS.map(x=>`<th>${x}</th>`).join('')}<th>Total</th></tr>`;
+  const rows = [
+    { label:'PF',     values:d.pf,   color:'#2563eb' },
+    { label:'PME',    values:d.pme,  color:'#16a34a' },
+    { label:'Adesão', values:d.ades, color:'#dc2626' },
+    { label:'Total',  values:data.DAYS.map((_,i)=>(d.pf[i]||0)+(d.pme[i]||0)+(d.ades[i]||0)), color:null, total:true }
+  ];
+  document.getElementById('table-body').innerHTML = rows.map(r => {
+    const tot = r.values.reduce((s,v)=>s+(v||0),0);
+    return `<tr${r.total?' class="total-row"':''}>
+      <td style="${r.color?`color:${r.color};font-weight:600`:'font-weight:600'}">${r.label}</td>
+      ${r.values.map(v=>`<td class="${!v?'zero':v>=100?'high':''}">${v||'—'}</td>`).join('')}
+      <td style="font-weight:700">${tot.toLocaleString('pt-BR')}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────────────────────
+function refreshAll() {
+  const data = buildData(currentView);
+  renderKPI(data, currentView);
+  renderChartAcum(data);
+  renderChartStack(data);
+  renderChartLine(data);
+  renderTable(data);
+  document.getElementById('header-sub').textContent =
+    `Meta: ${views[currentView].meta.toLocaleString('pt-BR')} · Dias ${periodStart} → ${periodEnd}`;
+}
+
+function setView(key) {
+  currentView = key;
+  document.querySelectorAll('.tab[data-view]').forEach(t => t.classList.toggle('active', t.dataset.view === key));
+  refreshAll();
+}
+
+function toggleProduct(prod) {
+  if (activeProducts.has(prod) && activeProducts.size <= 1) return;
+  activeProducts.has(prod) ? activeProducts.delete(prod) : activeProducts.add(prod);
+  updateProductTabs();
+  refreshAll();
+}
+
+function updateProductTabs() {
+  const cfg = {
+    pf:   ['#2563eb','rgba(37,99,235,0.45)','#e8eefb'],
+    pme:  ['#16a34a','rgba(22,163,74,0.45)','#e8f5ec'],
+    ades: ['#dc2626','rgba(220,38,38,0.45)','#fbeaea']
+  };
+  document.querySelectorAll('.tab[data-product]').forEach(t => {
+    const [c, bc, bg] = cfg[t.dataset.product];
+    const on = activeProducts.has(t.dataset.product);
+    t.style.background  = on ? c : bg;
+    t.style.borderColor = on ? c : bc;
+    t.style.color       = on ? '#fff' : c;
+    t.style.fontWeight  = on ? '600' : '500';
+  });
+}
+
+function onRangeChange() {
+  let s = parseInt(document.getElementById('range-start').value);
+  let e = parseInt(document.getElementById('range-end').value);
+  if (s > e) { e = s; document.getElementById('range-end').value = e; }
+  periodStart = s; periodEnd = e;
+  document.getElementById('period-display').textContent = `Dias ${s} → ${e}`;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  refreshAll();
+}
+
+function setPreset(s, e) {
+  periodStart = s; periodEnd = e;
+  document.getElementById('range-start').value = s;
+  document.getElementById('range-end').value   = e;
+  document.getElementById('period-display').textContent = `Dias ${s} → ${e}`;
+  document.querySelectorAll('.preset-btn').forEach(b => {
+    const m = (s===1&&e===7&&b.textContent==='Sem 1')||(s===8&&e===14&&b.textContent==='Sem 2')||
+              (s===15&&e===21&&b.textContent==='Sem 3')||(s===22&&e===31&&b.textContent==='Sem 4')||
+              (s===1&&e===24&&b.textContent==='Realizado')||(s===1&&e===31&&b.textContent==='Mês todo');
+    b.classList.toggle('active', m);
+  });
+  refreshAll();
+}
+
+// Init
+updateProductTabs();
+setView('josy');
+</script>
+</body>
+</html>
