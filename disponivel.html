@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Dashboard de Leads</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#07090f;--s2:#111827;--s3:#1c2333;--bd:#1c2a3e;--tx:#d8e2f0;--mu:#4e6080;--a1:#22d3ee;--a2:#a78bfa;--gold:#f59e0b;--green:#10b981}
 body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
@@ -13,28 +14,52 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
 @keyframes spin{to{transform:rotate(360deg)}}
 #load-msg{font-size:.85rem;color:var(--mu)}
 #load-err{font-size:.82rem;color:#f87171;max-width:460px;text-align:center;display:none;padding:16px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;line-height:1.6;white-space:pre-wrap}
-.hdr{padding:12px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0c1120}
-.hdr-title{font-weight:800;font-size:1.1rem;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hdr-kpis{display:flex;gap:20px;align-items:center}
-.kv{font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--a1)}
-.kl{font-size:.6rem;color:var(--mu);text-transform:uppercase;text-align:right}
-.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.reload-btn{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;color:var(--mu);font-size:.72rem;cursor:pointer}
+
+/* HEADER */
+.hdr{padding:10px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0c1120;gap:16px;flex-wrap:wrap}
+.hdr-title{font-weight:800;font-size:1.1rem;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.hdr-kpis{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.kv{font-family:monospace;font-size:1.05rem;font-weight:700;color:var(--a1)}
+.kl{font-size:.58rem;color:var(--mu);text-transform:uppercase;text-align:right}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.reload-btn{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:5px 12px;color:var(--mu);font-size:.72rem;cursor:pointer;white-space:nowrap}
 .reload-btn:hover{color:var(--a1);border-color:var(--a1)}
-.last-upd{font-size:.6rem;color:var(--mu)}
+.last-upd{font-size:.58rem;color:var(--mu);white-space:nowrap}
+
+/* DATE FILTER BAR */
+.dfilter{padding:8px 24px;border-bottom:1px solid var(--bd);display:flex;gap:6px;align-items:center;flex-shrink:0;background:#0a0f1c;flex-wrap:wrap}
+.dfilter-label{font-size:.65rem;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
+.dfbtn{background:transparent;border:1px solid var(--bd);border-radius:7px;padding:5px 12px;color:var(--mu);font-size:.72rem;cursor:pointer;white-space:nowrap;transition:all .15s}
+.dfbtn:hover{color:var(--tx);border-color:var(--a2)}
+.dfbtn.on{background:rgba(34,211,238,.1);color:var(--a1);border-color:var(--a1)}
+.dfsep{width:1px;height:18px;background:var(--bd);flex-shrink:0}
+.date-range{display:none;align-items:center;gap:6px}
+.date-range.on{display:flex}
+.date-inp{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:4px 8px;color:var(--tx);font-size:.72rem;outline:none;cursor:pointer}
+.date-inp:focus{border-color:var(--a1)}
+.date-range span{font-size:.7rem;color:var(--mu)}
+.dfrange-apply{background:var(--a1);border:none;border-radius:7px;padding:5px 12px;color:#000;font-size:.72rem;font-weight:700;cursor:pointer}
+.dfrange-apply:hover{opacity:.85}
+.dflabel-active{font-size:.65rem;color:var(--a1);white-space:nowrap;font-weight:600}
+
+/* TABS */
 .tabs{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--bd);flex-shrink:0;background:#0c1120}
-.tab{padding:10px 20px;font-size:.8rem;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;letter-spacing:.05em;background:none;border-top:none;border-left:none;border-right:none}
+.tab{padding:9px 18px;font-size:.78rem;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;letter-spacing:.05em;background:none;border-top:none;border-left:none;border-right:none}
 .tab:hover{color:var(--tx)}
 .tab.on{color:var(--a1);border-bottom-color:var(--a1)}
 .sheet{display:none;flex:1;flex-direction:column;overflow:hidden}
 .sheet.on{display:flex}
-.bar{padding:10px 24px;border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center;flex-shrink:0;background:#0c1120}
-.bar input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:7px 12px;color:var(--tx);font-size:.82rem;outline:none}
+
+/* TOOLBAR */
+.bar{padding:9px 24px;border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center;flex-shrink:0;background:#0c1120}
+.bar input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;color:var(--tx);font-size:.8rem;outline:none}
 .bar input:focus{border-color:var(--a1)}
 .bar input::placeholder{color:var(--mu)}
-.btn{background:transparent;border:1px solid var(--bd);border-radius:8px;padding:7px 14px;color:var(--mu);font-size:.75rem;cursor:pointer}
+.btn{background:transparent;border:1px solid var(--bd);border-radius:8px;padding:6px 12px;color:var(--mu);font-size:.73rem;cursor:pointer}
 .btn.on{background:var(--s3);color:var(--a1);border-color:var(--a1)}
-.cnt{font-size:.7rem;color:var(--mu);white-space:nowrap}
+.cnt{font-size:.68rem;color:var(--mu);white-space:nowrap}
+
+/* LIST + PANEL */
 .wrap{display:flex;flex:1;overflow:hidden}
 .lst{width:340px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--bd)}
 .row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(28,42,62,.5);cursor:pointer;border-left:3px solid transparent}
@@ -77,7 +102,9 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
 .dx.zero{color:var(--mu)}
 .no-data{font-size:.8rem;color:var(--mu);padding:12px;background:var(--s2);border-radius:8px;border:1px solid var(--bd)}
 ::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}</style>
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5)}
+</style>
 </head>
 <body>
 
@@ -100,17 +127,33 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
   </div>
 </div>
 
+<!-- DATE FILTER BAR -->
+<div class="dfilter">
+  <span class="dfilter-label">Periodo:</span>
+  <button class="dfbtn on" id="df-all"   onclick="setFilter('all')">Acumulado</button>
+  <button class="dfbtn"    id="df-week"  onclick="setFilter('week')">Esta semana</button>
+  <button class="dfbtn"    id="df-2d"    onclick="setFilter('2d')">Ultimos 2 dias</button>
+  <button class="dfbtn"    id="df-range" onclick="setFilter('range')">Periodo</button>
+  <div class="dfsep"></div>
+  <div class="date-range" id="range-inputs">
+    <input type="date" id="dt-from" class="date-inp" onchange="applyRange()">
+    <span>ate</span>
+    <input type="date" id="dt-to"   class="date-inp" onchange="applyRange()">
+  </div>
+  <span class="dflabel-active" id="df-active-label"></span>
+</div>
+
 <div class="tabs">
   <button id="tab-agents" class="tab on" onclick="switchTab('agents')">&#128100; Agentes</button>
-  <button id="tab-queues" class="tab" onclick="switchTab('queues')">&#128203; Filas</button>
+  <button id="tab-queues" class="tab"    onclick="switchTab('queues')">&#128203; Filas</button>
 </div>
 
 <div id="sheet-agents" class="sheet on">
   <div class="bar">
     <input id="aq" placeholder="Buscar agente..." oninput="aFilter()">
     <button id="abv" class="btn on" onclick="aSort('v')">Volume</button>
-    <button id="aba" class="btn" onclick="aSort('a')">A-Z</button>
-    <button id="abc" class="btn" onclick="aSort('c')">Conversao</button>
+    <button id="aba" class="btn"    onclick="aSort('a')">A-Z</button>
+    <button id="abc" class="btn"    onclick="aSort('c')">Conversao</button>
     <span id="acnt" class="cnt"></span>
   </div>
   <div class="wrap">
@@ -123,8 +166,8 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
   <div class="bar">
     <input id="qq" placeholder="Buscar fila..." oninput="qFilter()">
     <button id="qbv" class="btn on" onclick="qSort('v')">Volume</button>
-    <button id="qba" class="btn" onclick="qSort('a')">A-Z</button>
-    <button id="qbc" class="btn" onclick="qSort('c')">Conversao</button>
+    <button id="qba" class="btn"    onclick="qSort('a')">A-Z</button>
+    <button id="qbc" class="btn"    onclick="qSort('c')">Conversao</button>
     <span id="qcnt" class="cnt"></span>
   </div>
   <div class="wrap">
@@ -135,15 +178,113 @@ body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;heigh
 
 <script>
 var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnlwiAP5sVy5NpzqrHObGJcqL6BsyzNoWNM8CC-iBD74TkHRDYVzFHOm14WEBv8mwXmn0N2lgX87pH/pub?gid=948821657&single=true&output=csv";
+
+// ALL_ROWS = raw parsed rows (excluding header), used for date filtering
+var ALL_ROWS = [];
+var HEADERS  = [];
+
 var AGENTS=[], QUEUES=[];
 var A_TOTAL=0, Q_TOTAL=0, A_MAX=1, Q_MAX=1;
 var COLORS=['#22d3ee','#a78bfa','#34d399','#fb923c','#f472b6','#60a5fa','#fbbf24','#4ade80','#e879f9','#2dd4bf','#facc15','#f87171'];
 var state={sheet:'agents',a:{sm:'v',cur:null,vis:[]},q:{sm:'v',cur:null,vis:[]}};
 
+// - date filter state -
+var filterMode = 'all';  // 'all' | 'week' | '2d' | 'range'
+var filterFrom = null;   // Date object
+var filterTo   = null;   // Date object
+
+// - helpers -
 function h(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// Parse "DD/MM/YYYY HH:mm" or "DD/MM/YYYY" -> "YYYY-MM-DD" string
+function parseDate(str){
+  if(!str) return null;
+  str = str.trim();
+  // try DD/MM/YYYY
+  var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if(m) return m[3]+'-'+pad(m[2])+'-'+pad(m[1]);
+  // try YYYY-MM-DD
+  m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return m[1]+'-'+m[2]+'-'+m[3];
+  return null;
+}
+
+function pad(n){ return String(n).length===1?'0'+n:String(n); }
+
+// today as YYYY-MM-DD
+function todayStr(){
+  var d=new Date();
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+
+function mondayStr(){
+  var d=new Date();
+  var day=d.getDay()||7; // 1=mon .. 7=sun
+  d.setDate(d.getDate()-(day-1));
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+
+function daysAgoStr(n){
+  var d=new Date();
+  d.setDate(d.getDate()-n);
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+}
+
+// - date filter UI -
+function setFilter(mode){
+  filterMode = mode;
+  ['all','week','2d','range'].forEach(function(m){
+    document.getElementById('df-'+m).className = 'dfbtn'+(mode===m?' on':'');
+  });
+  document.getElementById('range-inputs').className = 'date-range'+(mode==='range'?' on':'');
+
+  if(mode==='range'){
+    // set defaults if empty
+    if(!document.getElementById('dt-from').value) document.getElementById('dt-from').value = daysAgoStr(6);
+    if(!document.getElementById('dt-to').value)   document.getElementById('dt-to').value   = todayStr();
+    filterFrom = document.getElementById('dt-from').value;
+    filterTo   = document.getElementById('dt-to').value;
+  } else {
+    filterFrom = null; filterTo = null;
+  }
+
+  updateActiveLabel();
+  rebuildFromRows();
+}
+
+function applyRange(){
+  filterFrom = document.getElementById('dt-from').value;
+  filterTo   = document.getElementById('dt-to').value;
+  updateActiveLabel();
+  rebuildFromRows();
+}
+
+function updateActiveLabel(){
+  var lbl = '';
+  if(filterMode==='all')   lbl = 'Todos os dados';
+  else if(filterMode==='week') lbl = 'Seg '+mondayStr().slice(5).replace('-','/')+' - hoje';
+  else if(filterMode==='2d')   lbl = daysAgoStr(1).slice(5).replace('-','/')+' - '+todayStr().slice(5).replace('-','/');
+  else if(filterMode==='range' && filterFrom && filterTo) lbl = filterFrom.slice(5).replace('-','/')+'/'+filterFrom.slice(0,4)+' - '+filterTo.slice(5).replace('-','/')+'/'+filterTo.slice(0,4);
+  document.getElementById('df-active-label').textContent = lbl;
+}
+
+// - check if a row passes the date filter -
+function rowPassesFilter(dateStr){
+  if(filterMode==='all') return true;
+  if(!dateStr) return filterMode==='all';
+
+  var from, to;
+  if(filterMode==='week'){ from=mondayStr(); to=todayStr(); }
+  else if(filterMode==='2d'){ from=daysAgoStr(1); to=todayStr(); }
+  else if(filterMode==='range'){ from=filterFrom||''; to=filterTo||''; }
+  else return true;
+
+  return dateStr >= from && dateStr <= to;
+}
+
+// - data loading -
 function loadData(){
   showLoading("Buscando dados do Google Sheets...");
   fetch(CSV_URL)
@@ -154,54 +295,59 @@ function loadData(){
     .then(function(csv){
       showLoading("Processando dados...");
       setTimeout(function(){
-        try{ processCSV(csv); hideLoading(); document.getElementById('last-upd').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR'); }
-        catch(e){ showError("Erro ao processar:\n"+e.message); }
+        try{
+          var rows = parseCSV(csv);
+          if(rows.length<2) throw new Error("Planilha vazia");
+          HEADERS = rows[0].map(function(h){return h.trim().replace(/^"|"$/g,'');});
+          ALL_ROWS = rows.slice(1);
+          rebuildFromRows();
+          hideLoading();
+          document.getElementById('last-upd').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR');
+        }catch(e){ showError("Erro ao processar:\n"+e.message); }
       },50);
     })
     .catch(function(e){
-      showError("Nao foi possivel acessar a planilha.\n\n"+e.message+"\n\nVerifique se a planilha esta publicada em:\nArquivo > Compartilhar > Publicar na web > CSV");
+      showError("Nao foi possivel acessar a planilha.\n\n"+e.message);
     });
 }
 
-function parseCSV(text){
-  var rows=[], lines=text.split('\n');
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].replace(/\r$/,'');
-    if(!line.trim()) continue;
-    var cols=[],cur='',inQ=false;
-    for(var j=0;j<line.length;j++){
-      var c=line[j];
-      if(c==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
-      else if(c===','&&!inQ){cols.push(cur);cur='';}
-      else cur+=c;
+// - rebuild AGENTS + QUEUES from ALL_ROWS applying current filter -
+function rebuildFromRows(){
+  var iAgent   = HEADERS.indexOf('Currently Assigned to');
+  var iQueue   = HEADERS.indexOf('Session Team');
+  var iTag     = HEADERS.indexOf('Tag de encerramento');
+  var iSession = HEADERS.indexOf('Session ID');
+  // Try both possible column names for the date
+  var iDate    = HEADERS.indexOf('Time of Chat Assignment');
+  if(iDate===-1) iDate = HEADERS.indexOf('Chat Start In');
+  if(iDate===-1) iDate = HEADERS.indexOf('Chat Start Time');
+  // fallback: try to find any column with "Chat Start" or "Time of"
+  if(iDate===-1){
+    for(var hi=0;hi<HEADERS.length;hi++){
+      if(HEADERS[hi].indexOf('Chat Start')===0||HEADERS[hi].indexOf('Time of Chat')===0){iDate=hi;break;}
     }
-    cols.push(cur);
-    rows.push(cols);
   }
-  return rows;
-}
 
-function processCSV(csv){
-  var rows=parseCSV(csv);
-  if(rows.length<2) throw new Error("Planilha vazia ou sem dados");
-  var headers=rows[0].map(function(h){return h.trim().replace(/^"|"$/g,'');});
-
-  var iAgent=headers.indexOf('Currently Assigned to');
-  var iQueue=headers.indexOf('Session Team');
-  var iTag=headers.indexOf('Tag de encerramento');
-
-  if(iAgent===-1) throw new Error("Coluna 'Currently Assigned to' nao encontrada.\nCabecalhos encontrados: "+headers.slice(0,8).join(', '));
+  if(iAgent===-1) throw new Error("Coluna 'Currently Assigned to' nao encontrada. Cabecalhos: "+HEADERS.slice(0,8).join(', '));
   if(iQueue===-1) throw new Error("Coluna 'Session Team' nao encontrada.");
 
   var agQ={},agT={},agX={},qAg={},qAgX={},qT={},qX={};
 
-  for(var i=1;i<rows.length;i++){
-    var row=rows[i];
+  for(var i=0;i<ALL_ROWS.length;i++){
+    var row = ALL_ROWS[i];
     if(row.length<2) continue;
-    var agent=(row[iAgent]||'').trim();
-    var queue=(row[iQueue]||'').trim()||'DEFAULT';
-    var tag=iTag>=0?(row[iTag]||'').trim():'';
-    var isT10=tag.indexOf('10')===0;
+    if(iSession>=0 && !(row[iSession]||'').trim()) continue;
+
+    // date filter
+    if(iDate>=0){
+      var dstr = parseDate((row[iDate]||'').trim());
+      if(!rowPassesFilter(dstr)) continue;
+    }
+
+    var agent = (row[iAgent]||'').trim();
+    var queue = (row[iQueue]||'').trim()||'DEFAULT';
+    var tag   = iTag>=0?(row[iTag]||'').trim():'';
+    var isT10 = tag.indexOf('10')===0;
 
     if(!qT[queue]){qT[queue]=0;qX[queue]=0;qAg[queue]={};qAgX[queue]={};}
     qT[queue]++;
@@ -237,15 +383,36 @@ function processCSV(csv){
   document.getElementById('kv-tag10').textContent=totalX.toLocaleString('pt-BR');
   document.getElementById('kv-conv').textContent=Q_TOTAL?(totalX/Q_TOTAL*100).toFixed(2)+'%':'--';
 
-  state.a.cur=null; state.a.vis=[];
-  state.q.cur=null; state.q.vis=[];
+  // reset selections
+  state.a.cur=null; state.q.cur=null;
   document.getElementById('a-pnl').innerHTML='<div class="ph"><div class="ph-ico">&#128100;</div><div>Selecione um agente para ver detalhes</div></div>';
   document.getElementById('q-pnl').innerHTML='<div class="ph"><div class="ph-ico">&#128203;</div><div>Selecione uma fila para ver os agentes</div></div>';
 
   aBuildVis(); aRender();
   qBuildVis(); qRender();
+  updateActiveLabel();
 }
 
+// - CSV parser -
+function parseCSV(text){
+  var rows=[],lines=text.split('\n');
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].replace(/\r$/,'');
+    if(!line.trim()) continue;
+    var cols=[],cur='',inQ=false;
+    for(var j=0;j<line.length;j++){
+      var c=line[j];
+      if(c==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
+      else if(c===','&&!inQ){cols.push(cur);cur='';}
+      else cur+=c;
+    }
+    cols.push(cur);
+    rows.push(cols);
+  }
+  return rows;
+}
+
+// - UI helpers -
 function showLoading(msg){
   document.getElementById('loading').classList.remove('hidden');
   document.getElementById('load-msg').textContent=msg||'Carregando...';
@@ -267,7 +434,7 @@ function switchTab(name){
   document.getElementById('sheet-queues').className='sheet'+(name==='queues'?' on':'');
 }
 
-/* AGENTS */
+/* - AGENTS - */
 function aBuildVis(){
   var q=document.getElementById('aq').value.toLowerCase();
   var s=state.a; s.vis=[];
@@ -334,7 +501,7 @@ function aSel(i){
     '<div class="dlist">'+rows+'</div>';
 }
 
-/* QUEUES */
+/* - QUEUES - */
 function qBuildVis(){
   var q=document.getElementById('qq').value.toLowerCase();
   var s=state.q; s.vis=[];
