@@ -134,7 +134,7 @@
 
 <div class="header">
   <h1>Vendas — Maio 2026</h1>
-  <span class="sub" id="header-sub">Meta: 11.600 · Dias 1 → 24</span>
+  <span class="sub" id="header-sub">Meta: 11.600 · Dias 1 → 28</span>
 </div>
 
 <div class="tabs">
@@ -154,14 +154,14 @@
   <span style="font-size:12px;color:var(--muted)">De</span>
   <input type="range" id="range-start" min="1" max="31" value="1" oninput="onRangeChange()">
   <span style="font-size:12px;color:var(--muted)">Até</span>
-  <input type="range" id="range-end" min="1" max="31" value="24" oninput="onRangeChange()">
-  <span class="period-display" id="period-display">Dias 1 → 24</span>
+  <input type="range" id="range-end" min="1" max="31" value="28" oninput="onRangeChange()">
+  <span class="period-display" id="period-display">Dias 1 → 28</span>
   <div class="period-presets">
     <div class="preset-btn" onclick="setPreset(1,7)">Sem 1</div>
     <div class="preset-btn" onclick="setPreset(8,14)">Sem 2</div>
     <div class="preset-btn" onclick="setPreset(15,21)">Sem 3</div>
     <div class="preset-btn" onclick="setPreset(22,31)">Sem 4</div>
-    <div class="preset-btn active" onclick="setPreset(1,24)">Realizado</div>
+    <div class="preset-btn active" onclick="setPreset(1,28)">Realizado</div>
     <div class="preset-btn" onclick="setPreset(1,31)">Mês todo</div>
   </div>
 </div>
@@ -223,22 +223,22 @@ const ALL_DAYS = Array.from({length:31},(_,i)=>i+1);
 
 const raw = {
   fabio: {
-    pf:   [6,9,2,123,115,94,130,84,14,4,137,138,113,94,105,12,6,116,99,91,115,85,15,9,0,0,0,0,0,0,0],
-    pme:  [101,34,40,75,124,103,122,86,102,97,88,131,112,89,96,67,73,97,183,129,96,51,117,68,0,0,0,0,0,0,0],
-    ades: [372,0,0,0,0,0,0,0,0,13,0,0,0,0,1,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0]
+    pf:   [6,9,2,122,115,94,129,83,14,4,137,138,113,94,104,12,6,116,98,90,114,84,15,17,138,107,87,1,0,0,0],
+    pme:  [102,34,40,75,124,103,122,86,102,97,88,131,114,86,96,67,73,97,183,132,110,64,125,68,81,93,108,57,65,85,56],
+    ades: [374,0,0,0,0,0,0,0,0,13,0,0,0,0,1,0,0,0,0,24,0,0,0,0,0,0,0,0,0,0,0]
   },
   josy: {
-    pf:   [18,17,9,166,177,169,154,150,22,14,205,142,177,148,136,29,11,192,176,144,164,121,20,6,0,0,0,0,0,0,0],
-    pme:  [3,14,4,7,7,25,38,2,13,12,8,26,35,9,7,6,2,20,28,10,4,0,13,3,0,0,0,0,0,0,0],
-    ades: [0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,0,26,0,0,0,0,0,0,0,0,0,0]
+    pf:   [17,17,9,165,177,169,154,150,22,14,205,142,177,148,136,29,11,192,176,143,161,124,24,13,186,162,66,0,0,0,0],
+    pme:  [3,14,4,7,7,25,39,2,13,12,8,26,35,9,7,6,2,20,28,10,4,22,16,18,19,28,19,9,0,16,3],
+    ades: [0,0,0,0,0,0,0,0,0,23,0,0,0,0,0,0,0,0,0,26,0,0,0,0,0,0,0,0,0,0,0]
   },
   admin: {
-    pf:   [6,10,19,27,28,36,24,23,3,4,14,18,19,32,32,8,6,25,12,37,20,29,15,5,0,0,0,0,0,0,0],
+    pf:   [6,10,19,27,28,36,24,23,3,4,14,18,19,32,32,8,6,25,12,36,18,26,15,7,12,11,11,1,0,0,0],
     pme:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ades: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   actionline: {
-    pf:   [0,0,0,3,1,1,1,3,0,0,3,1,4,0,2,0,0,3,0,2,0,3,0,0,0,0,0,0,0,0,0],
+    pf:   [0,0,0,3,1,1,1,3,0,0,3,1,4,0,2,0,0,3,0,2,0,3,0,0,1,1,2,0,0,0,0],
     pme:  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ades: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   }
@@ -263,7 +263,7 @@ const views = {
 let currentView    = 'josy';
 let activeProducts = new Set(['pf','pme','ades']);
 let periodStart    = 1;
-let periodEnd      = 24;
+let periodEnd      = 28;
 let chartAcum, chartStack, chartLine;
 
 Chart.defaults.color = '#6b7591';
@@ -501,7 +501,7 @@ function setPreset(s, e) {
   document.querySelectorAll('.preset-btn').forEach(b => {
     const m = (s===1&&e===7&&b.textContent==='Sem 1')||(s===8&&e===14&&b.textContent==='Sem 2')||
               (s===15&&e===21&&b.textContent==='Sem 3')||(s===22&&e===31&&b.textContent==='Sem 4')||
-              (s===1&&e===24&&b.textContent==='Realizado')||(s===1&&e===31&&b.textContent==='Mês todo');
+              (s===1&&e===28&&b.textContent==='Realizado')||(s===1&&e===31&&b.textContent==='Mês todo');
     b.classList.toggle('active', m);
   });
   refreshAll();
