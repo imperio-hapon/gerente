@@ -2,583 +2,1966 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Dashboard de Leads</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Central de Performance</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#07090f;--s2:#111827;--s3:#1c2333;--bd:#1c2a3e;--tx:#d8e2f0;--mu:#4e6080;--a1:#22d3ee;--a2:#a78bfa;--gold:#f59e0b;--green:#10b981}
-body{background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
-#loading.hidden{display:none}
-.spinner{width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--a1);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#load-msg{font-size:.85rem;color:var(--mu)}
-#load-err{font-size:.82rem;color:#f87171;max-width:460px;text-align:center;display:none;padding:16px;background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:10px;line-height:1.6;white-space:pre-wrap}
-
-/* HEADER */
-.hdr{padding:10px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0c1120;gap:16px;flex-wrap:wrap}
-.hdr-title{font-weight:800;font-size:1.1rem;background:linear-gradient(90deg,var(--a1),var(--a2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
-.hdr-kpis{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
-.kv{font-family:monospace;font-size:1.05rem;font-weight:700;color:var(--a1)}
-.kl{font-size:.58rem;color:var(--mu);text-transform:uppercase;text-align:right}
-.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
-.reload-btn{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:5px 12px;color:var(--mu);font-size:.72rem;cursor:pointer;white-space:nowrap}
-.reload-btn:hover{color:var(--a1);border-color:var(--a1)}
-.last-upd{font-size:.58rem;color:var(--mu);white-space:nowrap}
-
-/* DATE FILTER BAR */
-.dfilter{padding:8px 24px;border-bottom:1px solid var(--bd);display:flex;gap:6px;align-items:center;flex-shrink:0;background:#0a0f1c;flex-wrap:wrap}
-.dfilter-label{font-size:.65rem;color:var(--mu);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap}
-.dfbtn{background:transparent;border:1px solid var(--bd);border-radius:7px;padding:5px 12px;color:var(--mu);font-size:.72rem;cursor:pointer;white-space:nowrap;transition:all .15s}
-.dfbtn:hover{color:var(--tx);border-color:var(--a2)}
-.dfbtn.on{background:rgba(34,211,238,.1);color:var(--a1);border-color:var(--a1)}
-.dfsep{width:1px;height:18px;background:var(--bd);flex-shrink:0}
-.date-range{display:none;align-items:center;gap:6px}
-.date-range.on{display:flex}
-.date-inp{background:var(--s2);border:1px solid var(--bd);border-radius:7px;padding:4px 8px;color:var(--tx);font-size:.72rem;outline:none;cursor:pointer}
-.date-inp:focus{border-color:var(--a1)}
-.date-range span{font-size:.7rem;color:var(--mu)}
-.dfrange-apply{background:var(--a1);border:none;border-radius:7px;padding:5px 12px;color:#000;font-size:.72rem;font-weight:700;cursor:pointer}
-.dfrange-apply:hover{opacity:.85}
-.dflabel-active{font-size:.65rem;color:var(--a1);white-space:nowrap;font-weight:600}
-
-/* TABS */
-.tabs{display:flex;gap:4px;padding:0 24px;border-bottom:1px solid var(--bd);flex-shrink:0;background:#0c1120}
-.tab{padding:9px 18px;font-size:.78rem;font-weight:600;color:var(--mu);cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;letter-spacing:.05em;background:none;border-top:none;border-left:none;border-right:none}
-.tab:hover{color:var(--tx)}
-.tab.on{color:var(--a1);border-bottom-color:var(--a1)}
-.sheet{display:none;flex:1;flex-direction:column;overflow:hidden}
-.sheet.on{display:flex}
-
-/* TOOLBAR */
-.bar{padding:9px 24px;border-bottom:1px solid var(--bd);display:flex;gap:8px;align-items:center;flex-shrink:0;background:#0c1120}
-.bar input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:6px 12px;color:var(--tx);font-size:.8rem;outline:none}
-.bar input:focus{border-color:var(--a1)}
-.bar input::placeholder{color:var(--mu)}
-.btn{background:transparent;border:1px solid var(--bd);border-radius:8px;padding:6px 12px;color:var(--mu);font-size:.73rem;cursor:pointer}
-.btn.on{background:var(--s3);color:var(--a1);border-color:var(--a1)}
-.cnt{font-size:.68rem;color:var(--mu);white-space:nowrap}
-
-/* LIST + PANEL */
-.wrap{display:flex;flex:1;overflow:hidden}
-.lst{width:340px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--bd)}
-.row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(28,42,62,.5);cursor:pointer;border-left:3px solid transparent}
-.row:hover{background:var(--s2)}
-.row.sel{background:var(--s3);border-left-color:var(--a1)}
-.rk{font-size:.72rem;font-weight:700;color:var(--mu);width:20px;text-align:center;flex-shrink:0}
-.rk.g{color:var(--gold)}
-.info{flex:1;min-width:0}
-.nm{font-size:.76rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini{height:3px;background:var(--bd);border-radius:2px;margin-top:3px;overflow:hidden}
-.mini-f{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--a1),var(--a2))}
-.nums{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
-.tot{font-family:monospace;font-size:.88rem;font-weight:700;color:var(--a1)}
-.cv{font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:4px;white-space:nowrap}
-.cv.good{background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3)}
-.cv.zero{background:rgba(100,96,128,.1);color:var(--mu);border:1px solid var(--bd)}
-.pnl{flex:1;overflow-y:auto;padding:24px}
-.ph{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--mu);gap:12px;font-size:.88rem}
-.ph-ico{font-size:44px}
-.dtitle{font-size:1.5rem;font-weight:800;word-break:break-word}
-.akpis{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-.akpi{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;text-align:center}
-.akpi.hl{border-color:rgba(16,185,129,.4);background:rgba(16,185,129,.06)}
-.akv{font-family:monospace;font-size:1.1rem;font-weight:700;color:var(--a1);display:block;white-space:nowrap}
-.akv.g{color:var(--green)}
-.akl{font-size:.6rem;color:var(--mu);text-transform:uppercase}
-.sec{font-size:.68rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.1em;margin:18px 0 8px}
-.dlist{display:flex;flex-direction:column;gap:5px}
-.drow{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;display:flex;align-items:center;gap:8px}
-.di{font-size:.72rem;font-weight:700;color:var(--mu);width:18px;text-align:center;flex-shrink:0}
-.di.g{color:var(--gold)}
-.dn{flex:1;font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dbar{width:120px;display:flex;gap:6px;align-items:center;flex-shrink:0}
-.dbt{flex:1;height:5px;background:var(--bd);border-radius:3px;overflow:hidden}
-.dbf{height:100%;border-radius:3px}
-.dc{font-family:monospace;font-size:.86rem;font-weight:700;min-width:28px;text-align:right;flex-shrink:0}
-.dp{font-size:.63rem;color:var(--mu);min-width:36px;text-align:right;flex-shrink:0}
-.dx{font-size:.63rem;font-weight:700;min-width:52px;text-align:right;flex-shrink:0;padding:2px 5px;border-radius:4px}
-.dx.good{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25)}
-.dx.zero{color:var(--mu)}
-.no-data{font-size:.8rem;color:var(--mu);padding:12px;background:var(--s2);border-radius:8px;border:1px solid var(--bd)}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
-input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4F8;color:#1A2332;font-size:14px}
+  :root{
+    --green:#10B981;--green-lt:#D1FAE5;
+    --amber:#F59E0B;--amber-lt:#FEF3C7;
+    --red:#EF4444;  --red-lt:#FEE2E2;
+    --blue:#2563EB; --blue-lt:#DBEAFE;
+    --surface:#fff; --border:#E2E8F0;
+    --text:#1A2332; --sub:#4A5568; --muted:#94A3B8;
+  }
+  /* HEADER */
+  .header{background:linear-gradient(135deg,#1A2332 0%,#2D3F5C 100%);padding:20px 28px 0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+  .header-top{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+  .header-label{font-size:9px;letter-spacing:4px;color:#7EB3FF;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+  .header-title{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px}
+  .header-sub{font-size:11px;color:#8FA3C0;margin-top:3px}
+  .kpi-strip{display:flex;gap:8px;flex-wrap:wrap}
+  .kpi-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 14px;text-align:center;min-width:110px}
+  .kpi-val{font-size:20px;font-weight:900;letter-spacing:-.5px}
+  .kpi-label{font-size:9px;color:rgba(255,255,255,.6);margin-top:2px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+  .kpi-sub{font-size:12px;font-weight:700;margin-top:2px}
+  /* TABS */
+  .tabs{display:flex;gap:2px}
+  .tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,.5);padding:9px 20px;font-size:13px;cursor:pointer;font-weight:500;transition:all .15s;font-family:inherit}
+  .tab-btn.active{color:#7EB3FF;border-bottom-color:#7EB3FF;font-weight:700}
+  /* PANELS */
+  .main{padding:20px 28px;max-width:1380px}
+  .panel{display:none}.panel.active{display:block}
+  /* FILTER BAR */
+  .filter-bar{background:var(--surface);border-radius:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--border);display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .filter-group{display:flex;flex-direction:column;gap:5px}
+  .filter-label{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+  .filter-bar select{padding:6px 10px;border:1px solid var(--border);border-radius:7px;font-size:12px;color:var(--text);background:#F8FAFC;outline:none;cursor:pointer;font-family:inherit;min-width:160px}
+  .btn-group{display:flex;gap:4px}
+  .btn-toggle{background:transparent;border:1px solid var(--border);color:var(--sub);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:400;font-family:inherit;transition:all .15s;white-space:nowrap}
+  .btn-toggle.active{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+  /* EQUIPE CHIP BUTTONS */
+  .equipe-btns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .equipe-btn{border:2px solid transparent;border-radius:20px;padding:6px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .18s;opacity:.7}
+  .equipe-btn.active{opacity:1;transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.15)}
+  /* CARD */
+  .card{background:var(--surface);border-radius:12px;padding:18px 20px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,.04);margin-bottom:16px}
+  .card-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
+  /* KPI GRID */
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .kpi-inner{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .kpi-inner .val{font-size:22px;font-weight:900;letter-spacing:-.5px}
+  .kpi-inner .lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+  .kpi-inner .sub{font-size:11px;margin-top:2px;font-weight:600}
+  /* TOP10 */
+  .top10-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .top10-card{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .top10-header{padding:12px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+  .top10-strip{width:4px;height:18px;border-radius:2px;flex-shrink:0}
+  .top10-title{font-size:13px;font-weight:700}
+  .top10-sub{font-size:10px;color:var(--sub)}
+  .top10-col-head{display:grid;grid-template-columns:28px 1fr 60px 60px;gap:6px;padding:6px 14px;font-size:9px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;background:#FAFBFD;border-bottom:1px solid var(--border)}
+  .top10-row{display:grid;grid-template-columns:28px 1fr 60px 60px;align-items:center;gap:6px;padding:8px 14px;border-bottom:1px solid #F0F4F8;transition:background .12s}
+  .top10-row:hover{background:#F7FAFB}
+  .top10-medal{text-align:center;font-size:14px}
+  .top10-name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top10-badge{font-size:9px;padding:1px 5px;border-radius:4px;font-weight:600}
+  .top10-leads{text-align:right;font-size:11px;color:var(--sub)}
+  .top10-pct{text-align:right;font-size:13px;font-weight:800}
+  /* SEARCH */
+  .search-bar{background:var(--surface);border-radius:12px;padding:12px 16px;margin-bottom:12px;border:1px solid var(--border);display:flex;gap:12px;align-items:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .search-wrap{position:relative;flex:1;max-width:300px}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px}
+  .search-wrap input{width:100%;padding:7px 10px 7px 28px;border:1px solid var(--border);border-radius:8px;font-size:12px;outline:none;background:#F8FAFC;font-family:inherit}
+  /* TABLE */
+  .table-wrap{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  table{width:100%;border-collapse:collapse}
+  th{padding:8px 10px;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;background:#F7F9FC;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;white-space:nowrap}
+  th:hover{color:var(--blue)}
+  th.sorted{color:var(--blue)}
+  td{padding:9px 10px;border-bottom:1px solid var(--border);transition:background .1s}
+  tr:hover td{background:#F7F9FC}
+  .td-right{text-align:right}
+  .eq-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;white-space:nowrap}
+  .status-badge{font-size:9px;padding:2px 7px;border-radius:6px;font-weight:700;white-space:nowrap}
+  .mini-bar-wrap{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+  .mini-bar-bg{width:48px;height:5px;border-radius:3px;background:#F1F5F9;overflow:hidden}
+  .mini-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-top:1px solid var(--border);background:#FAFBFD}
+  .pagination span{font-size:11px;color:var(--sub)}
+  .pg-btns{display:flex;gap:4px}
+  .pg-btn{padding:3px 9px;border:1px solid var(--border);border-radius:5px;background:var(--surface);color:var(--text);cursor:pointer;font-size:11px;font-family:inherit}
+  .pg-btn:disabled{background:#F1F5F9;color:var(--muted);cursor:default}
+  /* SUP CHIPS INFO */
+  .sup-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .sup-chip{border-radius:10px;padding:10px 14px;min-width:150px;border:1px solid transparent}
+  .sup-chip-name{font-size:11px;font-weight:700;margin-bottom:4px}
+  .sup-chip-count{font-size:11px}
+  .sup-chip-rates{display:flex;gap:8px;margin-top:4px}
+  .sup-chip-avg{font-size:10px}
+  /* COMPARATIVO EQUIPES */
+  .comp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+  .comp-card{background:var(--surface);border-radius:12px;border:1px solid var(--border);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+  .comp-header{padding:10px 12px;font-size:11px;font-weight:800;text-align:center;border-bottom:1px solid var(--border)}
+  .comp-row{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-bottom:1px solid #F0F4F8;font-size:11px}
+  .comp-row:last-child{border-bottom:none}
+  .comp-lbl{color:var(--muted);font-size:10px}
+  .comp-val{font-weight:700;font-size:13px}
+  .comp-sub{font-size:10px;font-weight:600}
+  .comp-bar-wrap{padding:8px 12px 10px;border-bottom:1px solid #F0F4F8}
+  .comp-bar-track{height:6px;border-radius:3px;background:#F1F5F9;overflow:hidden;margin-top:4px}
+  .comp-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+  @media(max-width:1100px){.comp-grid{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:900px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.top10-grid{grid-template-columns:1fr}.comp-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.kpi-grid{grid-template-columns:1fr}.header-top{flex-direction:column}.comp-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<div id="loading">
-  <div class="spinner"></div>
-  <div id="load-msg">Conectando ao Google Sheets...</div>
-  <div id="load-err"></div>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-title">Central de Performance</div>
+      <div class="header-sub" id="period-label">Carregando...</div>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-box"><div class="kpi-val" id="h-leads" style="color:#7EB3FF">–</div><div class="kpi-label">Leads Totais</div></div>
+      <div class="kpi-box"><div class="kpi-val" id="h-ate2" style="color:#68D391">–</div><div class="kpi-label">Respondidos ≤2min</div><div class="kpi-sub" id="h-ate2-pct" style="color:#68D391"></div></div>
+      <div class="kpi-box"><div class="kpi-val" id="h-gt2" style="color:#F6AD55">–</div><div class="kpi-label">Respondidos &gt;2min</div><div class="kpi-sub" id="h-gt2-pct" style="color:#F6AD55"></div></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(0)">Primeira Resposta</button>
+    <button class="tab-btn" onclick="switchTab(1)">Disponibilidade</button>
+  </div>
 </div>
 
-<div class="hdr">
-  <div class="hdr-title">&#9889; DASHBOARD DE LEADS</div>
-  <div class="hdr-kpis">
-    <div><div class="kv" id="kv-total">--</div><div class="kl">total leads</div></div>
-    <div><div class="kv" id="kv-tag10">--</div><div class="kl">tag 10 fechados</div></div>
-    <div><div class="kv" id="kv-conv">--</div><div class="kl">conversao geral</div></div>
-    <div class="hdr-right">
-      <button class="reload-btn" onclick="loadData()">&#8635; Atualizar</button>
-      <div class="last-upd" id="last-upd"></div>
+<div class="main">
+
+<!-- PANEL 0: PRIMEIRA RESPOSTA -->
+<div class="panel active" id="panel-0">
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-label">Mês</div>
+      <select id="sel-month-0" onchange="onMonthChange(0)"></select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Período</div>
+      <div class="btn-group">
+        <button class="btn-toggle active" id="btn-acum-0"  onclick="setPeriod('acum',0)">Acumulado</button>
+        <button class="btn-toggle" id="btn-dia-0"   onclick="setPeriod('dia',0)">Por Dia</button>
+        <button class="btn-toggle" id="btn-sem-0"   onclick="setPeriod('sem',0)">Semanal</button>
+        <button class="btn-toggle" id="btn-2dias-0" onclick="setPeriod('2dias',0)">2 Dias</button>
+        <button class="btn-toggle" id="btn-range-0" onclick="setPeriod('range',0)">Período</button>
+      </div>
+    </div>
+    <div class="filter-group" id="date-wrap-0" style="display:none">
+      <div class="filter-label">Data</div>
+      <select id="sel-date-0" onchange="render()"></select>
+    </div>
+    <div class="filter-group" id="date2-wrap-0" style="display:none">
+      <div class="filter-label">Segunda Data</div>
+      <select id="sel-date2-0" onchange="render()"></select>
+    </div>
+    <div class="filter-group" id="range-wrap-0" style="display:none">
+      <div class="filter-label">De</div>
+      <select id="sel-range-from-0" onchange="render()"></select>
+    </div>
+    <div class="filter-group" id="range-wrap2-0" style="display:none">
+      <div class="filter-label">Até</div>
+      <select id="sel-range-to-0" onchange="render()"></select>
+    </div>
+  </div>
+
+  <!-- EQUIPE BUTTONS -->
+  <div class="equipe-btns" id="equipe-btns-0"></div>
+
+  <!-- COMPARATIVO (visível só quando Todas as Equipes) -->
+  <div id="pr-comparativo" style="display:none"></div>
+
+  <div class="kpi-grid" id="pr-kpis"></div>
+
+  <!-- TOP 10 -->
+  <div class="top10-grid">
+    <div class="top10-card">
+      <div class="top10-header" style="background:#D1FAE5">
+        <div class="top10-strip" style="background:#10B981"></div>
+        <div class="top10-title">Top 10 Melhores</div>
+        <div class="top10-sub">maior % ≤2min</div>
+      </div>
+      <div class="top10-col-head"><div></div><div>Promotor / Equipe</div><div style="text-align:right">Leads</div><div style="text-align:right">%≤2min</div></div>
+      <div id="pr-top10-best"></div>
+    </div>
+    <div class="top10-card">
+      <div class="top10-header" style="background:#FEE2E2">
+        <div class="top10-strip" style="background:#EF4444"></div>
+        <div class="top10-title">Top 10 Ofensores</div>
+        <div class="top10-sub">menor % ≤2min</div>
+      </div>
+      <div class="top10-col-head"><div></div><div>Promotor / Equipe</div><div style="text-align:right">Leads</div><div style="text-align:right">%≤2min</div></div>
+      <div id="pr-top10-worst"></div>
+    </div>
+  </div>
+
+  <!-- SEARCH + TABLE -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="ag-search" placeholder="Buscar promotor..." oninput="agPage=0;renderAgTable()">
+    </div>
+    <span style="font-size:12px;color:var(--sub)"><b id="ag-count"></b> promotores</span>
+    <button onclick="exportAgCSV()" style="margin-left:auto;padding:6px 14px;background:#2563EB;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px">⬇ Exportar CSV</button>
+  </div>
+  <div class="table-wrap" style="overflow-x:auto">
+    <table id="ag-table">
+      <thead id="ag-thead">
+        <tr>
+          <th onclick="sortAg('name')" id="th-name" style="text-align:left">Promotor ↕</th>
+          <th>Equipe</th>
+          <th onclick="sortAg('total_leads')" id="th-total_leads" class="td-right sorted">Total Leads ↓</th>
+          <th onclick="sortAg('ate1')" id="th-ate1" class="td-right">≤1min ↕</th>
+          <th onclick="sortAg('ate2')" id="th-ate2" class="td-right">1-2min ↕</th>
+          <th onclick="sortAg('gt2')" id="th-gt2" class="td-right">&gt;2min ↕</th>
+          <th onclick="sortAg('pctAte2')" id="th-pctAte2" class="td-right">% ≤2min ↕</th>
+          <th class="td-right">Status</th>
+          <th class="td-right">Meta ≤2min</th>
+        </tr>
+      </thead>
+      <tbody id="ag-tbody"></tbody>
+    </table>
+    <div class="pagination">
+      <span id="ag-page-info"></span>
+      <div class="pg-btns">
+        <button class="pg-btn" id="ag-pg-first"  onclick="agPage=0;renderAgTable()">«</button>
+        <button class="pg-btn" id="ag-pg-prev"   onclick="agPage=Math.max(0,agPage-1);renderAgTable()">‹</button>
+        <button class="pg-btn" id="ag-pg-next"   onclick="agPage=Math.min(agTotalPages-1,agPage+1);renderAgTable()">›</button>
+        <button class="pg-btn" id="ag-pg-last"   onclick="agPage=agTotalPages-1;renderAgTable()">»</button>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- DATE FILTER BAR -->
-<div class="dfilter">
-  <span class="dfilter-label">Periodo:</span>
-  <button class="dfbtn on" id="df-all"   onclick="setFilter('all')">Acumulado</button>
-  <button class="dfbtn"    id="df-week"  onclick="setFilter('week')">Esta semana</button>
-  <button class="dfbtn"    id="df-2d"    onclick="setFilter('2d')">Ultimos 2 dias</button>
-  <button class="dfbtn"    id="df-range" onclick="setFilter('range')">Periodo</button>
-  <div class="dfsep"></div>
-  <div class="date-range" id="range-inputs">
-    <input type="date" id="dt-from" class="date-inp" onchange="applyRange()">
-    <span>ate</span>
-    <input type="date" id="dt-to"   class="date-inp" onchange="applyRange()">
+<!-- PANEL 1: DISPONIBILIDADE -->
+<div class="panel" id="panel-1">
+  <div class="filter-bar">
+    <div class="filter-group">
+      <div class="filter-label">Mês</div>
+      <select id="sel-month-1" onchange="onMonthChange(1)"></select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Período</div>
+      <div class="btn-group">
+        <button class="btn-toggle active" id="btn-acum-1"  onclick="setPeriod('acum',1)">Acumulado</button>
+        <button class="btn-toggle" id="btn-dia-1"   onclick="setPeriod('dia',1)">Por Dia</button>
+        <button class="btn-toggle" id="btn-sem-1"   onclick="setPeriod('sem',1)">Semanal</button>
+        <button class="btn-toggle" id="btn-2dias-1" onclick="setPeriod('2dias',1)">2 Dias</button>
+        <button class="btn-toggle" id="btn-range-1" onclick="setPeriod('range',1)">Período</button>
+      </div>
+    </div>
+    <div class="filter-group" id="date-wrap-1" style="display:none">
+      <div class="filter-label">Data</div>
+      <select id="sel-date-1" onchange="render()"></select>
+    </div>
+    <div class="filter-group" id="date2-wrap-1" style="display:none">
+      <div class="filter-label">Segunda Data</div>
+      <select id="sel-date2-1" onchange="render()"></select>
+    </div>
+    <div class="filter-group" id="range-wrap-1" style="display:none">
+      <div class="filter-label">De</div>
+      <select id="sel-range-from-1" onchange="render()"></select>
+    </div>
+    <div class="filter-group" id="range-wrap2-1" style="display:none">
+      <div class="filter-label">Até</div>
+      <select id="sel-range-to-1" onchange="render()"></select>
+    </div>
   </div>
-  <span class="dflabel-active" id="df-active-label"></span>
+
+  <!-- EQUIPE BUTTONS -->
+  <div class="equipe-btns" id="equipe-btns-1"></div>
+
+  <div class="kpi-grid" id="av-kpis"></div>
+
+  <!-- COMPARATIVO DE EQUIPES -->
+  <div id="av-comp-equipes"></div>
+
+  <!-- SEARCH + TABLE -->
+  <div class="search-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="av-search" placeholder="Buscar promotor..." oninput="avPage=0;renderAvTable()">
+    </div>
+    <span style="font-size:12px;color:var(--sub)" id="av-count-label"></span>
+    <button onclick="exportAvCSV()" style="margin-left:auto;padding:6px 14px;background:#2563EB;color:#fff;border:none;border-radius:7px;font-size:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:5px">⬇ Exportar CSV</button>
+  </div>
+
+  <div class="table-wrap" style="overflow-x:auto">
+    <table>
+      <thead id="av-thead">
+        <tr>
+          <th onclick="sortAv('name')" id="av-th-name" style="text-align:left">Promotor ↕</th>
+          <th>Equipe</th>
+          <th onclick="sortAv('totalH')" id="av-th-totalH" class="td-right">Total Horas ↕</th>
+          <th onclick="sortAv('days')"   id="av-th-days"   class="td-right">Dias ↕</th>
+          <th onclick="sortAv('avgH')"   id="av-th-avgH"   class="td-right sorted">Média Diária ↓</th>
+          <th class="td-right">Status</th>
+        </tr>
+      </thead>
+      <tbody id="av-tbody"></tbody>
+    </table>
+    <div class="pagination">
+      <span id="av-page-info"></span>
+      <div class="pg-btns">
+        <button class="pg-btn" id="av-pg-first" onclick="avPage=0;renderAvTable()">«</button>
+        <button class="pg-btn" id="av-pg-prev"  onclick="avPage=Math.max(0,avPage-1);renderAvTable()">‹</button>
+        <button class="pg-btn" id="av-pg-next"  onclick="avPage=Math.min(avTotalPages-1,avPage+1);renderAvTable()">›</button>
+        <button class="pg-btn" id="av-pg-last"  onclick="avPage=avTotalPages-1;renderAvTable()">»</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="tabs">
-  <button id="tab-agents" class="tab on" onclick="switchTab('agents')">&#128100; Agentes</button>
-  <button id="tab-queues" class="tab"    onclick="switchTab('queues')">&#128203; Filas</button>
-</div>
-
-<div id="sheet-agents" class="sheet on">
-  <div class="bar">
-    <input id="aq" placeholder="Buscar agente..." oninput="aFilter()">
-    <button id="abv" class="btn on" onclick="aSort('v')">Volume</button>
-    <button id="aba" class="btn"    onclick="aSort('a')">A-Z</button>
-    <button id="abc" class="btn"    onclick="aSort('c')">Conversao</button>
-    <span id="acnt" class="cnt"></span>
-  </div>
-  <div class="wrap">
-    <div class="lst" id="a-lst"></div>
-    <div class="pnl" id="a-pnl"><div class="ph"><div class="ph-ico">&#128100;</div><div>Selecione um agente para ver detalhes</div></div></div>
-  </div>
-</div>
-
-<div id="sheet-queues" class="sheet">
-  <div class="bar">
-    <input id="qq" placeholder="Buscar fila..." oninput="qFilter()">
-    <button id="qbv" class="btn on" onclick="qSort('v')">Volume</button>
-    <button id="qba" class="btn"    onclick="qSort('a')">A-Z</button>
-    <button id="qbc" class="btn"    onclick="qSort('c')">Conversao</button>
-    <span id="qcnt" class="cnt"></span>
-  </div>
-  <div class="wrap">
-    <div class="lst" id="q-lst"></div>
-    <div class="pnl" id="q-pnl"><div class="ph"><div class="ph-ico">&#128203;</div><div>Selecione uma fila para ver os agentes</div></div></div>
-  </div>
-</div>
+</div><!-- /main -->
 
 <script>
-var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnlwiAP5sVy5NpzqrHObGJcqL6BsyzNoWNM8CC-iBD74TkHRDYVzFHOm14WEBv8mwXmn0N2lgX87pH/pub?gid=948821657&single=true&output=csv";
+// ── GOOGLE SHEETS ─────────────────────────────────────────────────────────────
+const SHEET_BASE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vROvS5snM-Nr6L1KRvAhEVyUyyRx6n2bOo7Lq-ZqEuaOBofFUOWqKAgO7LX-o4aJHJuKTR3olNA9Lsj/pub";
+// Equipes removidas (sem dados)
+const EQUIPES_REMOVIDAS = ['ADM','DESLIGADO']; // removidos completamente dos dados
+const EQUIPES_OCULTAS = ['ADMINISTRATIVO']; // oculto nos comparativos e botões, mas dados mantidos
 
-// ALL_ROWS = raw parsed rows (excluding header), used for date filtering
-var ALL_ROWS = [];
-var HEADERS  = [];
+// ── RUNTIME DATA ──────────────────────────────────────────────────────────────
+let RAW_BY_DAY = [];
+let RAW_AVAIL  = [];
+let ALL_DATES  = [];
+let ALL_SUPS   = [];
+let PR_HEADERS = []; // cabeçalhos originais da planilha
+let PR_ROWS_RAW = []; // linhas brutas da planilha (para export)
+// Months indexed per tab: { '2026-04': ['2026-04-01', ...], ... }
+let MONTHS_PR  = {}; // tab 0
+let MONTHS_AV  = {}; // tab 1
 
-var AGENTS=[], QUEUES=[];
-var A_TOTAL=0, Q_TOTAL=0, A_MAX=1, Q_MAX=1;
-var COLORS=['#22d3ee','#a78bfa','#34d399','#fb923c','#f472b6','#60a5fa','#fbbf24','#4ade80','#e879f9','#2dd4bf','#facc15','#f87171'];
-var state={sheet:'agents',a:{sm:'v',cur:null,vis:[]},q:{sm:'v',cur:null,vis:[]}};
+// ── STATE (declarado antes de qualquer função) ────────────────────────────────
+const state = {
+  dateMode:     ['acum','acum'],
+  selMonth:     ['',''],        // 'YYYY-MM' — mês selecionado por tab
+  selDate:      ['',''],
+  selDate2:     ['',''],
+  selRangeFrom: ['',''],
+  selRangeTo:   ['',''],
+  selSup:       ['Todos','Todos'],
+};
+let agSortCol='total_leads', agSortDir=-1, agPage=0, agTotalPages=1;
+let compSortSlice=-1, compSortDir=-1; // -1 = sem sort comparativo
+let compSortField='pct'; // 'pct' ou 'leads'
 
-// - date filter state -
-var filterMode = 'all';  // 'all' | 'week' | '2d' | 'range'
-var filterFrom = null;   // Date object
-var filterTo   = null;   // Date object
-
-// - helpers -
-function h(s){
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function sortComp(sliceIdx, field){
+  if(compSortSlice===sliceIdx && compSortField===field){
+    compSortDir*=-1;
+  } else {
+    compSortSlice=sliceIdx; compSortField=field; compSortDir=-1;
+  }
+  agPage=0;
+  renderAgTable();
 }
 
-// Parse "DD/MM/YYYY HH:mm" or "DD/MM/YYYY" -> "YYYY-MM-DD" string
-function parseDate(str){
-  if(!str) return null;
-  str = str.trim();
-  // try DD/MM/YYYY
-  var m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if(m) return m[3]+'-'+pad(m[2])+'-'+pad(m[1]);
-  // try YYYY-MM-DD
-  m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if(m) return m[1]+'-'+m[2]+'-'+m[3];
+function exportAgCSV(){
+  // Filtra índices dos registros válidos conforme filtros ativos
+  const filteredRows = filterPR(0);
+  const validIdx = new Set(filteredRows.map(r => r._idx));
+  const exportRows = PR_ROWS_RAW.filter((_, i) => validIdx.has(i));
+
+  if (!exportRows.length) { alert('Nenhum dado para exportar com os filtros atuais.'); return; }
+
+  const avIdx = window._AV_STATUS_IDX || {};
+
+  // Função: dado agente + timestamp da atribuição, retorna o status vigente
+  function getAgentStatus(agentName, atribuicaoStr) {
+    if (!atribuicaoStr || !atribuicaoStr.trim()) return '–';
+    const atTs = parseDateTimeBR(atribuicaoStr.trim());
+    if (!atTs) return '–';
+    const events = avIdx[agentName];
+    if (!events || !events.length) return 'Sem registro';
+    // Pega o último evento ANTES ou IGUAL ao horário de atribuição
+    let status = 'Sem registro';
+    for (const ev of events) {
+      if (ev.ts <= atTs) status = ev.reason;
+      else break;
+    }
+    return status;
+  }
+
+  const colAtrib = PR_HEADERS.find(h => h.includes('atribui') || h.includes('Atribui') || h.toLowerCase().includes('horário de atri')) || 'Horário de atribuição';
+  const colVendedor = PR_HEADERS.find(h => h.toUpperCase().includes('VENDEDOR')) || 'VENDEDOR';
+
+  const headers = [...PR_HEADERS, 'Status Disponibilidade na Atribuição'];
+
+  const csv = [headers, ...exportRows.map(r => {
+    const agente = (r[colVendedor] || '').trim();
+    const horAtrib = (r[colAtrib] || '').trim();
+    const statusAv = getAgentStatus(agente, horAtrib);
+    return [...PR_HEADERS.map(h => r[h] || ''), statusAv];
+  })].map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+
+  const bom  = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const today = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  const sup   = state.selSup[0]==='Todos' ? 'todas-equipes' : state.selSup[0].replace(/\s+/g,'-').toLowerCase();
+  a.href     = url;
+  a.download = `leads_${sup}_${today}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function exportAvCSV(){
+  const avRows = filterAv(1);
+  const avData = aggAvByAgent(avRows);
+  if (!avData.length) { alert('Nenhum dado para exportar com os filtros atuais.'); return; }
+
+  const search = (document.getElementById('av-search')?.value || '').toLowerCase();
+  const filtered = search ? avData.filter(a => a.name.toLowerCase().includes(search) || (a.sup||'').toLowerCase().includes(search)) : avData;
+
+  const headers = ['Agente','Equipe','Total Horas','Dias','Média Diária (h)','Status'];
+  const rows = filtered.map(a => [
+    a.name,
+    a.sup || '',
+    a.totalH.toFixed(2),
+    a.days,
+    a.avgH.toFixed(2),
+    a.avgH >= 7 ? 'OK' : a.avgH >= 5 ? 'Atenção' : 'Crítico'
+  ]);
+
+  const csv = [headers, ...rows]
+    .map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+
+  const bom  = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const today = new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+  a.href     = url;
+  a.download = `disponibilidade_agentes_${today}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+let avSortCol='avgH',        avSortDir=-1, avPage=0, avTotalPages=1;
+const PAGE = 15;
+
+// ── CSV PARSER ────────────────────────────────────────────────────────────────
+function splitCSVLine(line) {
+  const fields = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQ) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; }
+        else { inQ = false; }
+      } else { cur += ch; }
+    } else {
+      if (ch === '"') { inQ = true; }
+      else if (ch === ',') { fields.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+  }
+  fields.push(cur.trim());
+  return fields;
+}
+
+function parseCSV(text) {
+  const lines = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') { inQ = !inQ; cur += ch; }
+    else if ((ch === '\n' || (ch === '\r' && text[i+1] === '\n')) && !inQ) {
+      if (ch === '\r') i++;
+      lines.push(cur); cur = '';
+    } else { cur += ch; }
+  }
+  if (cur.trim()) lines.push(cur);
+  if (lines.length < 2) return { headers: [], rows: [] };
+  const headers = splitCSVLine(lines[0]);
+  const rows = lines.slice(1)
+    .filter(l => l.trim())
+    .map(line => {
+      const fields = splitCSVLine(line);
+      const obj = {};
+      headers.forEach((h, i) => { obj[h] = (fields[i] || ''); });
+      return obj;
+    });
+  return { headers, rows };
+}
+
+// Converte "DD/MM/YYYY" ou "DD/MM/YYYY HH:MM:SS" ou "YYYY-MM-DD" → "YYYY-MM-DD"
+function fmtDate(v) {
+  if (!v) return '';
+  const s = v.trim().split(' ')[0];
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) {
+    const [d, m, y] = s.split('/');
+    return y + '-' + m + '-' + d;
+  }
+  return s;
+}
+
+// Converte "HH:MM:SS" → horas decimais
+function hmsToH(v) {
+  if (!v || !v.trim()) return 0;
+  const p = v.trim().split(':');
+  if (p.length === 3) return (+p[0]) + (+p[1]) / 60 + (+p[2]) / 3600;
+  if (p.length === 2) return (+p[0]) + (+p[1]) / 60;
+  return 0;
+}
+
+// Converte "HH:MM:SS" ou segundos → segundos
+function toSeconds(v) {
+  if (!v || !v.trim()) return null;
+  const s = v.trim();
+  if (/^\d+$/.test(s)) return +s;  // já em segundos
+  const p = s.split(':');
+  if (p.length === 3) return (+p[0]) * 3600 + (+p[1]) * 60 + (+p[2]);
+  if (p.length === 2) return (+p[0]) * 60 + (+p[1]);
   return null;
 }
 
-function pad(n){ return String(n).length===1?'0'+n:String(n); }
-
-// today as YYYY-MM-DD
-function todayStr(){
-  var d=new Date();
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+// Converte "DD/MM/YYYY HH:MM:SS" → Date object
+function parseDateTimeBR(v) {
+  if (!v || !v.trim()) return null;
+  const s = v.trim();
+  // formato: DD/MM/YYYY HH:MM:SS
+  const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2}):(\d{2})$/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5], +m[6]);
+  // fallback: tentar parse direto
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
 }
 
-function mondayStr(){
-  var d=new Date();
-  var day=d.getDay()||7; // 1=mon .. 7=sun
-  d.setDate(d.getDate()-(day-1));
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+// ── LOAD DATA ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  showLoading(true);
+  try {
+    const [prResp, avResp] = await Promise.all([
+      fetch(SHEET_BASE + '?output=csv&gid=1476075993&single=true'),
+      fetch(SHEET_BASE + '?output=csv&sheet=' + encodeURIComponent('disponibilidade'))
+    ]);
+    if (!prResp.ok) throw new Error('HTTP ' + prResp.status + ' na aba "primeira resposta"');
+    if (!avResp.ok) throw new Error('HTTP ' + avResp.status + ' na aba "disponibilidade"');
+    const [prText, avText] = await Promise.all([prResp.text(), avResp.text()]);
+
+    console.log('[Dashboard] primeira resposta header:', prText.split('\n')[0]);
+    console.log('[Dashboard] disponibilidade header:', avText.split('\n')[0]);
+
+    // ── PRIMEIRA RESPOSTA ─────────────────────────────────────────────────────
+    // Fonte: SOMENTE a sheet "primeira resposta" — 1 linha = 1 lead real
+    // Colunas utilizadas:
+    //   VENDEDOR              → nome do agente
+    //   SUPERVISOR            → equipe
+    //   DATA DE ATRIBUIÇÃO    → coluna D — fonte única para filtro de data (DD/MM/YYYY)
+    //   Primeira resposta do agente → tempo HH:MM:SS ou segundos
+    //   STATUS                → "sem resposta" / "expirado" → sem_resp
+    // Linhas sem VENDEDOR ou sem DATA DE ATRIBUIÇÃO são descartadas (linhas auxiliares/vazias)
+    const { headers: prHeaders, rows: prRows } = parseCSV(prText);
+    PR_HEADERS = prHeaders;
+    console.log('[Dashboard] primeira resposta headers:', prHeaders);
+    console.log('[Dashboard] primeira resposta linhas brutas:', prRows.length);
+    if (prRows.length > 0) console.log('[Dashboard] primeira resposta linha 1:', JSON.stringify(prRows[0]));
+
+    // Sem agrupamento: cada linha = 1 registro = 1 lead
+    RAW_BY_DAY = [];
+    PR_ROWS_RAW = [];
+    prRows.forEach(r => {
+      const vendedor     = (r['VENDEDOR'] || '').trim();
+      const sup          = normSup((r['SUPERVISOR'] || '').trim());
+      const date         = fmtDate(r['DATA DE ATRIBUIÇÃO'] || r['DATA DE ATRIBUICAO'] || '');
+      const transferencia= (r['Transferência'] || r['Transferencia'] || '').trim().toLowerCase();
+      const status       = (r['STATUS'] || '').trim().toLowerCase();
+      const media        = (r['MEDIA'] || r['Média'] || r['Media'] || '').trim().toLowerCase();
+
+      if (!vendedor || !date) return;
+      if (vendedor.toUpperCase() === 'VENDEDOR' || vendedor.startsWith('=')) return;
+
+      // Detecta fora do horário: STATUS = "fora do horario" OU MEDIA = "fora do horario"
+      const statusNorm = status.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const mediaNorm  = media.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      const foraHorario = statusNorm.includes('fora do horario') || mediaNorm.includes('fora do horario');
+
+      // Transferido: coluna Transferência = "Sim"
+      const transferido = transferencia === 'sim';
+
+      // Leads contados: NÃO transferido E NÃO fora do horário
+      const contaLead = !foraHorario && !transferido;
+
+      const dtResposta   = parseDateTimeBR(r['Primeira resposta do agente'] || '');
+      const dtAtribuicao = parseDateTimeBR(r['Horário de atribuição'] || r['Horario de atribuicao'] || '');
+
+      let secs = null;
+      if (dtResposta && dtAtribuicao && dtResposta >= dtAtribuicao) {
+        secs = Math.round((dtResposta - dtAtribuicao) / 1000);
+      }
+
+      let ate1=0, ate2=0, gt2=0, sem_resp=0;
+      if (contaLead) {
+        if (status === 'sem resposta' || status === 'expirado' || secs === null) {
+          sem_resp = 1;
+        } else if (secs <= 60)  { ate1 = 1; }
+        else if (secs <= 120)   { ate2 = 1; }
+        else                    { gt2  = 1; }
+      }
+
+      // total_leads = apenas leads com tempo de resposta (ate1+ate2+gt2)
+      // sem_resp e fora_horario NÃO contam no total
+      const idx = RAW_BY_DAY.length;
+      RAW_BY_DAY.push({
+        POWER_BI: vendedor, SUPERVISOR: sup, date_str: date,
+        total_leads: (ate1||ate2||gt2) ? 1 : 0,
+        ate1, ate2, gt2, sem_resp,
+        fora_horario: foraHorario ? 1 : 0,
+        transferido:  transferido  ? 1 : 0,
+        _idx: idx
+      });
+      PR_ROWS_RAW.push(r);
+    });
+    console.log('[Dashboard] RAW_BY_DAY:', RAW_BY_DAY.length,
+      '| leads válidos:', RAW_BY_DAY.filter(r=>r.total_leads).length,
+      '| fora horário:', RAW_BY_DAY.filter(r=>r.fora_horario).length,
+      '| transferidos:', RAW_BY_DAY.filter(r=>r.transferido).length);
+
+    // ── DISPONIBILIDADE ───────────────────────────────────────────────────────
+    // Colunas confirmadas: A=Agent Name | B=Date | C=HORARIO | D=Reason | E=SITUAÇÃO | F=PF OU PME | G=SUPERVISOR | H=TEMPO LOGADO | I=Tempo de um status para outro
+    // Regra: soma col I quando col D (Reason) = "Disponível"
+
+    const { headers: avHeaders, rows: avRows } = parseCSV(avText);
+    console.log('[AV] headers:', JSON.stringify(avHeaders));
+    console.log('[AV] total linhas:', avRows.length);
+    if (avRows.length > 0) console.log('[AV] linha 1:', JSON.stringify(avRows[0]));
+
+    // Busca coluna por nome exato ou parcial (ignora acento/case)
+    function findAvCol(candidates){
+      const norm=s=>(s||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      for(const c of candidates){
+        const k=avHeaders.find(h=>norm(h)===norm(c));
+        if(k!==undefined) return k;
+      }
+      for(const c of candidates){
+        const k=avHeaders.find(h=>norm(h).includes(norm(c).split(' ')[0]));
+        if(k!==undefined) return k;
+      }
+      return null;
+    }
+
+    const COL_AGENT  = findAvCol(['Agent Name'])    || avHeaders[0];
+    const COL_DATE   = findAvCol(['Date'])           || avHeaders[1];
+    const COL_HORARIO= findAvCol(['HORARIO','Horario','horario']) || avHeaders[2]; // col C: timestamp do evento
+    const COL_REASON = findAvCol(['Reason'])         || avHeaders[3];
+    const COL_SUP    = findAvCol(['SUPERVISOR'])     || avHeaders[6];
+    const COL_TEMPO  = findAvCol(['Tempo de um status para outro','Tempo de um status','TEMPO LOGADO']) || avHeaders[8] || avHeaders[7];
+
+    console.log('[AV] colunas:', {COL_AGENT,COL_DATE,COL_HORARIO,COL_REASON,COL_SUP,COL_TEMPO});
+
+    // Índice de status por agente para lookup no export
+    // Estrutura: AV_STATUS_IDX[agentName] = [{ts: Date, reason: string}, ...]
+    const AV_STATUS_IDX = {};
+    avRows.forEach(r => {
+      const agent  = (r[COL_AGENT]  || '').trim();
+      const horario= (r[COL_HORARIO]|| '').trim();
+      const reason = (r[COL_REASON] || '').trim();
+      if (!agent || !horario || !reason) return;
+      const ts = parseDateTimeBR(horario);
+      if (!ts) return;
+      if (!AV_STATUS_IDX[agent]) AV_STATUS_IDX[agent] = [];
+      AV_STATUS_IDX[agent].push({ ts, reason });
+    });
+    // Ordena cada agente por timestamp
+    Object.values(AV_STATUS_IDX).forEach(arr => arr.sort((a,b) => a.ts-b.ts));
+
+    // Expõe globalmente para uso no export
+    window._AV_STATUS_IDX = AV_STATUS_IDX;
+
+    // Passo 1: coleta TODOS os agentes únicos da col A
+    const agentSupMap = {};
+    avRows.forEach(r => {
+      const agent = (r[COL_AGENT] || '').trim();
+      const sup   = normSup((r[COL_SUP] || '').trim());
+      if (!agent) return;
+      if (EQUIPES_REMOVIDAS.includes(sup.toUpperCase())) return;
+      if (!agentSupMap[agent]) agentSupMap[agent] = sup;
+    });
+    console.log('[AV] agentes col A:', Object.keys(agentSupMap).length, Object.keys(agentSupMap).slice(0,5));
+
+    // Passo 2: agrupa por agente+data, soma col I quando Reason=Disponível
+    const avMap = {};
+    avRows.forEach(r => {
+      const agent   = (r[COL_AGENT]  || '').trim();
+      const dateRaw = (r[COL_DATE]   || '').trim();
+      const reason  = (r[COL_REASON] || '').trim();
+      const sup     = normSup((r[COL_SUP]   || '').trim());
+      const tempo   = (r[COL_TEMPO]  || '').trim();
+
+      if (!agent) return;
+      if (EQUIPES_REMOVIDAS.includes(sup.toUpperCase())) return;
+
+      const date = fmtDate(dateRaw);
+      if (!date) return; // ignora linhas sem data válida na col B
+
+      const key = agent + '|' + date;
+      if (!avMap[key]) avMap[key] = { POWER_BI:agent, SUPERVISOR:sup, date_str:date, avail_hours:0 };
+
+      // Soma tempo disponível: Reason = "Disponível" (col D)
+      const rNorm = reason.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+      if (rNorm === 'disponivel') {
+        const h = hmsToH(tempo);
+        avMap[key].avail_hours += h;
+        console.log('[AV] disponivel:', agent, date, tempo, '->', h.toFixed(3)+'h');
+      }
+    });
+
+    // Passo 3: adiciona agentes sem nenhum registro com data válida como entrada zero
+    const agentsInMap = new Set(Object.values(avMap).map(r=>r.POWER_BI));
+    Object.entries(agentSupMap).forEach(([agent,sup])=>{
+      if(!agentsInMap.has(agent)){
+        avMap['__nodate__'+agent] = { POWER_BI:agent, SUPERVISOR:sup, date_str:'', avail_hours:0 };
+      }
+    });
+
+    RAW_AVAIL = Object.values(avMap).filter(r=>r.POWER_BI);
+    const withH = RAW_AVAIL.filter(r=>r.avail_hours>0).length;
+    console.log('[AV] RAW_AVAIL:', RAW_AVAIL.length, '| com horas>0:', withH);
+
+    // ── DATAS E SUPERVISORES ──────────────────────────────────────────────────
+    const dateSet = new Set([...RAW_BY_DAY.map(r=>r.date_str), ...RAW_AVAIL.map(r=>r.date_str)]);
+    ALL_DATES = [...dateSet].filter(Boolean).sort();
+    // Só inclui supervisores que têm ao menos 1 lead válido ou 1 registro de disponibilidade
+    const supsComDados = new Set([
+      ...RAW_BY_DAY.filter(r=>r.total_leads>0||r.ate1||r.ate2||r.gt2||r.sem_resp).map(r=>r.SUPERVISOR),
+      ...RAW_AVAIL.filter(r=>r.date_str).map(r=>r.SUPERVISOR)
+    ]);
+    const supSet = supsComDados;
+    const supArr=[...supSet].filter(s=>s&&!EQUIPES_REMOVIDAS.includes(s.toUpperCase()));
+    // Ordena: não-BENVE alfabético primeiro, BENVE ao final
+    supArr.sort((a,b)=>{
+      const aB=a.toUpperCase().includes('BENVE');
+      const bB=b.toUpperCase().includes('BENVE');
+      if(aB&&!bB) return 1;
+      if(!aB&&bB) return -1;
+      return a.localeCompare(b);
+    });
+    SUPS_ORDER=supArr.slice();
+    SUP_C={};
+    SUPS_ORDER.forEach((s,i)=>{ SUP_C[s]=SUP_PALETTE[i%SUP_PALETTE.length]; });
+    ALL_SUPS=SUPS_ORDER.slice();
+
+    console.log('[Dashboard] ALL_SUPS:', ALL_SUPS);
+
+    showLoading(false);
+    init();
+  } catch(err) {
+    showLoading(false);
+    showError(err.message);
+    console.error('[Dashboard] Erro:', err);
+  }
 }
 
-function daysAgoStr(n){
-  var d=new Date();
-  d.setDate(d.getDate()-n);
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+function showLoading(show) {
+  let el = document.getElementById('loading-overlay');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'loading-overlay';
+    el.style.cssText = 'position:fixed;inset:0;background:rgba(26,35,50,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;font-family:Segoe UI,sans-serif;gap:14px';
+    document.body.appendChild(el);
+  }
+  if (show) {
+    el.style.display = 'flex';
+    el.innerHTML = '<div style="font-size:34px">⏳</div>'
+      + '<div style="font-size:17px;font-weight:700">Carregando dados da planilha...</div>'
+      + '<div style="font-size:12px;color:#8FA3C0">Conectando ao Google Sheets</div>';
+  } else { el.style.display = 'none'; }
 }
 
-// - date filter UI -
-function setFilter(mode){
-  filterMode = mode;
-  ['all','week','2d','range'].forEach(function(m){
-    document.getElementById('df-'+m).className = 'dfbtn'+(mode===m?' on':'');
+function showError(msg) {
+  let el = document.getElementById('loading-overlay');
+  if (!el) { el = document.createElement('div'); el.id='loading-overlay'; document.body.appendChild(el); }
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(26,35,50,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;color:#fff;font-family:Segoe UI,sans-serif;gap:12px;padding:40px;text-align:center';
+  el.style.display = 'flex';
+  el.innerHTML = '<div style="font-size:36px">⚠️</div>'
+    + '<div style="font-size:18px;font-weight:800;color:#FC8181">Erro ao carregar dados</div>'
+    + '<div style="font-size:13px;color:#CBD5E0;max-width:500px;line-height:1.6">' + msg + '</div>'
+    + '<button onclick="loadData()" style="margin-top:14px;padding:10px 28px;background:#2563EB;color:#fff;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-weight:700">🔄 Tentar novamente</button>';
+}
+
+// ── SUP COLORS ────────────────────────────────────────────────────────────────
+function normSup(s){
+  if(!s) return '';
+  const t=s.trim();
+  if(t.startsWith('=')) return 'DESLIGADO';
+  const u=t.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(u==='DESLIGADO'||u.includes('DESLIGADO')) return 'DESLIGADO';
+  // "BENVE" isolado → nome completo para exibição
+  if(u==='BENVE') return 'BENVE';
+  return t; // mantém nome original da planilha
+}
+// Supervisores e cores — preenchidos dinamicamente após carregar os dados
+let SUPS_ORDER=[];
+
+// Paleta de cores para equipes (atribuída na ordem de aparecimento)
+const SUP_PALETTE=[
+  {bg:'#EFF6FF',tc:'#1D4ED8'}, // azul
+  {bg:'#FAF5FF',tc:'#7C3AED'}, // roxo
+  {bg:'#FFF1F2',tc:'#BE123C'}, // rosa
+  {bg:'#FFFBEB',tc:'#B45309'}, // âmbar
+  {bg:'#F0FDF4',tc:'#15803D'}, // verde
+  {bg:'#FFF7ED',tc:'#C2410C'}, // laranja
+  {bg:'#F0F9FF',tc:'#0369A1'}, // ciano
+  {bg:'#FDF4FF',tc:'#A21CAF'}, // magenta
+  {bg:'#FEFCE8',tc:'#854D0E'}, // amarelo
+  {bg:'#F1F5F9',tc:'#334155'}, // cinza
+];
+let SUP_C={};
+const medals=['🥇','🥈','🥉'];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let currentTab=0;
+// state, sort vars e PAGE declarados acima no bloco loader
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function fmt(n){return Math.round(n).toLocaleString('pt-BR');}
+function pct(a,b){return b>0?((a/b)*100).toFixed(1)+'%':'–';}
+
+function aggTotals(rows){
+  const t={total_leads:0,ate1:0,ate2:0,gt2:0,sem_resp:0};
+  rows.forEach(r=>{t.total_leads+=r.total_leads;t.ate1+=r.ate1;t.ate2+=r.ate2;t.gt2+=r.gt2;t.sem_resp+=r.sem_resp;});
+  return t;
+}
+function aggByAgent(rows){
+  const m={};
+  rows.forEach(r=>{
+    if(!m[r.POWER_BI])m[r.POWER_BI]={name:r.POWER_BI,sup:r.SUPERVISOR,total_leads:0,ate1:0,ate2:0,gt2:0,sem_resp:0};
+    const a=m[r.POWER_BI];
+    a.total_leads+=r.total_leads;a.ate1+=r.ate1;a.ate2+=r.ate2;a.gt2+=r.gt2;a.sem_resp+=r.sem_resp;
   });
-  document.getElementById('range-inputs').className = 'date-range'+(mode==='range'?' on':'');
+  return Object.values(m).map(a=>({...a,leadsResp:a.ate1+a.ate2+a.gt2,pctAte2:(a.ate1+a.ate2+a.gt2)>0?(a.ate1+a.ate2)/(a.ate1+a.ate2+a.gt2)*100:0}));
+}
+function aggBySup(rows){
+  const m={};
+  rows.forEach(r=>{
+    if(!m[r.SUPERVISOR])m[r.SUPERVISOR]={sup:r.SUPERVISOR,total_leads:0,ate1:0,ate2:0,gt2:0,sem_resp:0};
+    const s=m[r.SUPERVISOR];
+    s.total_leads+=r.total_leads;s.ate1+=r.ate1;s.ate2+=r.ate2;s.gt2+=r.gt2;s.sem_resp+=r.sem_resp;
+  });
+  return Object.values(m);
+}
+function aggAvByAgent(rows){
+  const m={};
+  rows.forEach(r=>{
+    if(!m[r.POWER_BI])m[r.POWER_BI]={name:r.POWER_BI,sup:r.SUPERVISOR,totalH:0,days:0,_dates:new Set()};
+    if(r.date_str){
+      m[r.POWER_BI].totalH+=r.avail_hours;
+      m[r.POWER_BI]._dates.add(r.date_str);
+    }
+  });
+  return Object.values(m).map(a=>({
+    name:a.name,sup:a.sup,totalH:a.totalH,
+    days:a._dates.size,
+    avgH:a._dates.size>0?a.totalH/a._dates.size:0
+  }));
+}
+function availStatus(v){
+  if(v>=6)return{label:'Ideal',    color:'#10B981',bg:'#D1FAE5'};
+  if(v>=4)return{label:'Aceitável',color:'#F59E0B',bg:'#FEF3C7'};
+  return        {label:'Crítico',  color:'#EF4444',bg:'#FEE2E2'};
+}
+function agStatus(p){
+  if(p>=80)return{label:'Bom',     color:'#10B981',bg:'#D1FAE5'};
+  if(p>=51)return{label:'Atenção', color:'#F59E0B',bg:'#FEF3C7'};
+  return         {label:'Crítico', color:'#EF4444',bg:'#FEE2E2'};
+}
+function supBadge(sup){
+  const sc=SUP_C[sup]||{bg:'#EEE',tc:'#666'};
+  return `<span class="eq-badge" style="background:${sc.bg};color:${sc.tc}">${sup}</span>`;
+}
 
-  if(mode==='range'){
-    // set defaults if empty
-    if(!document.getElementById('dt-from').value) document.getElementById('dt-from').value = daysAgoStr(6);
-    if(!document.getElementById('dt-to').value)   document.getElementById('dt-to').value   = todayStr();
-    filterFrom = document.getElementById('dt-from').value;
-    filterTo   = document.getElementById('dt-to').value;
+// ── WEEK HELPER ───────────────────────────────────────────────────────────────
+function getWeekDates(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const day=d.getDay(); // 0=Sun
+  const mon=new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1));
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  const fmt2=dt=>dt.toISOString().slice(0,10);
+  return {from:fmt2(mon),to:fmt2(sun)};
+}
+
+function filterRows(raw, t){
+  const dm=state.dateMode[t], sd=state.selDate[t], sd2=state.selDate2[t];
+  const rfrom=state.selRangeFrom[t], rto=state.selRangeTo[t];
+  const sup=state.selSup[t];
+  const ym=state.selMonth[t]; // 'YYYY-MM' or 'all'
+  return raw.filter(r=>{
+    // remove equipes zeradas
+    if(EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())) return false;
+    if(sup!=='Todos'&&r.SUPERVISOR!==sup)return false;
+    // filtro de mês
+    if(ym && ym!=='all' && !r.date_str.startsWith(ym)) return false;
+    if(dm==='acum') return true;
+    if(dm==='dia')  return r.date_str===sd;
+    if(dm==='2dias') return r.date_str===sd||r.date_str===sd2;
+    if(dm==='sem'){
+      const w=getWeekDates(sd);
+      return r.date_str>=w.from&&r.date_str<=w.to;
+    }
+    if(dm==='range') return r.date_str>=rfrom&&r.date_str<=rto;
+    return true;
+  });
+}
+function filterPR(t){ return filterRows(RAW_BY_DAY, t); }
+function filterAv(t){ return filterRows(RAW_AVAIL, t); }
+
+function periodLabel(){
+  const t=currentTab, dm=state.dateMode[t];
+  const ym=state.selMonth[t];
+  const mLabel=(ym&&ym!=='all')?` [${monthLabel(ym)}]`:'';
+  if(dm==='acum') return 'Acumulado'+mLabel;
+  if(dm==='dia'){
+    const d=new Date(state.selDate[t]+'T12:00:00');
+    return d.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  }
+  if(dm==='2dias'){
+    const d1=new Date(state.selDate[t]+'T12:00:00');
+    const d2=new Date(state.selDate2[t]+'T12:00:00');
+    return d1.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})
+      +' vs '+d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  }
+  if(dm==='sem'){
+    const w=getWeekDates(state.selDate[t]);
+    const d1=new Date(w.from+'T12:00:00'), d2=new Date(w.to+'T12:00:00');
+    return 'Semana: '+d1.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})
+      +' a '+d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  }
+  if(dm==='range'){
+    const d1=new Date(state.selRangeFrom[t]+'T12:00:00');
+    const d2=new Date(state.selRangeTo[t]+'T12:00:00');
+    return d1.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})
+      +' a '+d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+  }
+  return '';
+}
+
+// ── RENDER EQUIPE BUTTONS ─────────────────────────────────────────────────────
+function renderEquipeBtns(t){
+  const container=document.getElementById(`equipe-btns-${t}`);
+  const cur=state.selSup[t];
+  // Filtra equipes que têm dados reais (ao menos 1 registro)
+  const rawData=t===0?RAW_BY_DAY:RAW_AVAIL;
+  // Filtra pelo período/mês ativos — não mostra equipes sem dados no filtro atual
+  const filteredForBtns=t===0?filterPR(t).filter(r=>r.total_leads>0||r.ate1||r.ate2||r.gt2||r.sem_resp):filterAv(t).filter(r=>r.date_str);
+  const supsComDados=new Set(filteredForBtns.map(r=>r.SUPERVISOR));
+  const sups=['Todos',...ALL_SUPS.filter(s=>!EQUIPES_OCULTAS.includes(s)&&supsComDados.has(s))];
+  // Se equipe selecionada sumiu, volta para Todos
+  if(cur!=='Todos'&&!sups.includes(cur)){
+    state.selSup[t]='Todos';
+  }
+  container.innerHTML=sups.map(s=>{
+    const sc=s==='Todos'?{bg:'#E2E8F0',tc:'#1A2332'}:(SUP_C[s]||{bg:'#EEE',tc:'#666'});
+    const isActive=state.selSup[t]===s;
+    return `<button class="equipe-btn${isActive?' active':''}"
+      style="background:${sc.bg};color:${sc.tc};border-color:${isActive?sc.tc:'transparent'}"
+      onclick="selectEquipe('${s}',${t})">${s==='Todos'?'Todas as Equipes':s}</button>`;
+  }).join('');
+}
+
+function selectEquipe(sup,t){
+  state.selSup[t]=sup;
+  agPage=0;avPage=0;
+  render();
+}
+
+// ── MAIN SWITCHES ─────────────────────────────────────────────────────────────
+function switchTab(i){
+  currentTab=i;
+  document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  document.querySelectorAll('.panel').forEach((p,j)=>p.classList.toggle('active',j===i));
+  render();
+}
+
+function setPeriod(mode,t){
+  state.dateMode[t]=mode;
+  compSortSlice=-1; // reset sort comparativo ao mudar período
+  const modes=['acum','dia','sem','2dias','range'];
+  modes.forEach(m=>{
+    const el=document.getElementById(`btn-${m}-${t}`);
+    if(el) el.classList.toggle('active',m===mode);
+  });
+  // show/hide date pickers
+  document.getElementById(`date-wrap-${t}`).style.display=
+    (mode==='dia'||mode==='sem')?'':'none';
+  document.getElementById(`date2-wrap-${t}`).style.display=
+    mode==='2dias'?'':'none';
+  // For 2dias: auto-seleciona os 2 últimos dias úteis (excluindo hoje)
+  if(mode==='2dias'){
+    document.getElementById(`date-wrap-${t}`).style.display='';
+    const allDates=(t===0?ALL_DATES:(ALL_AVAIL_DATES||ALL_DATES)).filter(Boolean);
+    const todayStr=new Date().toISOString().slice(0,10);
+    const workdays=allDates.filter(d=>{
+      if(d>=todayStr) return false;
+      const wd=new Date(d+'T12:00:00').getDay();
+      return wd>=1&&wd<=5;
+    }).sort();
+    const last2=workdays.slice(-2);
+    if(last2.length>=1){
+      const sd1=document.getElementById(`sel-date-${t}`);
+      const sd2=document.getElementById(`sel-date2-${t}`);
+      if(sd1) sd1.value=last2[0]||'';
+      if(sd2) sd2.value=last2[1]||last2[0]||'';
+      state.selDate[t]=last2[0]||'';
+      state.selDate2[t]=last2[1]||last2[0]||'';
+    }
+  }
+  const rangeShow=mode==='range';
+  document.getElementById(`range-wrap-${t}`).style.display=rangeShow?'':'none';
+  document.getElementById(`range-wrap2-${t}`).style.display=rangeShow?'':'none';
+  render();
+}
+
+// ── POPULATE DATE SELECTS ─────────────────────────────────────────────────────
+function buildDateSelect(el, dates, selected){
+  if (!el) return;
+  el.innerHTML='';
+  [...dates].slice().reverse().forEach(d=>{
+    const o=document.createElement('option');
+    o.value=d;
+    const dt=new Date(d+'T12:00:00');
+    o.textContent=dt.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',year:'2-digit'});
+    if(d===selected)o.selected=true;
+    el.appendChild(o);
+  });
+}
+
+// ── MONTH HELPERS ─────────────────────────────────────────────────────────────
+const MONTH_NAMES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function buildMonthIndex(dates){
+  const idx={};
+  dates.forEach(d=>{
+    const ym=d.slice(0,7);
+    if(!idx[ym])idx[ym]=[];
+    idx[ym].push(d);
+  });
+  return idx;
+}
+
+function monthLabel(ym){
+  if(!ym||ym==='all')return'Todos os meses';
+  const parts=ym.split('-');
+  if(parts.length<2)return ym;
+  const [y,m]=parts;
+  return MONTH_NAMES[+m-1]+'/'+y.slice(2);
+}
+
+function buildMonthSelect(el, monthIdx, selectedYM){
+  if(!el)return;
+  el.innerHTML='';
+  // option "Todos os meses"
+  const all=document.createElement('option');
+  all.value='all'; all.textContent='Todos os meses';
+  if(selectedYM==='all')all.selected=true;
+  el.appendChild(all);
+  Object.keys(monthIdx).sort().forEach(ym=>{
+    const o=document.createElement('option');
+    o.value=ym;
+    o.textContent=monthLabel(ym);
+    if(ym===selectedYM)o.selected=true;
+    el.appendChild(o);
+  });
+}
+
+function getDatesForMonth(t){
+  const monthIdx = t===0 ? MONTHS_PR : MONTHS_AV;
+  const ym = state.selMonth[t];
+  if(!ym || ym==='all'){
+    // all dates across all months
+    return Object.values(monthIdx).flat().slice().sort();
+  }
+  return (monthIdx[ym]||[]).slice().sort();
+}
+
+function onMonthChange(t){
+  const el=document.getElementById(`sel-month-${t}`);
+  state.selMonth[t]=el.value;
+  const dates=getDatesForMonth(t);
+  const lastDate  = dates.length>0?dates[dates.length-1]:'';
+  const prevDate  = dates.length>1?dates[dates.length-2]:lastDate;
+  const firstDate = dates.length>0?dates[0]:'';
+  state.selDate[t]      = lastDate;
+  state.selDate2[t]     = prevDate;
+  state.selRangeFrom[t] = firstDate;
+  state.selRangeTo[t]   = lastDate;
+  buildDateSelect(document.getElementById(`sel-date-${t}`),       dates, lastDate);
+  buildDateSelect(document.getElementById(`sel-date2-${t}`),      dates, prevDate);
+  buildDateSelect(document.getElementById(`sel-range-from-${t}`), dates, firstDate);
+  buildDateSelect(document.getElementById(`sel-range-to-${t}`),   dates, lastDate);
+  agPage=0; avPage=0;
+  render();
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+function init(){
+  const prDates=[...new Set(
+    RAW_BY_DAY.filter(r=>!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())).map(r=>r.date_str)
+  )].filter(Boolean).sort();
+  const avDates=[...new Set(
+    RAW_AVAIL.filter(r=>r.date_str&&r.date_str.match(/^\d{4}-\d{2}-\d{2}$/)&&!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())).map(r=>r.date_str)
+  )].filter(Boolean).sort();
+
+  MONTHS_PR=buildMonthIndex(prDates);
+  MONTHS_AV=buildMonthIndex(avDates);
+
+  for(let i=0;i<2;i++){
+    const monthIdx=i===0?MONTHS_PR:MONTHS_AV;
+    const yms=Object.keys(monthIdx).sort();
+    const lastYM=yms.length>0?yms[yms.length-1]:'all';
+    state.selMonth[i]=lastYM;
+
+    buildMonthSelect(document.getElementById(`sel-month-${i}`),monthIdx,lastYM);
+
+    const dates=getDatesForMonth(i);
+    const lastDate  = dates.length>0?dates[dates.length-1]:'';
+    const prevDate  = dates.length>1?dates[dates.length-2]:lastDate;
+    const firstDate = dates.length>0?dates[0]:'';
+    state.selDate[i]      = lastDate;
+    state.selDate2[i]     = prevDate;
+    state.selRangeFrom[i] = firstDate;
+    state.selRangeTo[i]   = lastDate;
+
+    buildDateSelect(document.getElementById(`sel-date-${i}`),       dates, lastDate);
+    buildDateSelect(document.getElementById(`sel-date2-${i}`),      dates, prevDate);
+    buildDateSelect(document.getElementById(`sel-range-from-${i}`), dates, firstDate);
+    buildDateSelect(document.getElementById(`sel-range-to-${i}`),   dates, lastDate);
+  }
+  render();
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────────
+function render(){
+  const t=currentTab;
+  const dm=state.dateMode[t];
+
+  // sync month select → state
+  const mEl=document.getElementById(`sel-month-${t}`);
+  if(mEl) state.selMonth[t]=mEl.value;
+
+  // sync date selects → state
+  const dEl=document.getElementById(`sel-date-${t}`);
+  if(dEl&&(dm==='dia'||dm==='sem'||dm==='2dias'))state.selDate[t]=dEl.value||'';
+  const d2El=document.getElementById(`sel-date2-${t}`);
+  if(d2El&&dm==='2dias')state.selDate2[t]=d2El.value||'';
+  const rfEl=document.getElementById(`sel-range-from-${t}`);
+  if(rfEl&&dm==='range')state.selRangeFrom[t]=rfEl.value||'';
+  const rtEl=document.getElementById(`sel-range-to-${t}`);
+  if(rtEl&&dm==='range')state.selRangeTo[t]=rtEl.value||'';
+
+  // update header
+  document.getElementById('period-label').textContent=`${periodLabel()} · ${state.selSup[t]==='Todos'?'Todas as equipes':state.selSup[t]}`;
+
+  if(t===0) renderPR();
+  if(t===1) renderAvail();
+}
+
+// ── PRIMEIRA RESPOSTA ─────────────────────────────────────────────────────────
+let _agData=[];
+function renderPR(){
+  const prRows=filterPR(0);
+  const tots=aggTotals(prRows);
+  const agData=aggByAgent(prRows);
+  _agData=agData;
+
+  renderEquipeBtns(0);
+
+  const isTodos = state.selSup[0]==='Todos';
+  const compDiv = document.getElementById('pr-comparativo');
+  const kpiDiv  = document.getElementById('pr-kpis');
+
+  // rows filtered by period + month (no sup filter) — mesmos dados dos cards
+  const allRows = RAW_BY_DAY.filter(r=>{
+    if(EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())) return false;
+    const ym=state.selMonth[0];
+    if(ym&&ym!=='all'&&!r.date_str.startsWith(ym)) return false;
+    const dm=state.dateMode[0], sd=state.selDate[0], sd2=state.selDate2[0];
+    const rfrom=state.selRangeFrom[0], rto=state.selRangeTo[0];
+    if(dm==='dia')  return r.date_str===sd;
+    if(dm==='2dias')return r.date_str===sd||r.date_str===sd2;
+    if(dm==='sem'){const w=getWeekDates(sd);return r.date_str>=w.from&&r.date_str<=w.to;}
+    if(dm==='range')return r.date_str>=rfrom&&r.date_str<=rto;
+    return true;
+  });
+
+  // Header usa allRows (inclui todos os supervisores, respeita mês e período)
+  const tots0all=aggTotals(allRows);
+  document.getElementById('h-leads').textContent=fmt(tots0all.ate1+tots0all.ate2+tots0all.gt2);
+  document.getElementById('h-ate2').textContent=fmt(tots0all.ate1+tots0all.ate2);
+  document.getElementById('h-ate2-pct').textContent=pct(tots0all.ate1+tots0all.ate2,tots0all.ate1+tots0all.ate2+tots0all.gt2);
+  document.getElementById('h-gt2').textContent=fmt(tots0all.gt2);
+  document.getElementById('h-gt2-pct').textContent=pct(tots0all.gt2,tots0all.ate1+tots0all.ate2+tots0all.gt2);
+
+  if(isTodos){
+    compDiv.style.display='block';
+    kpiDiv.style.display='none';
+    const dm=state.dateMode[0];
+    const ym=state.selMonth[0];
+    // Só mostra equipes com dados reais no período/filtro ativo
+    const supsComDadosAtual=new Set(allRows.filter(r=>r.total_leads>0||r.ate1||r.ate2||r.gt2||r.sem_resp).map(r=>r.SUPERVISOR));
+    const visibleSups=ALL_SUPS.filter(s=>!EQUIPES_OCULTAS.includes(s)&&supsComDadosAtual.has(s));
+
+    if(dm==='sem'||dm==='2dias'||dm==='range'){
+      // ── TABELA COMPARATIVA — todas as equipes × fatias de tempo ──────────
+      // Monta as fatias (colunas)
+      let slicesCmp=[];
+      const todayStr=new Date().toISOString().slice(0,10);
+      const fmtD=d=>new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+
+      if(dm==='sem'){
+        const weekSet={};
+        RAW_BY_DAY.filter(r=>!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())
+          &&r.total_leads>0&&(ym&&ym!=='all'?r.date_str.startsWith(ym):true))
+          .forEach(r=>{const w=getWeekDates(r.date_str);const k=w.from+'_'+w.to;if(!weekSet[k])weekSet[k]=w;});
+        slicesCmp=Object.values(weekSet).sort((a,b)=>a.from<b.from?-1:1).map((w,i)=>({
+          label:`${fmtD(w.from)} – ${fmtD(w.to)}`,
+          tag: todayStr>=w.from&&todayStr<=w.to?'● Atual':`Sem ${i+1}`,
+          isCur: todayStr>=w.from&&todayStr<=w.to,
+          filter: r=>r.date_str>=w.from&&r.date_str<=w.to
+        }));
+      } else if(dm==='2dias'){
+        const sd=state.selDate[0], sd2=state.selDate2[0];
+        slicesCmp=[
+          {label:fmtD(sd), tag:'Dia 1', isCur:sd===todayStr, filter:r=>r.date_str===sd},
+          {label:fmtD(sd2),tag:'Dia 2', isCur:sd2===todayStr, filter:r=>r.date_str===sd2},
+        ];
+      } else { // range — divide por semanas dentro do range
+        const rfrom=state.selRangeFrom[0], rto=state.selRangeTo[0];
+        const weekSet={};
+        RAW_BY_DAY.filter(r=>r.date_str>=rfrom&&r.date_str<=rto&&r.total_leads>0
+          &&!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase()))
+          .forEach(r=>{const w=getWeekDates(r.date_str);const k=w.from+'_'+w.to;if(!weekSet[k])weekSet[k]=w;});
+        slicesCmp=Object.values(weekSet).sort((a,b)=>a.from<b.from?-1:1).map((w,i)=>({
+          label:`${fmtD(w.from)} – ${fmtD(w.to)}`,
+          tag:`Sem ${i+1}`,
+          isCur:todayStr>=w.from&&todayStr<=w.to,
+          filter:r=>r.date_str>=w.from&&r.date_str<=w.to
+        }));
+      }
+
+      const modeLabel={'sem':'Semanal','2dias':'2 Dias','range':'Período'}[dm];
+      if(!slicesCmp.length){
+        compDiv.innerHTML=`<div class="card"><div class="card-title">Sem dados para o período</div></div>`;
+      } else {
+        compDiv.innerHTML=`<div class="card" style="overflow-x:auto;margin-bottom:16px">
+          <div class="card-title">📊 Comparativo ${modeLabel} — Todas as Equipes${ym&&ym!=='all'?' · '+monthLabel(ym):''}</div>
+          <table style="width:100%;border-collapse:collapse;min-width:${200+slicesCmp.length*160}px">
+            <thead><tr style="background:#F7F9FC">
+              <th style="text-align:left;padding:10px 12px;font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.7px;text-transform:uppercase;border-bottom:2px solid #E2E8F0;min-width:160px">Equipe</th>
+              ${slicesCmp.map(s=>`<th style="text-align:center;padding:10px 8px;border-bottom:2px solid #E2E8F0;border-left:1px solid #E2E8F0;min-width:155px;background:${s.isCur?'#F0FDF4':'#F7F9FC'}">
+                <div style="font-size:11px;font-weight:800;color:#1A2332">${s.label}</div>
+                <div style="font-size:9px;color:${s.isCur?'#10B981':'#94A3B8'};font-weight:600">${s.tag}</div>
+              </th>`).join('')}
+            </tr></thead>
+            <tbody>${visibleSups.map(sup=>{
+              const sc=SUP_C[sup]||{bg:'#EEE',tc:'#666'};
+              const baseRows=RAW_BY_DAY.filter(r=>r.SUPERVISOR===sup&&r.total_leads>0
+                &&(ym&&ym!=='all'?r.date_str.startsWith(ym):true));
+              const cells=slicesCmp.map((s,si)=>{
+                const rows=baseRows.filter(s.filter);
+                const t=aggTotals(rows);
+                const _lr=t.ate1+t.ate2+t.gt2;
+                const p2=_lr>0?((t.ate1+t.ate2)/_lr*100):0;
+                const st=_lr>0?agStatus(p2):null;
+                let delta=null;
+                if(si>0){const pr=aggTotals(baseRows.filter(slicesCmp[si-1].filter));const _plr=pr.ate1+pr.ate2+pr.gt2;if(_plr>0&&_lr>0)delta=p2-((pr.ate1+pr.ate2)/_plr*100);}
+                return `<td style="text-align:center;padding:10px 8px;border-bottom:1px solid #F0F4F8;border-left:1px solid #F0F4F8;background:${s.isCur?'#F0FDF4':''}">
+                  ${_lr>0?`
+                    <div style="font-size:20px;font-weight:900;color:${st.color}">${p2.toFixed(1)}%</div>
+                    <div style="font-size:10px;color:#94A3B8">${fmt(_lr)} leads</div>
+                    <span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
+                    ${delta!==null?`<div style="font-size:10px;font-weight:700;color:${delta>=0?'#10B981':'#EF4444'};margin-top:3px">${delta>=0?'▲':'▼'}${Math.abs(delta).toFixed(1)}%</div>`:''}
+                  `:'<span style="color:#CBD5E0;font-size:12px">–</span>'}
+                </td>`;
+              }).join('');
+              return `<tr onmouseover="this.style.background='#F7FAFB'" onmouseout="this.style.background=''">
+                <td style="padding:10px 12px;border-bottom:1px solid #F0F4F8"><span class="eq-badge" style="background:${sc.bg};color:${sc.tc};font-size:11px;padding:4px 8px">${sup}</span></td>
+                ${cells}</tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>`;
+      }
+
+    } else if(dm==='acum' && (!ym || ym==='all')){
+      // ── COMPARATIVO MENSAL — todas as equipes × meses ──────────────────────
+      const monthSet=[...new Set(
+        RAW_BY_DAY.filter(r=>!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())&&r.total_leads>0)
+          .map(r=>r.date_str.slice(0,7))
+      )].filter(Boolean).sort();
+
+      if(!monthSet.length){
+        compDiv.innerHTML=`<div class="card"><div class="card-title">Sem dados</div></div>`;
+      } else {
+        const curYM=new Date().toISOString().slice(0,7);
+        const monthSlices=monthSet.map(ym2=>({
+          label: monthLabel(ym2),
+          ym: ym2,
+          isCur: ym2===curYM,
+          filter: r=>r.date_str.startsWith(ym2)
+        }));
+        compDiv.innerHTML=`<div class="card" style="overflow-x:auto;margin-bottom:16px">
+          <div class="card-title">📅 Comparativo Mensal — Todas as Equipes</div>
+          <table style="width:100%;border-collapse:collapse;min-width:${200+monthSlices.length*155}px">
+            <thead><tr style="background:#F7F9FC">
+              <th style="text-align:left;padding:10px 12px;font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.7px;text-transform:uppercase;border-bottom:2px solid #E2E8F0;min-width:160px">Equipe</th>
+              ${monthSlices.map(s=>`
+                <th style="text-align:center;padding:10px 8px;border-bottom:2px solid #E2E8F0;border-left:1px solid #E2E8F0;min-width:145px;background:${s.isCur?'#F0FDF4':'#F7F9FC'}">
+                  <div style="font-size:12px;font-weight:800;color:#1A2332">${s.label}</div>
+                  ${s.isCur?'<div style="font-size:9px;color:#10B981;font-weight:600">● atual</div>':''}
+                </th>`).join('')}
+            </tr></thead>
+            <tbody>${visibleSups.map(sup=>{
+              const sc=SUP_C[sup]||{bg:'#EEE',tc:'#666'};
+              const baseRows=RAW_BY_DAY.filter(r=>r.SUPERVISOR===sup&&r.total_leads>0);
+              const cells=monthSlices.map((s,si)=>{
+                const rows=baseRows.filter(s.filter);
+                const t=aggTotals(rows);
+                const lr=t.ate1+t.ate2+t.gt2;
+                const p2=lr>0?((t.ate1+t.ate2)/lr*100):0;
+                const st=lr>0?agStatus(p2):null;
+                let delta=null;
+                if(si>0){
+                  const pr=aggTotals(baseRows.filter(monthSlices[si-1].filter));
+                  const plr=pr.ate1+pr.ate2+pr.gt2;
+                  if(plr>0&&lr>0) delta=p2-((pr.ate1+pr.ate2)/plr*100);
+                }
+                return `<td style="text-align:center;padding:10px 8px;border-bottom:1px solid #F0F4F8;border-left:1px solid #F0F4F8;background:${s.isCur?'#F0FDF4':''}">
+                  ${lr>0?`
+                    <div style="font-size:20px;font-weight:900;color:${st.color}">${p2.toFixed(1)}%</div>
+                    <div style="font-size:10px;color:#94A3B8">${fmt(lr)} leads</div>
+                    <span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
+                    ${delta!==null?`<div style="font-size:10px;font-weight:700;color:${delta>=0?'#10B981':'#EF4444'};margin-top:3px">${delta>=0?'▲':'▼'}${Math.abs(delta).toFixed(1)}%</div>`:''}
+                  `:'<span style="color:#CBD5E0;font-size:12px">–</span>'}
+                </td>`;
+              }).join('');
+              return `<tr onmouseover="this.style.background='#F7FAFB'" onmouseout="this.style.background=''">
+                <td style="padding:10px 12px;border-bottom:1px solid #F0F4F8">
+                  <span class="eq-badge" style="background:${sc.bg};color:${sc.tc};font-size:11px;padding:4px 8px">${sup}</span>
+                </td>${cells}</tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>`;
+      }
+
+    } else {
+      const supTots=visibleSups.map(s=>({sup:s,...aggTotals(allRows.filter(r=>r.SUPERVISOR===s&&r.total_leads>0))}));
+      const maxLeads=Math.max(...supTots.map(s=>s.ate1+s.ate2+s.gt2),1);
+      compDiv.innerHTML=`<div class="comp-grid">${supTots.map(s=>{
+        const sc=SUP_C[s.sup]||{bg:'#EEF',tc:'#333'};
+        const lr=s.ate1+s.ate2+s.gt2;
+        const p2=lr>0?((s.ate1+s.ate2)/lr*100):0;
+        const pGt=lr>0?(s.gt2/lr*100):0;
+        const barW=(lr/maxLeads*100).toFixed(1);
+        const st=agStatus(p2);
+        const supRows=allRows.filter(r=>r.SUPERVISOR===s.sup&&r.total_leads>0);
+        const agCnt=[...new Set(supRows.map(r=>r.POWER_BI))].length;
+        const agWithin=aggByAgent(supRows).filter(a=>a.pctAte2>=80).length;
+        return `<div class="comp-card">
+          <div class="comp-header" style="background:${sc.bg};color:${sc.tc}">${s.sup}</div>
+          <div class="comp-bar-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94A3B8"><span>Leads</span><span style="font-weight:700;color:#1A2332">${fmt(lr)}</span></div>
+            <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${barW}%;background:${sc.tc}40"></div></div>
+          </div>
+          <div class="comp-row"><div><div class="comp-lbl">≤ 2min</div><div class="comp-val" style="color:${st.color}">${fmt(s.ate1+s.ate2)}</div></div>
+            <div style="text-align:right"><div class="comp-sub" style="color:${st.color}">${p2.toFixed(1)}%</div><span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span></div></div>
+          <div class="comp-row"><div><div class="comp-lbl">&gt; 2min</div><div class="comp-val" style="color:#F59E0B">${fmt(s.gt2)}</div></div>
+            <div style="text-align:right"><div class="comp-sub" style="color:#F59E0B">${pGt.toFixed(1)}%</div></div></div>
+          <div class="comp-row"><div><div class="comp-lbl">Promotores</div><div class="comp-val" style="color:#2563EB">${agCnt}</div></div>
+            <div style="text-align:right"><div class="comp-lbl">Dentro meta</div><div class="comp-sub" style="color:#10B981">${agWithin}</div></div></div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+
   } else {
-    filterFrom = null; filterTo = null;
+    // ── KPIs + COMPARATIVO SEMANAL para equipe específica ──────────────────
+    compDiv.style.display='block';
+    kpiDiv.style.display='grid';
+    kpiDiv.innerHTML=[
+      {l:'Leads Totais',v:fmt(tots.ate1+tots.ate2+tots.gt2),accent:'#2563EB'},
+      {l:'Respondidos ≤2min',v:fmt(tots.ate1+tots.ate2),sub:pct(tots.ate1+tots.ate2,tots.ate1+tots.ate2+tots.gt2),accent:'#10B981'},
+      {l:'Respondidos >2min',v:fmt(tots.gt2),sub:pct(tots.gt2,tots.ate1+tots.ate2+tots.gt2),accent:'#F59E0B'},
+    ].map(k=>`<div class="kpi-inner">
+      <div class="val" style="color:${k.accent}">${k.v}</div>
+      <div class="lbl">${k.l}</div>
+      ${k.sub?`<div class="sub" style="color:${k.accent}">${k.sub}</div>`:''}
+    </div>`).join('');
+
+    // ── Comparativo semanal: usa semanas COM dados da equipe, respeitando mês
+    const sup=state.selSup[0];
+    const ym=state.selMonth[0];
+    const supRows=RAW_BY_DAY.filter(r=>r.SUPERVISOR===sup&&r.date_str&&r.total_leads>0
+      &&(ym&&ym!=='all'?r.date_str.startsWith(ym):true));
+    const weekSet={};
+    supRows.forEach(r=>{
+      const w=getWeekDates(r.date_str);
+      const key=w.from+'_'+w.to;
+      if(!weekSet[key]) weekSet[key]={from:w.from,to:w.to,rows:[]};
+      weekSet[key].rows.push(r);
+    });
+    const todayStr=new Date().toISOString().slice(0,10);
+    const weeks=Object.values(weekSet).sort((a,b)=>a.from<b.from?-1:1);
+
+    if(weeks.length>0){
+      compDiv.innerHTML=`<div class="card" style="margin-bottom:16px">
+        <div class="card-title">📅 Comparativo Semanal — ${sup}${ym&&ym!=='all'?' · '+monthLabel(ym):''}</div>
+        <div style="display:grid;grid-template-columns:repeat(${weeks.length},1fr);gap:10px">
+        ${weeks.map((w,wi)=>{
+          const t2=aggTotals(w.rows);
+          const p2=t2.total_leads>0?((t2.ate1+t2.ate2)/t2.total_leads*100):0;
+          const st=agStatus(p2);
+          const d1=new Date(w.from+'T12:00:00'),d2=new Date(w.to+'T12:00:00');
+          const label=d1.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' – '+d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+          const agTotal=[...new Set(w.rows.map(r=>r.POWER_BI))].length;
+          const agWithin=aggByAgent(w.rows).filter(a=>a.pctAte2>=80).length;
+          const isCur=todayStr>=w.from&&todayStr<=w.to;
+          // delta vs semana anterior
+          let delta=null;
+          if(wi>0){
+            const pw=weeks[wi-1];
+            const pt=aggTotals(pw.rows);
+            if(pt.total_leads>0) delta=p2-((pt.ate1+pt.ate2)/pt.total_leads*100);
+          }
+          return `<div style="background:${isCur?'#F0FDF4':'#F8FAFC'};border:2px solid ${isCur?st.color:st.color+'44'};border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:#94A3B8;font-weight:600;margin-bottom:6px">${isCur?'● ATUAL · ':''} ${label}</div>
+            <div style="font-size:22px;font-weight:900;color:${st.color}">${p2.toFixed(1)}%</div>
+            <div style="font-size:10px;color:#94A3B8;margin-bottom:4px">≤ 2min</div>
+            <span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
+            ${delta!==null?`<div style="font-size:11px;font-weight:700;color:${delta>=0?'#10B981':'#EF4444'};margin-top:4px">${delta>=0?'▲':'▼'}${Math.abs(delta).toFixed(1)}%</div>`:''}
+            <div style="margin-top:8px;display:flex;justify-content:space-around">
+              <div><div style="font-size:11px;font-weight:700;color:#4A5568">${fmt(t2.ate1+t2.ate2+t2.gt2)}</div><div style="font-size:9px;color:#94A3B8">leads</div></div>
+              <div><div style="font-size:11px;font-weight:700;color:#10B981">${agWithin}/${agTotal}</div><div style="font-size:9px;color:#94A3B8">na meta</div></div>
+            </div>
+          </div>`;
+        }).join('')}
+        </div>
+      </div>`;
+    } else {
+      compDiv.innerHTML='';
+    }
   }
 
-  updateActiveLabel();
-  rebuildFromRows();
+  // Top 10
+  const minL=5;
+  const sorted=[...agData].filter(a=>(a.ate1+a.ate2+a.gt2)>=minL);
+  const best=[...sorted].filter(a=>a.pctAte2>=80).sort((a,b)=>b.pctAte2-a.pctAte2).slice(0,10);
+  const worst=[...sorted].sort((a,b)=>a.pctAte2-b.pctAte2).slice(0,10);
+
+  ['best','worst'].forEach(type=>{
+    const data=type==='best'?best:worst;
+    const color=type==='best'?'#10B981':'#EF4444';
+    document.getElementById(`pr-top10-${type}`).innerHTML=data.map((a,i)=>{
+      const sc=SUP_C[a.sup]||{bg:'#EEE',tc:'#666'};
+      return `<div class="top10-row" style="border-left:3px solid ${i<3?color:'transparent'}">
+        <div class="top10-medal">${type==='best'?(medals[i]||`<span style="font-size:11px;color:#94A3B8;font-weight:700">${i+1}</span>`):`<span style="font-size:11px;color:#94A3B8;font-weight:700">${i+1}</span>`}</div>
+        <div>
+          <div class="top10-name">${a.name}</div>
+          <span class="top10-badge" style="background:${sc.bg};color:${sc.tc}">${a.sup}</span>
+        </div>
+        <div class="top10-leads">${fmt(a.ate1+a.ate2+a.gt2)}</div>
+        <div class="top10-pct" style="color:${color}">${a.pctAte2.toFixed(1)}%</div>
+      </div>`;
+    }).join('');
+  });
+
+  agPage=0;
+  renderAgTable();
 }
 
-function applyRange(){
-  filterFrom = document.getElementById('dt-from').value;
-  filterTo   = document.getElementById('dt-to').value;
-  updateActiveLabel();
-  rebuildFromRows();
+function getWeekDates(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  const day=d.getDay(); // 0=Dom
+  const diff=(day===0)?-6:1-day;
+  const mon=new Date(d); mon.setDate(d.getDate()+diff);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  const f=dt=>dt.toISOString().slice(0,10);
+  return {from:f(mon),to:f(sun)};
 }
 
-function updateActiveLabel(){
-  var lbl = '';
-  if(filterMode==='all')   lbl = 'Todos os dados';
-  else if(filterMode==='week') lbl = 'Seg '+mondayStr().slice(5).replace('-','/')+' - hoje';
-  else if(filterMode==='2d')   lbl = daysAgoStr(1).slice(5).replace('-','/')+' - '+todayStr().slice(5).replace('-','/');
-  else if(filterMode==='range' && filterFrom && filterTo) lbl = filterFrom.slice(5).replace('-','/')+'/'+filterFrom.slice(0,4)+' - '+filterTo.slice(5).replace('-','/')+'/'+filterTo.slice(0,4);
-  document.getElementById('df-active-label').textContent = lbl;
-}
-
-// - check if a row passes the date filter -
-function rowPassesFilter(dateStr){
-  if(filterMode==='all') return true;
-  if(!dateStr) return filterMode==='all';
-
-  var from, to;
-  if(filterMode==='week'){ from=mondayStr(); to=todayStr(); }
-  else if(filterMode==='2d'){ from=daysAgoStr(1); to=todayStr(); }
-  else if(filterMode==='range'){ from=filterFrom||''; to=filterTo||''; }
-  else return true;
-
-  return dateStr >= from && dateStr <= to;
-}
-
-// - data loading -
-function loadData(){
-  showLoading("Buscando dados do Google Sheets...");
-  fetch(CSV_URL)
-    .then(function(r){
-      if(!r.ok) throw new Error("HTTP "+r.status);
-      return r.text();
-    })
-    .then(function(csv){
-      showLoading("Processando dados...");
-      setTimeout(function(){
-        try{
-          var rows = parseCSV(csv);
-          if(rows.length<2) throw new Error("Planilha vazia");
-          HEADERS = rows[0].map(function(h){return h.trim().replace(/^"|"$/g,'');});
-          ALL_ROWS = rows.slice(1);
-          rebuildFromRows();
-          hideLoading();
-          document.getElementById('last-upd').textContent='Atualizado '+new Date().toLocaleTimeString('pt-BR');
-        }catch(e){ showError("Erro ao processar:\n"+e.message); }
-      },50);
-    })
-    .catch(function(e){
-      showError("Nao foi possivel acessar a planilha.\n\n"+e.message);
+function buildCompSlices(){
+  const dm=state.dateMode[0];
+  if(dm!=='sem'&&dm!=='2dias') return [];
+  if(dm==='2dias'){
+    const sd=state.selDate[0], sd2=state.selDate2[0];
+    const fD=d=>new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+    return [
+      {label:fD(sd), short:'Dia 1', filter:r=>r.date_str===sd},
+      {label:fD(sd2),short:'Dia 2', filter:r=>r.date_str===sd2},
+    ];
+  }
+  // semanal: últimas 4 semanas com dados
+  const weekSet={};
+  RAW_BY_DAY.forEach(r=>{
+    if(!r.date_str) return;
+    const w=getWeekDates(r.date_str);
+    const key=w.from+'_'+w.to;
+    if(!weekSet[key]) weekSet[key]={from:w.from,to:w.to};
+  });
+  const todayStr=new Date().toISOString().slice(0,10);
+  return Object.values(weekSet)
+    .sort((a,b)=>a.from<b.from?-1:1)
+    .slice(-4)
+    .map((w,i,arr)=>{
+      const isCur=todayStr>=w.from&&todayStr<=w.to;
+      const d1=new Date(w.from+'T12:00:00'),d2=new Date(w.to+'T12:00:00');
+      const lbl=d1.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' – '+d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+      return {label:lbl, short:isCur?'Atual':`S${i+1}`, isCur, filter:r=>r.date_str>=w.from&&r.date_str<=w.to};
     });
 }
 
-// - rebuild AGENTS + QUEUES from ALL_ROWS applying current filter -
-function rebuildFromRows(){
-  var iAgent   = HEADERS.indexOf('Currently Assigned to');
-  var iQueue   = HEADERS.indexOf('Session Team');
-  var iTag     = HEADERS.indexOf('Tag de encerramento');
-  var iSession = HEADERS.indexOf('Session ID');
-  // Try both possible column names for the date
-  var iDate    = HEADERS.indexOf('Time of Chat Assignment');
-  if(iDate===-1) iDate = HEADERS.indexOf('Chat Start In');
-  if(iDate===-1) iDate = HEADERS.indexOf('Chat Start Time');
-  // fallback: try to find any column with "Chat Start" or "Time of"
-  if(iDate===-1){
-    for(var hi=0;hi<HEADERS.length;hi++){
-      if(HEADERS[hi].indexOf('Chat Start')===0||HEADERS[hi].indexOf('Time of Chat')===0){iDate=hi;break;}
-    }
-  }
+function renderAgTable(){
+  const search=(document.getElementById('ag-search')?.value||'').toLowerCase();
+  let data=[..._agData];
+  if(search) data=data.filter(a=>a.name.toLowerCase().includes(search)||a.sup.toLowerCase().includes(search));
 
-  if(iAgent===-1) throw new Error("Coluna 'Currently Assigned to' nao encontrada. Cabecalhos: "+HEADERS.slice(0,8).join(', '));
-  if(iQueue===-1) throw new Error("Coluna 'Session Team' nao encontrada.");
+  // Slices comparativos
+  const slices=buildCompSlices();
+  const hasComp=slices.length>0;
 
-  var agQ={},agT={},agX={},qAg={},qAgX={},qT={},qX={};
-
-  for(var i=0;i<ALL_ROWS.length;i++){
-    var row = ALL_ROWS[i];
-    if(row.length<2) continue;
-    if(iSession>=0 && !(row[iSession]||'').trim()) continue;
-
-    // date filter
-    if(iDate>=0){
-      var dstr = parseDate((row[iDate]||'').trim());
-      if(!rowPassesFilter(dstr)) continue;
-    }
-
-    var agent = (row[iAgent]||'').trim();
-    var queue = (row[iQueue]||'').trim()||'DEFAULT';
-    var tag   = iTag>=0?(row[iTag]||'').trim():'';
-    var isT10 = tag.indexOf('10')===0;
-
-    if(!qT[queue]){qT[queue]=0;qX[queue]=0;qAg[queue]={};qAgX[queue]={};}
-    qT[queue]++;
-    if(isT10) qX[queue]++;
-
-    if(agent){
-      if(!agT[agent]){agT[agent]=0;agX[agent]=0;agQ[agent]={};}
-      agT[agent]++;
-      if(isT10) agX[agent]++;
-      agQ[agent][queue]=(agQ[agent][queue]||0)+1;
-      qAg[queue][agent]=(qAg[queue][agent]||0)+1;
-      if(isT10) qAgX[queue][agent]=(qAgX[queue][agent]||0)+1;
-    }
-  }
-
-  AGENTS=Object.keys(agT).map(function(n){
-    var qs=Object.keys(agQ[n]).map(function(q){return{n:q,c:agQ[n][q]};}).sort(function(a,b){return b.c-a.c;});
-    return{n:n,t:agT[n],x:agX[n]||0,q:qs};
-  }).sort(function(a,b){return b.t-a.t;});
-
-  QUEUES=Object.keys(qT).map(function(n){
-    var ags=Object.keys(qAg[n]).map(function(a){return{n:a,c:qAg[n][a],x:qAgX[n][a]||0};}).sort(function(a,b){return b.c-a.c;});
-    return{n:n,t:qT[n],x:qX[n]||0,a:ags};
-  }).sort(function(a,b){return b.t-a.t;});
-
-  A_TOTAL=AGENTS.reduce(function(s,a){return s+a.t;},0);
-  Q_TOTAL=QUEUES.reduce(function(s,q){return s+q.t;},0);
-  A_MAX=AGENTS.length?AGENTS[0].t:1;
-  Q_MAX=QUEUES.length?QUEUES[0].t:1;
-
-  var totalX=QUEUES.reduce(function(s,q){return s+q.x;},0);
-  document.getElementById('kv-total').textContent=Q_TOTAL.toLocaleString('pt-BR');
-  document.getElementById('kv-tag10').textContent=totalX.toLocaleString('pt-BR');
-  document.getElementById('kv-conv').textContent=Q_TOTAL?(totalX/Q_TOTAL*100).toFixed(2)+'%':'--';
-
-  // reset selections
-  state.a.cur=null; state.q.cur=null;
-  document.getElementById('a-pnl').innerHTML='<div class="ph"><div class="ph-ico">&#128100;</div><div>Selecione um agente para ver detalhes</div></div>';
-  document.getElementById('q-pnl').innerHTML='<div class="ph"><div class="ph-ico">&#128203;</div><div>Selecione uma fila para ver os agentes</div></div>';
-
-  aBuildVis(); aRender();
-  qBuildVis(); qRender();
-  updateActiveLabel();
-}
-
-// - CSV parser -
-function parseCSV(text){
-  var rows=[],lines=text.split('\n');
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].replace(/\r$/,'');
-    if(!line.trim()) continue;
-    var cols=[],cur='',inQ=false;
-    for(var j=0;j<line.length;j++){
-      var c=line[j];
-      if(c==='"'){if(inQ&&line[j+1]==='"'){cur+='"';j++;}else inQ=!inQ;}
-      else if(c===','&&!inQ){cols.push(cur);cur='';}
-      else cur+=c;
-    }
-    cols.push(cur);
-    rows.push(cols);
-  }
-  return rows;
-}
-
-// - UI helpers -
-function showLoading(msg){
-  document.getElementById('loading').classList.remove('hidden');
-  document.getElementById('load-msg').textContent=msg||'Carregando...';
-  document.getElementById('load-err').style.display='none';
-  document.querySelector('.spinner').style.display='block';
-}
-function hideLoading(){document.getElementById('loading').classList.add('hidden');}
-function showError(msg){
-  document.getElementById('load-msg').textContent='';
-  document.querySelector('.spinner').style.display='none';
-  var el=document.getElementById('load-err');
-  el.textContent=msg; el.style.display='block';
-}
-function switchTab(name){
-  state.sheet=name;
-  document.getElementById('tab-agents').className='tab'+(name==='agents'?' on':'');
-  document.getElementById('tab-queues').className='tab'+(name==='queues'?' on':'');
-  document.getElementById('sheet-agents').className='sheet'+(name==='agents'?' on':'');
-  document.getElementById('sheet-queues').className='sheet'+(name==='queues'?' on':'');
-}
-
-/* - AGENTS - */
-function aBuildVis(){
-  var q=document.getElementById('aq').value.toLowerCase();
-  var s=state.a; s.vis=[];
-  for(var i=0;i<AGENTS.length;i++) if(!q||AGENTS[i].n.toLowerCase().indexOf(q)>=0) s.vis.push(i);
-  if(s.sm==='a') s.vis.sort(function(a,b){return AGENTS[a].n.localeCompare(AGENTS[b].n,'pt');});
-  else if(s.sm==='c') s.vis.sort(function(a,b){return (AGENTS[b].t?AGENTS[b].x/AGENTS[b].t:0)-(AGENTS[a].t?AGENTS[a].x/AGENTS[a].t:0);});
-  else s.vis.sort(function(a,b){return AGENTS[b].t-AGENTS[a].t;});
-}
-function aSort(m){
-  state.a.sm=m;
-  document.getElementById('abv').className='btn'+(m==='v'?' on':'');
-  document.getElementById('aba').className='btn'+(m==='a'?' on':'');
-  document.getElementById('abc').className='btn'+(m==='c'?' on':'');
-  aBuildVis(); aRender();
-}
-function aFilter(){aBuildVis();aRender();}
-function aRender(){
-  var vis=state.a.vis,cur=state.a.cur;
-  document.getElementById('acnt').textContent=vis.length+' agente'+(vis.length!==1?'s':'');
-  var out='';
-  for(var k=0;k<vis.length;k++){
-    var i=vis[k],a=AGENTS[i];
-    var rank=i+1,w=(a.t/A_MAX*100).toFixed(1);
-    var cvr=a.t?a.x/a.t:0,cvs=a.t?(cvr*100).toFixed(1)+'%':'--',cvc=cvr>0?'good':'zero';
-    out+='<div class="row'+(cur===i?' sel':'')+'" data-i="'+i+'">';
-    out+='<div class="rk'+(rank<=3?' g':'')+'">'+rank+'</div>';
-    out+='<div class="info"><div class="nm" title="'+h(a.n)+'">'+h(a.n)+'</div>';
-    out+='<div class="mini"><div class="mini-f" style="width:'+w+'%"></div></div></div>';
-    out+='<div class="nums"><div class="tot">'+a.t.toLocaleString('pt-BR')+'</div>';
-    out+='<div class="cv '+cvc+'">&#10003; '+cvs+'</div></div></div>';
-  }
-  document.getElementById('a-lst').innerHTML=out;
-}
-document.getElementById('a-lst').addEventListener('click',function(e){
-  var el=e.target;
-  while(el&&el.dataset.i===undefined) el=el.parentElement;
-  if(el&&el.dataset.i!==undefined) aSel(parseInt(el.dataset.i,10));
-});
-function aSel(i){
-  state.a.cur=i; aRender();
-  var a=AGENTS[i],mq=a.q.length?a.q[0].c:1;
-  var fn=a.q.length?a.q[0].n:'-'; if(fn.length>18) fn=fn.slice(0,18)+'...';
-  var cvs=a.t?(a.x/a.t*100).toFixed(2)+'%':'--';
-  var kpis='';
-  kpis+='<div class="akpi"><span class="akv">'+a.t.toLocaleString('pt-BR')+'</span><span class="akl">total leads</span></div>';
-  kpis+='<div class="akpi"><span class="akv">'+(A_TOTAL?((a.t/A_TOTAL)*100).toFixed(2)+'%':'--')+'</span><span class="akl">share</span></div>';
-  kpis+='<div class="akpi hl"><span class="akv g">'+a.x+'</span><span class="akl">tag 10</span></div>';
-  kpis+='<div class="akpi hl"><span class="akv g">'+cvs+'</span><span class="akl">conversao</span></div>';
-  kpis+='<div class="akpi"><span class="akv">'+a.q.length+'</span><span class="akl">filas</span></div>';
-  var rows='';
-  for(var j=0;j<a.q.length;j++){
-    var qq=a.q[j],col=COLORS[j%COLORS.length];
-    var qp=(qq.c/a.t*100).toFixed(1),qw=(qq.c/mq*100).toFixed(1);
-    rows+='<div class="drow"><div class="di'+(j<3?' g':'')+'">'+(j+1)+'</div>';
-    rows+='<div class="dn" title="'+h(qq.n)+'">'+h(qq.n)+'</div>';
-    rows+='<div class="dbar"><div class="dbt"><div class="dbf" style="width:'+qw+'%;background:'+col+'"></div></div></div>';
-    rows+='<div class="dc" style="color:'+col+'">'+qq.c+'</div>';
-    rows+='<div class="dp">'+qp+'%</div></div>';
-  }
-  document.getElementById('a-pnl').innerHTML=
-    '<div class="dtitle">'+h(a.n)+'</div>'+
-    '<div class="akpis">'+kpis+'</div>'+
-    '<div class="sec">Distribuicao por fila</div>'+
-    '<div class="dlist">'+rows+'</div>';
-}
-
-/* - QUEUES - */
-function qBuildVis(){
-  var q=document.getElementById('qq').value.toLowerCase();
-  var s=state.q; s.vis=[];
-  for(var i=0;i<QUEUES.length;i++) if(!q||QUEUES[i].n.toLowerCase().indexOf(q)>=0) s.vis.push(i);
-  if(s.sm==='a') s.vis.sort(function(a,b){return QUEUES[a].n.localeCompare(QUEUES[b].n,'pt');});
-  else if(s.sm==='c') s.vis.sort(function(a,b){return (QUEUES[b].t?QUEUES[b].x/QUEUES[b].t:0)-(QUEUES[a].t?QUEUES[a].x/QUEUES[a].t:0);});
-  else s.vis.sort(function(a,b){return QUEUES[b].t-QUEUES[a].t;});
-}
-function qSort(m){
-  state.q.sm=m;
-  document.getElementById('qbv').className='btn'+(m==='v'?' on':'');
-  document.getElementById('qba').className='btn'+(m==='a'?' on':'');
-  document.getElementById('qbc').className='btn'+(m==='c'?' on':'');
-  qBuildVis(); qRender();
-}
-function qFilter(){qBuildVis();qRender();}
-function qRender(){
-  var vis=state.q.vis,cur=state.q.cur;
-  document.getElementById('qcnt').textContent=vis.length+' fila'+(vis.length!==1?'s':'');
-  var out='';
-  for(var k=0;k<vis.length;k++){
-    var i=vis[k],q=QUEUES[i];
-    var rank=i+1,w=(q.t/Q_MAX*100).toFixed(1);
-    var cvr=q.t?q.x/q.t:0,cvs=q.t?(cvr*100).toFixed(1)+'%':'--',cvc=cvr>0?'good':'zero';
-    out+='<div class="row'+(cur===i?' sel':'')+'" data-i="'+i+'">';
-    out+='<div class="rk'+(rank<=3?' g':'')+'">'+rank+'</div>';
-    out+='<div class="info"><div class="nm" title="'+h(q.n)+'">'+h(q.n)+'</div>';
-    out+='<div class="mini"><div class="mini-f" style="width:'+w+'%"></div></div></div>';
-    out+='<div class="nums"><div class="tot">'+q.t.toLocaleString('pt-BR')+'</div>';
-    out+='<div class="cv '+cvc+'">&#10003; '+cvs+'</div></div></div>';
-  }
-  document.getElementById('q-lst').innerHTML=out;
-}
-document.getElementById('q-lst').addEventListener('click',function(e){
-  var el=e.target;
-  while(el&&el.dataset.i===undefined) el=el.parentElement;
-  if(el&&el.dataset.i!==undefined) qSel(parseInt(el.dataset.i,10));
-});
-function qSel(i){
-  state.q.cur=i; qRender();
-  var q=QUEUES[i];
-  var atrib=q.a.reduce(function(s,ag){return s+ag.c;},0);
-  var sem=q.t-atrib;
-  var cvs=q.t?(q.x/q.t*100).toFixed(2)+'%':'--';
-  var kpis='';
-  kpis+='<div class="akpi"><span class="akv">'+q.t.toLocaleString('pt-BR')+'</span><span class="akl">total leads</span></div>';
-  kpis+='<div class="akpi"><span class="akv">'+(Q_TOTAL?((q.t/Q_TOTAL)*100).toFixed(2)+'%':'--')+'</span><span class="akl">share</span></div>';
-  kpis+='<div class="akpi hl"><span class="akv g">'+q.x+'</span><span class="akl">tag 10</span></div>';
-  kpis+='<div class="akpi hl"><span class="akv g">'+cvs+'</span><span class="akl">conversao</span></div>';
-  kpis+='<div class="akpi"><span class="akv">'+q.a.length+'</span><span class="akl">agentes</span></div>';
-  if(sem>0) kpis+='<div class="akpi"><span class="akv">'+sem.toLocaleString('pt-BR')+'</span><span class="akl">sem agente</span></div>';
-  var rows='';
-  if(!q.a.length){
-    rows='<div class="no-data">Nenhum agente atribuido nesta fila.</div>';
+  // ── SORT ÚNICO — comparativo tem prioridade sobre sort normal ──────────────
+  if(hasComp && compSortSlice>=0 && compSortSlice<slices.length){
+    const sl=slices[compSortSlice];
+    const valCache=new Map();
+    data.forEach(ag=>{
+      const rows=RAW_BY_DAY.filter(r=>r.POWER_BI===ag.name && sl.filter(r));
+      const t=aggTotals(rows);
+      const lr=t.ate1+t.ate2+t.gt2;
+      valCache.set(ag.name, compSortField==='leads' ? lr : (lr>0?((t.ate1+t.ate2)/lr*100):0));
+    });
+    data.sort((a,b)=>(valCache.get(a.name)-valCache.get(b.name))*compSortDir);
   } else {
-    var mxc=q.a[0].c;
-    for(var j=0;j<q.a.length;j++){
-      var ag=q.a[j],col=COLORS[j%COLORS.length];
-      var ap=(ag.c/q.t*100).toFixed(1),aw=(ag.c/mxc*100).toFixed(1);
-      var agcv=ag.c?(ag.x/ag.c*100).toFixed(1)+'%':'--';
-      var agcc=ag.x>0?'good':'zero';
-      rows+='<div class="drow"><div class="di'+(j<3?' g':'')+'">'+(j+1)+'</div>';
-      rows+='<div class="dn" title="'+h(ag.n)+'">'+h(ag.n)+'</div>';
-      rows+='<div class="dbar"><div class="dbt"><div class="dbf" style="width:'+aw+'%;background:'+col+'"></div></div></div>';
-      rows+='<div class="dc" style="color:'+col+'">'+ag.c+'</div>';
-      rows+='<div class="dp">'+ap+'%</div>';
-      rows+='<div class="dx '+agcc+'">&#10003; '+agcv+'</div></div>';
-    }
+    data.sort((a,b)=>{
+      if(agSortCol==='name') return a.name.localeCompare(b.name)*agSortDir;
+      return (a[agSortCol]-b[agSortCol])*agSortDir;
+    });
   }
-  document.getElementById('q-pnl').innerHTML=
-    '<div class="dtitle">'+h(q.n)+'</div>'+
-    '<div class="akpis">'+kpis+'</div>'+
-    '<div class="sec">Agentes nesta fila</div>'+
-    '<div class="dlist">'+rows+'</div>';
+
+  // Paginação DEPOIS do sort
+  agTotalPages=Math.ceil(data.length/PAGE)||1;
+  agPage=Math.min(agPage,agTotalPages-1);
+  document.getElementById('ag-count').textContent=data.length;
+  document.getElementById('ag-page-info').textContent=`Pág. ${agPage+1}/${agTotalPages} · ${data.length} registros`;
+  const paged=data.slice(agPage*PAGE,(agPage+1)*PAGE);
+
+  // Atualiza header com colunas comparativas (clicáveis para sort)
+  const thead=document.getElementById('ag-thead');
+  if(hasComp){
+    thead.innerHTML=`<tr>
+      <th onclick="sortAg('name')" id="th-name" style="text-align:left;cursor:pointer">Promotor ↕</th>
+      <th>Equipe</th>
+      <th onclick="sortAg('total_leads')" id="th-total_leads" class="td-right sorted" style="cursor:pointer">Total Leads ↓</th>
+      <th onclick="sortAg('ate1')" id="th-ate1" class="td-right" style="cursor:pointer">≤1min ↕</th>
+      <th onclick="sortAg('ate2')" id="th-ate2" class="td-right" style="cursor:pointer">1-2min ↕</th>
+      <th onclick="sortAg('gt2')" id="th-gt2" class="td-right" style="cursor:pointer">&gt;2min ↕</th>
+      <th onclick="sortAg('pctAte2')" id="th-pctAte2" class="td-right" style="cursor:pointer">% ≤2min ↕</th>
+      <th class="td-right">Status</th>
+      <th class="td-right">Meta ≤2min</th>
+      <th colspan="${slices.length*2}" style="text-align:center;background:#F0F4F8;border-left:3px solid #CBD5E0;font-size:10px;color:#64748B;font-weight:700;letter-spacing:.7px">
+        COMPARATIVO ${slices.length===2&&state.dateMode[0]==='2dias'?'2 DIAS':'SEMANAL'}
+      </th>
+    </tr>
+    <tr>
+      <th colspan="9" style="border-bottom:1px solid #E2E8F0"></th>
+      ${slices.map((s,i)=>`
+        <th onclick="sortComp(${i},'leads')" class="td-right" style="border-left:${i===0?'3px solid #CBD5E0':'1px solid #E2E8F0'};background:${s.isCur?'#F0FDF4':'#F8FAFC'};font-size:9px;color:${s.isCur?'#10B981':'#1A2332'};padding:4px 8px;cursor:pointer" title="Ordenar por leads">
+          <div style="font-weight:800">${s.label}</div>
+          <div style="color:#94A3B8">${s.short}</div>
+          <div style="color:#CBD5E0">${compSortSlice===i&&compSortField==='leads'?(compSortDir===-1?'↓':'↑'):'↕'}</div>
+        </th>
+        <th onclick="sortComp(${i},'pct')" class="td-right" style="background:${s.isCur?'#F0FDF4':'#F8FAFC'};font-size:9px;padding:4px 8px;cursor:pointer;color:#1A2332" title="Ordenar por %≤2min">
+          %≤2min ${compSortSlice===i&&compSortField==='pct'?(compSortDir===-1?'↓':'↑'):'↕'}
+        </th>
+      `).join('')}
+    </tr>`;
+  } else {
+    thead.innerHTML=`<tr>
+      <th onclick="sortAg('name')" id="th-name" style="text-align:left">Promotor ↕</th>
+      <th>Equipe</th>
+      <th onclick="sortAg('total_leads')" id="th-total_leads" class="td-right sorted">Total Leads ↓</th>
+      <th onclick="sortAg('ate1')" id="th-ate1" class="td-right">≤1min ↕</th>
+      <th onclick="sortAg('ate2')" id="th-ate2" class="td-right">1-2min ↕</th>
+      <th onclick="sortAg('gt2')" id="th-gt2" class="td-right">&gt;2min ↕</th>
+      <th onclick="sortAg('pctAte2')" id="th-pctAte2" class="td-right">% ≤2min ↕</th>
+      <th class="td-right">Status</th>
+      <th class="td-right">Meta ≤2min</th>
+    </tr>`;
+  }
+
+  document.getElementById('ag-tbody').innerHTML=paged.map(a=>{
+    const sc=SUP_C[a.sup]||{bg:'#EEE',tc:'#666'};
+    const st=agStatus(a.pctAte2);
+    const lr=a.ate1+a.ate2+a.gt2;
+    const p1=lr>0?(a.ate1/lr*100).toFixed(0):0;
+    const p2=lr>0?(a.ate2/lr*100).toFixed(0):0;
+    const pGt=lr>0?(a.gt2/lr*100).toFixed(0):0;
+
+    // Colunas comparativas: busca dados do agente por período
+    let compCells='';
+    if(hasComp){
+      const agRows=RAW_BY_DAY.filter(r=>r.POWER_BI===a.name&&
+        (state.selSup[0]==='Todos'||r.SUPERVISOR===state.selSup[0]));
+      compCells=slices.map((sl,i)=>{
+        const rows=agRows.filter(sl.filter);
+        const t=aggTotals(rows);
+        const pct2=t.total_leads>0?((t.ate1+t.ate2)/t.total_leads*100):0;
+        const stt=t.total_leads>0?agStatus(pct2):null;
+        // delta vs fatia anterior
+        let delta=null;
+        if(i>0){
+          const prev=aggTotals(agRows.filter(slices[i-1].filter));
+          if(prev.total_leads>0&&t.total_leads>0)
+            delta=pct2-((prev.ate1+prev.ate2)/prev.total_leads*100);
+        }
+        const bg=sl.isCur?'#F0FDF4':'';
+        const borderL=i===0?'border-left:3px solid #CBD5E0':'';
+        return `
+          <td class="td-right" style="${borderL};background:${bg};font-weight:700;color:#4A5568">
+            ${(t.ate1+t.ate2+t.gt2)>0?fmt(t.ate1+t.ate2+t.gt2):'–'}
+          </td>
+          <td class="td-right" style="background:${bg}">
+            ${t.total_leads>0?`
+              <span style="font-size:12px;font-weight:900;color:${stt.color}">${pct2.toFixed(0)}%</span>
+              <span class="status-badge" style="background:${stt.bg};color:${stt.color};margin-left:3px">${stt.label}</span>
+              ${delta!==null?`<div style="font-size:9px;font-weight:700;color:${delta>=0?'#10B981':'#EF4444'}">${delta>=0?'▲':'▼'}${Math.abs(delta).toFixed(1)}%</div>`:''}
+            `:'<span style="color:#CBD5E0">–</span>'}
+          </td>`;
+      }).join('');
+    }
+
+    return `<tr>
+      <td style="font-weight:700;white-space:nowrap">${a.name}</td>
+      <td>${supBadge(a.sup)}</td>
+      <td class="td-right" style="font-weight:600;color:#4A5568">${fmt(lr)}</td>
+      <td class="td-right"><div style="color:#10B981;font-weight:700">${fmt(a.ate1)}</div><div style="font-size:9px;color:#94A3B8">${p1}%</div></td>
+      <td class="td-right"><div style="color:#F59E0B;font-weight:700">${fmt(a.ate2)}</div><div style="font-size:9px;color:#94A3B8">${p2}%</div></td>
+      <td class="td-right"><div style="color:#EF4444;font-weight:700">${fmt(a.gt2)}</div><div style="font-size:9px;color:#94A3B8">${pGt}%</div></td>
+      <td>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${Math.min(a.pctAte2,100)}%;background:${st.color}"></div></div>
+          <span style="font-size:12px;font-weight:800;color:${st.color};min-width:34px;text-align:right">${a.pctAte2.toFixed(0)}%</span>
+        </div>
+      </td>
+      <td class="td-right"><span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span></td>
+      <td class="td-right"><span class="status-badge" style="background:${a.pctAte2>=80?'#D1FAE5':'#FEE2E2'};color:${a.pctAte2>=80?'#10B981':'#EF4444'}">${a.pctAte2>=80?'✓ Dentro':'✗ Fora'}</span></td>
+      ${compCells}
+    </tr>`;
+  }).join('');
+  document.getElementById('ag-pg-first').disabled=agPage===0;
+  document.getElementById('ag-pg-prev').disabled=agPage===0;
+  document.getElementById('ag-pg-next').disabled=agPage>=agTotalPages-1;
+  document.getElementById('ag-pg-last').disabled=agPage>=agTotalPages-1;
 }
 
-loadData();
+function sortAg(col){
+  if(agSortCol===col)agSortDir*=-1;else{agSortCol=col;agSortDir=-1;}
+  document.querySelectorAll('[id^="th-"]').forEach(th=>{
+    th.classList.toggle('sorted',th.id===`th-${col}`);
+    if(th.id===`th-${col}`)th.textContent=th.textContent.replace(/[ ↑↓↕]/g,'')+' '+(agSortDir===-1?'↓':'↑');
+    else th.textContent=th.textContent.replace(/[ ↑↓↕]/g,'')+'↕';
+  });
+  agPage=0;renderAgTable();
+}
+
+// ── DISPONIBILIDADE ───────────────────────────────────────────────────────────
+let _avData=[];
+function renderAvail(){
+  const avRows=filterAv(1);
+  const avData=aggAvByAgent(avRows);
+  _avData=avData;
+
+  renderEquipeBtns(1);
+
+  // KPIs
+  const ideal=avData.filter(a=>a.avgH>=6).length;
+  const aceit=avData.filter(a=>a.avgH>=4&&a.avgH<6).length;
+  const crit=avData.filter(a=>a.avgH<4).length;
+  document.getElementById('av-kpis').innerHTML=[
+    {l:'Promotores',v:fmt(avData.length),accent:'#2563EB'},
+    {l:'Ideal (≥6h)',v:fmt(ideal),sub:pct(ideal,avData.length),accent:'#10B981'},
+    {l:'Aceitável (4-6h)',v:fmt(aceit),sub:pct(aceit,avData.length),accent:'#F59E0B'},
+    {l:'Crítico (<4h)',v:fmt(crit),sub:pct(crit,avData.length),accent:'#EF4444'},
+  ].map(k=>`<div class="kpi-inner">
+    <div class="val" style="color:${k.accent}">${k.v}</div>
+    <div class="lbl">${k.l}</div>
+    ${k.sub?`<div class="sub" style="color:${k.accent}">${k.sub}</div>`:''}
+  </div>`).join('');
+
+  // ── COMPARATIVO DE EQUIPES (quando Todas as Equipes) ────────────────────
+  const avCompDiv=document.getElementById('av-comp-equipes');
+  const isTodosAv=state.selSup[1]==='Todos';
+  const ym=state.selMonth[1];
+  const dm=state.dateMode[1];
+
+  if(avCompDiv && isTodosAv){
+    // Só mostra equipes com dados no filtro ativo de disponibilidade
+    const avRowsFiltered=filterAv(1);
+    const supsAvComDados=new Set(avRowsFiltered.filter(r=>r.date_str).map(r=>r.SUPERVISOR));
+    const supsAv=SUPS_ORDER.filter(s=>!EQUIPES_OCULTAS.includes(s)&&supsAvComDados.has(s));
+
+    if(dm==='sem'||dm==='2dias'||dm==='range'){
+      // ── TABELA COMPARATIVA — todas as equipes × fatias de tempo ──────────
+      let slicesAv=[];
+      const todayStr=new Date().toISOString().slice(0,10);
+      const fmtD=d=>new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+
+      if(dm==='sem'){
+        const weekSet={};
+        RAW_AVAIL.filter(r=>r.date_str&&!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())
+          &&(ym&&ym!=='all'?r.date_str.startsWith(ym):true))
+          .forEach(r=>{const w=getWeekDates(r.date_str);const k=w.from+'_'+w.to;if(!weekSet[k])weekSet[k]=w;});
+        slicesAv=Object.values(weekSet).sort((a,b)=>a.from<b.from?-1:1).map((w,i)=>({
+          label:`${fmtD(w.from)} – ${fmtD(w.to)}`,
+          tag:todayStr>=w.from&&todayStr<=w.to?'● Atual':`Sem ${i+1}`,
+          isCur:todayStr>=w.from&&todayStr<=w.to,
+          filter:r=>r.date_str>=w.from&&r.date_str<=w.to
+        }));
+      } else if(dm==='2dias'){
+        const sd=state.selDate[1],sd2=state.selDate2[1];
+        slicesAv=[
+          {label:fmtD(sd), tag:'Dia 1',isCur:sd===todayStr,filter:r=>r.date_str===sd},
+          {label:fmtD(sd2),tag:'Dia 2',isCur:sd2===todayStr,filter:r=>r.date_str===sd2},
+        ];
+      } else {
+        const rfrom=state.selRangeFrom[1],rto=state.selRangeTo[1];
+        const weekSet={};
+        RAW_AVAIL.filter(r=>r.date_str>=rfrom&&r.date_str<=rto
+          &&!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase()))
+          .forEach(r=>{const w=getWeekDates(r.date_str);const k=w.from+'_'+w.to;if(!weekSet[k])weekSet[k]=w;});
+        slicesAv=Object.values(weekSet).sort((a,b)=>a.from<b.from?-1:1).map((w,i)=>({
+          label:`${fmtD(w.from)} – ${fmtD(w.to)}`,tag:`Sem ${i+1}`,
+          isCur:todayStr>=w.from&&todayStr<=w.to,filter:r=>r.date_str>=w.from&&r.date_str<=w.to
+        }));
+      }
+
+      const modeLabel={'sem':'Semanal','2dias':'2 Dias','range':'Período'}[dm];
+      if(!slicesAv.length){avCompDiv.innerHTML='';} else {
+        avCompDiv.innerHTML=`<div class="card" style="overflow-x:auto;margin-bottom:16px">
+          <div class="card-title">📅 Comparativo ${modeLabel} Disponibilidade — Todas as Equipes${ym&&ym!=='all'?' · '+monthLabel(ym):''}</div>
+          <table style="width:100%;border-collapse:collapse;min-width:${200+slicesAv.length*150}px">
+            <thead><tr style="background:#F7F9FC">
+              <th style="text-align:left;padding:10px 12px;font-size:10px;color:#94A3B8;font-weight:700;letter-spacing:.7px;text-transform:uppercase;border-bottom:2px solid #E2E8F0;min-width:160px">Equipe</th>
+              ${slicesAv.map(s=>`<th style="text-align:center;padding:10px 8px;border-bottom:2px solid #E2E8F0;border-left:1px solid #E2E8F0;min-width:145px;background:${s.isCur?'#F0FDF4':'#F7F9FC'}">
+                <div style="font-size:11px;font-weight:800;color:#1A2332">${s.label}</div>
+                <div style="font-size:9px;color:${s.isCur?'#10B981':'#94A3B8'};font-weight:600">${s.tag}</div>
+              </th>`).join('')}
+            </tr></thead>
+            <tbody>${supsAv.map(sup=>{
+              const sc=SUP_C[sup]||{bg:'#EEE',tc:'#666'};
+              const baseRows=RAW_AVAIL.filter(r=>r.SUPERVISOR===sup&&r.date_str
+                &&(ym&&ym!=='all'?r.date_str.startsWith(ym):true));
+              const cells=slicesAv.map((s,si)=>{
+                const rows=baseRows.filter(s.filter);
+                const agd=aggAvByAgent(rows);
+                const avgH=agd.length>0?agd.reduce((sm,a)=>sm+a.avgH,0)/agd.length:0;
+                const hasDays=rows.length>0;
+                const st=hasDays?availStatus(avgH):null;
+                let delta=null;
+                if(si>0){const pr=aggAvByAgent(baseRows.filter(slicesAv[si-1].filter));const pA=pr.length>0?pr.reduce((sm,a)=>sm+a.avgH,0)/pr.length:null;if(pA!==null&&hasDays)delta=avgH-pA;}
+                return `<td style="text-align:center;padding:10px 8px;border-bottom:1px solid #F0F4F8;border-left:1px solid #F0F4F8;background:${s.isCur?'#F0FDF4':''}">
+                  ${hasDays?`
+                    <div style="font-size:20px;font-weight:900;color:${st.color}">${avgH.toFixed(1)}h</div>
+                    <div style="font-size:10px;color:#94A3B8">média/dia · ${agd.length} prom.</div>
+                    <span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span>
+                    ${delta!==null?`<div style="font-size:10px;font-weight:700;color:${delta>=0?'#10B981':'#EF4444'};margin-top:3px">${delta>=0?'▲':'▼'}${Math.abs(delta).toFixed(1)}h</div>`:''}
+                  `:'<span style="color:#CBD5E0;font-size:12px">–</span>'}
+                </td>`;
+              }).join('');
+              return `<tr onmouseover="this.style.background='#F7FAFB'" onmouseout="this.style.background=''">
+                <td style="padding:10px 12px;border-bottom:1px solid #F0F4F8"><span class="eq-badge" style="background:${sc.bg};color:${sc.tc};font-size:11px;padding:4px 8px">${sup}</span></td>
+                ${cells}</tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>`;
+      }
+
+    } else {
+      // Acumulado / Dia: cards por equipe
+      const maxH=Math.max(...supsAv.map(s=>{
+        const agd=aggAvByAgent(avRows.filter(r=>r.SUPERVISOR===s));
+        return agd.reduce((sum,a)=>sum+a.avgH,0)/(agd.length||1);
+      }),0.1);
+      avCompDiv.innerHTML=`<div class="comp-grid" style="margin-bottom:16px">${supsAv.map(s=>{
+        const sc=SUP_C[s]||{bg:'#EEE',tc:'#666'};
+        const agd=aggAvByAgent(avRows.filter(r=>r.SUPERVISOR===s));
+        const avgH=agd.length>0?agd.reduce((sum,a)=>sum+a.avgH,0)/agd.length:0;
+        const ideal=agd.filter(a=>a.avgH>=6).length;
+        const aceit=agd.filter(a=>a.avgH>=4&&a.avgH<6).length;
+        const crit2=agd.filter(a=>a.avgH<4).length;
+        const st=availStatus(avgH);
+        const barW=(avgH/12*100).toFixed(1);
+        return `<div class="comp-card">
+          <div class="comp-header" style="background:${sc.bg};color:${sc.tc}">${s}</div>
+          <div class="comp-bar-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#94A3B8"><span>Média/dia</span><span style="font-weight:700;color:${st.color}">${avgH.toFixed(1)}h</span></div>
+            <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${barW}%;background:${sc.tc}40"></div></div>
+          </div>
+          <div class="comp-row">
+            <div><div class="comp-lbl">Promotores</div><div class="comp-val" style="color:#2563EB">${agd.length}</div></div>
+            <div style="text-align:right"><span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span></div>
+          </div>
+          <div class="comp-row"><div><div class="comp-lbl">Ideal (≥6h)</div><div class="comp-val" style="color:#10B981">${ideal}</div></div><div style="text-align:right"><div class="comp-sub" style="color:#10B981">${agd.length?pct(ideal,agd.length):'–'}</div></div></div>
+          <div class="comp-row"><div><div class="comp-lbl">Aceitável (4-6h)</div><div class="comp-val" style="color:#F59E0B">${aceit}</div></div><div style="text-align:right"><div class="comp-sub" style="color:#F59E0B">${agd.length?pct(aceit,agd.length):'–'}</div></div></div>
+          <div class="comp-row"><div><div class="comp-lbl">Crítico (<4h)</div><div class="comp-val" style="color:#EF4444">${crit2}</div></div><div style="text-align:right"><div class="comp-sub" style="color:#EF4444">${agd.length?pct(crit2,agd.length):'–'}</div></div></div>
+        </div>`;
+      }).join('')}</div>`;
+    }
+  } else if(avCompDiv){
+    avCompDiv.innerHTML='';
+  }
+
+  avPage=0;
+  renderAvTable();
+}
+
+function buildAvCompSlices(){
+  const dm=state.dateMode[1];
+  if(dm!=='sem'&&dm!=='2dias') return [];
+  if(dm==='2dias'){
+    const sd=state.selDate[1], sd2=state.selDate2[1];
+    const fD=d=>new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'});
+    return [
+      {label:fD(sd), short:'Dia 1', isCur:false, filter:r=>r.date_str===sd},
+      {label:fD(sd2),short:'Dia 2', isCur:false, filter:r=>r.date_str===sd2},
+    ];
+  }
+  // semanal: semanas com dados no mês selecionado
+  const ym=state.selMonth[1];
+  const weekSet={};
+  RAW_AVAIL.filter(r=>!EQUIPES_REMOVIDAS.includes((r.SUPERVISOR||'').toUpperCase())
+    &&(ym&&ym!=='all'?r.date_str.startsWith(ym):true))
+    .forEach(r=>{
+      const w=getWeekDates(r.date_str);
+      const key=w.from+'_'+w.to;
+      if(!weekSet[key]) weekSet[key]={from:w.from,to:w.to};
+    });
+  const todayStr=new Date().toISOString().slice(0,10);
+  return Object.values(weekSet).sort((a,b)=>a.from<b.from?-1:1)
+    .map((w,i)=>{
+      const isCur=todayStr>=w.from&&todayStr<=w.to;
+      const d1=new Date(w.from+'T12:00:00'),d2=new Date(w.to+'T12:00:00');
+      const lbl=d1.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' – '+d2.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
+      return {label:lbl, short:isCur?'Atual':`S${i+1}`, isCur, filter:r=>r.date_str>=w.from&&r.date_str<=w.to};
+    });
+}
+
+function renderAvTable(){
+  const search=(document.getElementById('av-search')?.value||'').toLowerCase();
+  let data=[..._avData];
+  if(search) data=data.filter(a=>a.name.toLowerCase().includes(search)||a.sup.toLowerCase().includes(search));
+  data.sort((a,b)=>{
+    if(avSortCol==='name')return a.name.localeCompare(b.name)*avSortDir;
+    return(a[avSortCol]-b[avSortCol])*avSortDir;
+  });
+  avTotalPages=Math.ceil(data.length/PAGE)||1;
+  avPage=Math.min(avPage,avTotalPages-1);
+  document.getElementById('av-page-info').textContent=`Pág. ${avPage+1}/${avTotalPages} · ${data.length} registros`;
+  const cntLbl=document.getElementById('av-count-label');
+  if(cntLbl) cntLbl.textContent=`${data.length} promotores`;
+
+  const slices=buildAvCompSlices();
+  const hasComp=slices.length>0;
+
+  // Update header
+  const avThead=document.getElementById('av-thead');
+  const baseHeader=`<th onclick="sortAv('name')" id="av-th-name" style="text-align:left">Promotor ↕</th>
+    <th>Equipe</th>
+    <th onclick="sortAv('totalH')" id="av-th-totalH" class="td-right">Total Horas ↕</th>
+    <th onclick="sortAv('days')"   id="av-th-days"   class="td-right">Dias ↕</th>
+    <th onclick="sortAv('avgH')"   id="av-th-avgH"   class="td-right sorted">Média Diária ↓</th>
+    <th class="td-right">Status</th>`;
+  if(avThead){
+    if(hasComp){
+      avThead.innerHTML=`<tr>${baseHeader}
+        <th colspan="${slices.length*2}" style="text-align:center;background:#F0F4F8;border-left:3px solid #CBD5E0;font-size:10px;color:#64748B;font-weight:700;letter-spacing:.7px">
+          COMPARATIVO ${state.dateMode[1]==='2dias'?'2 DIAS':'SEMANAL'}
+        </th></tr>
+        <tr><th colspan="6" style="border-bottom:1px solid #E2E8F0"></th>
+        ${slices.map((s,i)=>`
+          <th class="td-right" style="border-left:${i===0?'3px solid #CBD5E0':'1px solid #E2E8F0'};background:${s.isCur?'#F0FDF4':'#F8FAFC'};font-size:9px;color:${s.isCur?'#10B981':'#94A3B8'};padding:4px 8px">
+            <div style="font-weight:800;color:#1A2332">${s.label}</div><div>${s.short}</div>
+          </th>
+          <th class="td-right" style="background:${s.isCur?'#F0FDF4':'#F8FAFC'};font-size:9px;color:#94A3B8;padding:4px 8px">Média/dia</th>
+        `).join('')}</tr>`;
+    } else {
+      avThead.innerHTML=`<tr>${baseHeader}</tr>`;
+    }
+  }
+
+  const paged=data.slice(avPage*PAGE,(avPage+1)*PAGE);
+  document.getElementById('av-tbody').innerHTML=paged.map(a=>{
+    const st=availStatus(a.avgH);
+
+    let compCells='';
+    if(hasComp){
+      const agRows=RAW_AVAIL.filter(r=>r.POWER_BI===a.name
+        &&(state.selSup[1]==='Todos'||r.SUPERVISOR===state.selSup[1]));
+      compCells=slices.map((sl,i)=>{
+        const rows=agRows.filter(sl.filter);
+        const agd=aggAvByAgent(rows);
+        const avgH=agd.length>0?agd.reduce((s,x)=>s+x.avgH,0)/agd.length:0;
+        const hasDays=rows.length>0;
+        const stt=hasDays?availStatus(avgH):null;
+        let delta=null;
+        if(i>0){
+          const prev=aggAvByAgent(agRows.filter(slices[i-1].filter));
+          const prevAvg=prev.length>0?prev.reduce((s,x)=>s+x.avgH,0)/prev.length:null;
+          if(prevAvg!==null&&hasDays) delta=avgH-prevAvg;
+        }
+        const bg=sl.isCur?'#F0FDF4':'';
+        const borderL=i===0?'border-left:3px solid #CBD5E0':'';
+        return `<td class="td-right" style="${borderL};background:${bg};font-weight:700;color:#4A5568">${hasDays?rows.length+'d':'–'}</td>
+          <td class="td-right" style="background:${bg}">
+            ${hasDays?`<span style="font-size:12px;font-weight:900;color:${stt.color}">${avgH.toFixed(1)}h</span>
+            <span class="status-badge" style="background:${stt.bg};color:${stt.color};margin-left:3px">${stt.label}</span>
+            ${delta!==null?`<div style="font-size:9px;font-weight:700;color:${delta>=0?'#10B981':'#EF4444'}">${delta>=0?'▲':'▼'}${Math.abs(delta).toFixed(1)}h</div>`:''}
+            `:'<span style="color:#CBD5E0">–</span>'}
+          </td>`;
+      }).join('');
+    }
+
+    return `<tr>
+      <td style="font-weight:700;white-space:nowrap">${a.name}</td>
+      <td>${supBadge(a.sup)}</td>
+      <td class="td-right" style="color:#4A5568">${a.totalH.toFixed(1)}h</td>
+      <td class="td-right" style="color:#4A5568">${a.days}</td>
+      <td>
+        <div class="mini-bar-wrap">
+          <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${Math.min((a.avgH/12)*100,100)}%;background:${st.color}"></div></div>
+          <span style="font-size:13px;font-weight:800;color:${st.color};min-width:34px;text-align:right">${a.avgH.toFixed(1)}h</span>
+        </div>
+      </td>
+      <td class="td-right"><span class="status-badge" style="background:${st.bg};color:${st.color}">${st.label}</span></td>
+      ${compCells}
+    </tr>`;
+  }).join('');
+  document.getElementById('av-pg-first').disabled=avPage===0;
+  document.getElementById('av-pg-prev').disabled=avPage===0;
+  document.getElementById('av-pg-next').disabled=avPage>=avTotalPages-1;
+  document.getElementById('av-pg-last').disabled=avPage>=avTotalPages-1;
+}
+
+function sortAv(col){
+  if(avSortCol===col)avSortDir*=-1;else{avSortCol=col;avSortDir=-1;}
+  document.querySelectorAll('[id^="av-th-"]').forEach(th=>{
+    th.classList.toggle('sorted',th.id===`av-th-${col}`);
+    if(th.id===`av-th-${col}`)th.textContent=th.textContent.replace(/[ ↑↓↕]/g,'')+' '+(avSortDir===-1?'↓':'↑');
+    else th.textContent=th.textContent.replace(/[ ↑↓↕]/g,'')+'↕';
+  });
+  avPage=0;renderAvTable();
+}
 </script>
+
+<script>document.addEventListener("DOMContentLoaded", loadData);</script>
 </body>
 </html>
