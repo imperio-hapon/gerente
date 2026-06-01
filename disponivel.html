@@ -376,19 +376,31 @@ function exportAgCSV(){
   const avIdx = window._AV_STATUS_IDX || {};
 
   // Função: dado agente + timestamp da atribuição, retorna o status vigente
+  // Lógica: status começa no horário do registro e vale até o próximo registro
   function getAgentStatus(agentName, atribuicaoStr) {
     if (!atribuicaoStr || !atribuicaoStr.trim()) return '–';
     const atTs = parseDateTimeBR(atribuicaoStr.trim());
     if (!atTs) return '–';
     const events = avIdx[agentName];
     if (!events || !events.length) return 'Sem registro';
-    // Pega o último evento ANTES ou IGUAL ao horário de atribuição
-    let status = 'Sem registro';
-    for (const ev of events) {
-      if (ev.ts <= atTs) status = ev.reason;
-      else break;
+
+    // Busca o intervalo: evento[i].ts <= atTs < evento[i+1].ts
+    let statusAtual = null;
+    for (let i = 0; i < events.length; i++) {
+      const ev = events[i];
+      const proxTs = i + 1 < events.length ? events[i+1].ts : null;
+
+      if (ev.ts <= atTs) {
+        // atTs está dentro deste intervalo se não há próximo ou atTs < próximo
+        if (!proxTs || atTs < proxTs) {
+          statusAtual = ev.reason;
+          break;
+        }
+        // Se atTs >= próximo, continua para o próximo intervalo
+        statusAtual = ev.reason; // mantém como fallback
+      }
     }
-    return status;
+    return statusAtual || 'Sem registro';
   }
 
   const colAtrib = PR_HEADERS.find(h => h.includes('atribui') || h.includes('Atribui') || h.toLowerCase().includes('horário de atri')) || 'Horário de atribuição';
