@@ -172,7 +172,7 @@ td{padding:6px 8px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align
 
 <!-- ==================== NOVATOS ==================== -->
 <div class="novatos-section" id="novatos-wrap">
-  <div class="section-title">🌱 Performance dos Novatos — Admissão ≤ 90 dias</div>
+  <div class="section-title">🌱 Performance dos Novatos — 1ª venda no mês</div>
   <div id="novatos-body"></div>
 </div>
 
@@ -249,7 +249,7 @@ td{padding:6px 8px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align
       +'<span style="font-size:22px;font-weight:800;color:#555">'+totalLeads.toLocaleString("pt-BR")+'</span></div>'
       +'<div><span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px">Conversão</span><br>'
       +'<span style="font-size:22px;font-weight:800;color:#7b2d8b">'+conv+'%</span></div>'
-      +'<div style="font-size:11px;color:#aaa;margin-left:auto">'+_novatosFilt.length+' novatos · referência: 02/06/2026</div>'
+      +'<div style="font-size:11px;color:#aaa;margin-left:auto">'+_novatosFilt.length+' novatos · 1ª venda em junho/2026</div>'
       +'</div>';
 
     var cards = _novatosFilt.map(function(r){
@@ -977,161 +977,221 @@ function switchMes(mes){
   if(typeof bSwitch==='function')bSwitch(typeof bCurBase!=='undefined'?bCurBase:'pf');
 }
 // ─── ALIMENTAÇÃO AO VIVO PELA PLANILHA PUBLICADA ──────────────────────────
-// Busca o CSV publicado, agrega Junho por promotor e atualiza JUN_DATA + rawData.
-// Mantém meta/leads/datas/novatos já definidos no painel (casa nomes ignorando
-// o sufixo "- VENDEDOR ADM"). Se a busca falhar, mantém os dados embutidos.
+// RANKING  -> valores/agregados (vidas por promotor, totais)
+// PF/ADESÃO/PME -> listas das Bases de Vendas (registro por registro)
+// Mantém metas/leads/datas/novatos do painel. Filtra MÊS=6. Fallback: dados embutidos.
 (function(){
-  var CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSMsegma4H7E5cuo_lbuidCwfLvrtOg3S1VogB5dQBVizcYxGzYKJRrXAroDBnCVHeP4XtkvZSwfabq/pub?output=csv";
-  var MES_ALVO = 6; // Junho
+  var PUB='https://docs.google.com/spreadsheets/d/e/2PACX-1vSMsegma4H7E5cuo_lbuidCwfLvrtOg3S1VogB5dQBVizcYxGzYKJRrXAroDBnCVHeP4XtkvZSwfabq/pub';
+  function url(gid){ return PUB+'?gid='+gid+'&single=true&output=csv'; }
+  var URLS={ ranking:url('867290851'), pf:url('0'), ade:url('719724632'), pme:url('971127286') };
+  var MES_ALVO=6;
 
-  function norm(s){
-    if(s==null) return '';
-    s = String(s).toUpperCase().trim();
-    s = s.replace(/\s*-\s*VENDEDOR ADM\s*$/,'');           // remove sufixo
-    s = s.normalize('NFD').replace(/[\u0300-\u036f]/g,''); // tira acentos
-    return s.replace(/\s+/g,' ').trim();
-  }
+  function norm(s){ if(s==null)return '';s=String(s).toUpperCase().trim();
+    s=s.replace(/\s*-\s*VENDEDOR ADM\s*$/,'');
+    s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    return s.replace(/\s+/g,' ').trim(); }
 
-  // Parser CSV robusto (lida com aspas e vírgulas dentro de campos)
   function parseCSV(text){
-    var rows=[], row=[], cur='', q=false, i=0, c;
-    text = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-    for(i=0;i<text.length;i++){
-      c=text[i];
-      if(q){
-        if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
-        else cur+=c;
-      } else {
-        if(c==='"') q=true;
-        else if(c===','){ row.push(cur); cur=''; }
-        else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
-        else cur+=c;
-      }
-    }
+    var rows=[],row=[],cur='',q=false,i,c;
+    text=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+    for(i=0;i<text.length;i++){ c=text[i];
+      if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+      else { if(c==='"')q=true; else if(c===','){row.push(cur);cur='';}
+             else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';} else cur+=c; } }
     if(cur.length||row.length){ row.push(cur); rows.push(row); }
     return rows;
   }
-
-  // Localiza índice de coluna por palavras-chave no cabeçalho
-  function findCol(headers, keys){
-    for(var i=0;i<headers.length;i++){
-      var h=norm(headers[i]);
-      for(var k=0;k<keys.length;k++) if(h.indexOf(keys[k])>=0) return i;
-    }
-    return -1;
+  function col(H,keys){ for(var i=0;i<H.length;i++){ var h=norm(H[i]);
+    for(var k=0;k<keys.length;k++) if(h.indexOf(keys[k])>=0) return i; } return -1; }
+  function num(x){ if(x==null)return 0; var s=String(x).trim().replace(/\.(?=\d{3}(\D|$))/g,'').replace(',','.');
+    var n=parseFloat(s); return isNaN(n)?0:Math.round(n); }
+  var EQUIPES=['HUMBERTO BANQUERI','LUIZ ROBERTO','REBECA MOURA','BENVE'];
+  function equipeOk(sup){ return EQUIPES.indexOf(norm(sup))>=0; }
+  // chave aproximada: 1º + 2º nome (para casar nome longo da aba com nome curto do RANKING)
+  function key2(s){ var w=norm(s).split(' '); return w.slice(0,2).join(' '); }
+  function tipoBucket(t){ var x=norm(t);
+    if(x.indexOf('ADE')>=0)return 'a';
+    if(x.indexOf('PME')>=0||x.indexOf('EMPRES')>=0)return 'pme';
+    return 'pf'; }
+  // Excel serial ou data BR/ISO -> "DD/MM/AAAA"
+  function fmtData(v){
+    if(v==null||v==='')return '';
+    var s=String(v).trim();
+    if(/^\d{2}\/\d{2}\/\d{4}$/.test(s))return s;
+    var iso=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(iso)return iso[3]+'/'+iso[2]+'/'+iso[1];
+    if(/^\d+(\.\d+)?$/.test(s)){ var d=new Date(Date.UTC(1899,11,30)+Math.round(parseFloat(s))*86400000);
+      if(!isNaN(d)) return ('0'+d.getUTCDate()).slice(-2)+'/'+('0'+(d.getUTCMonth()+1)).slice(-2)+'/'+d.getUTCFullYear(); }
+    return s;
   }
 
-  function tipoBucket(t){
-    var x=norm(t);
-    if(x.indexOf('ADE')>=0) return 'a';          // Adesão
-    if(x.indexOf('PME')>=0||x.indexOf('EMPRES')>=0) return 'pme';
-    return 'pf';                                  // PF / Pessoa Física / default
-  }
-
-  function aggregate(text){
-    var rows=parseCSV(text);
-    if(rows.length<2) throw new Error('CSV vazio');
+  // ── RANKING -> agregados por promotor ────────────────────────────────────
+  function applyRanking(text){
+    if(!window.JUN_DATA||!window.JUN_DATA.rawData)return;
+    var rows=parseCSV(text); if(rows.length<2)return;
     var H=rows[0];
-    var iSup=findCol(H,['SUPERVISOR']),
-        iProm=findCol(H,['PROMOTOR']),
-        iTipo=findCol(H,['TIPO']),
-        iVidas=findCol(H,['QTDE','VIDAS','QTD']),
-        iMes=findCol(H,['MES']);
-    if(iSup<0||iProm<0) throw new Error('colunas SUPERVISOR/PROMOTOR não encontradas');
-
-    var acc={}; // chave normalizada -> {s,pRaw,pf,a,pme,v}
-    for(var r=1;r<rows.length;r++){
-      var row=rows[r]; if(!row||row.length<2) continue;
-      var promRaw=(row[iProm]||'').trim(); if(!promRaw) continue;
-      // filtra mês se a coluna existir
-      if(iMes>=0){
-        var mv=parseInt(String(row[iMes]).replace(/\D/g,''),10);
-        if(!isNaN(mv)&&mv!==MES_ALVO) continue;
-      }
-      var key=norm(promRaw);
-      var vidas=1;
-      if(iVidas>=0){ var n=parseInt(String(row[iVidas]).replace(/\D/g,''),10); vidas=isNaN(n)?0:n; }
-      var b=tipoBucket(iTipo>=0?row[iTipo]:'');
-      if(!acc[key]) acc[key]={s:(row[iSup]||'').trim(),pRaw:promRaw,pf:0,a:0,pme:0,v:0};
-      acc[key][b]+=vidas; acc[key].v+=vidas;
+    var iSup=col(H,['SUPERVISOR']),iProm=col(H,['PROMOTOR']),
+        iPF=col(H,['VIDAS PF']),iAD=col(H,['VIDAS ADE','ADESAO','ADESÃO']),
+        iPM=col(H,['VIDAS PME']),iTOT=col(H,['VIDAS TOT','TOTAIS']);
+    if(iProm<0)return;
+    var byKey={}; window.JUN_DATA.rawData.forEach(function(r){ byKey[norm(r.p)]=r; });
+    var supFF='', totPF=0,totA=0,totPME=0,totV=0, found={};
+    for(var r=1;r<rows.length;r++){ var row=rows[r]; if(!row)continue;
+      var prom=(row[iProm]||'').trim();
+      var sup=(iSup>=0?(row[iSup]||''):'').trim();
+      if(sup&&sup.indexOf('Total')<0) supFF=sup;            // ffill supervisor
+      if(!prom)continue;
+      if(/total/i.test(prom)||/total/i.test(supFF))continue; // pula subtotais
+      var pf=iPF>=0?num(row[iPF]):0, ad=iAD>=0?num(row[iAD]):0,
+          pm=iPM>=0?num(row[iPM]):0, tot=iTOT>=0?num(row[iTOT]):(pf+ad+pm);
+      var key=norm(prom), rec=byKey[key];
+      if(rec){ rec.pf=pf;rec.a=ad;rec.pme=pm;rec.v=tot; found[key]=1; }
+      else { rec={s:supFF,p:prom,pf:pf,a:ad,pme:pm,v:tot,meta:0,leads:0,dz:0,cv:null};
+             window.JUN_DATA.rawData.push(rec); byKey[key]=rec; found[key]=1; }
+      totPF+=pf;totA+=ad;totPME+=pm;totV+=tot;
     }
-    return acc;
+    window.JUN_DATA.rawData.forEach(function(rec){
+      if(!found[norm(rec.p)]){ rec.pf=0;rec.a=0;rec.pme=0;rec.v=0; } });
+    window.JUN_DATA.vtot=totV;window.JUN_DATA.vpf=totPF;
+    window.JUN_DATA.vade=totA;window.JUN_DATA.vpme=totPME;
+    if(typeof MES_ATIVO!=='undefined'&&MES_ATIVO===6){
+      if(typeof VTOT!=='undefined'){VTOT=totV;VPF=totPF;VADE=totA;VPME=totPME;}
+      if(typeof rawData!=='undefined'){rawData.length=0;window.JUN_DATA.rawData.forEach(function(r){rawData.push(r);});}
+    }
   }
 
-  function apply(acc){
-    if(!window.JUN_DATA||!window.JUN_DATA.rawData) return;
-    var base=window.JUN_DATA.rawData;
-
-    // índice dos registros atuais por nome normalizado (preserva meta/leads/dz/cv)
-    var byKey={};
-    base.forEach(function(rec){ byKey[norm(rec.p)]=rec; });
-
-    var totPF=0,totA=0,totPME=0,totV=0;
-    var leadSup={}, found={};
-
-    // atualiza vidas dos promotores existentes
-    Object.keys(acc).forEach(function(key){
-      var a=acc[key], rec=byKey[key];
-      if(rec){
-        rec.pf=a.pf; rec.a=a.a; rec.pme=a.pme; rec.v=a.v;
-        found[key]=1;
-      }
-      // novos promotores (não existem no painel): adiciona com meta 0
-      else {
-        rec={s:a.s,p:a.pRaw,pf:a.pf,a:a.a,pme:a.pme,v:a.v,meta:0,leads:0,dz:0,cv:null};
-        base.push(rec); byKey[key]=rec; found[key]=1;
-      }
-      totPF+=a.pf; totA+=a.a; totPME+=a.pme; totV+=a.v;
-      var s=rec.s||a.s; leadSup[s]=(leadSup[s]||0);
-    });
-
-    // zera quem está no painel mas não veio na planilha (sem vendas no mês)
-    base.forEach(function(rec){
-      if(!found[norm(rec.p)]){ rec.pf=0;rec.a=0;rec.pme=0;rec.v=0; }
-    });
-
-    // atualiza totais globais de Junho (mantém meta/leads_sup/meta_sup do painel)
-    window.JUN_DATA.vtot=totV; window.JUN_DATA.vpf=totPF;
-    window.JUN_DATA.vade=totA; window.JUN_DATA.vpme=totPME;
-
-    // reflete no estado ativo, se Junho estiver selecionado
-    if(typeof MES_ATIVO!=='undefined' && MES_ATIVO===6){
-      if(typeof VTOT!=='undefined'){ VTOT=totV;VPF=totPF;VADE=totA;VPME=totPME; }
-      if(typeof rawData!=='undefined'){ rawData.length=0; base.forEach(function(r){rawData.push(r);}); }
+  // ── PF/ADESÃO/PME -> listas detalhadas ───────────────────────────────────
+  function mapList(text,kind){
+    var rows=parseCSV(text); if(rows.length<2)return [];
+    var H=rows[0];
+    var iSup=col(H,['SUPERVISOR']),iProm=col(H,['PROMOTOR']),iMes=col(H,['MES']);
+    var out=[],i;
+    function mes_ok(row){ if(!equipeOk(row[iSup]))return false; if(iMes<0)return true; var m=num(row[iMes]); return m===0||m===MES_ALVO; }
+    if(kind==='pf'){
+      var c=col(H,['N\u00ba CONTROLE','CONTROLE']),cp=col(H,['CPF']),nm=col(H,['NOME TITULAR','NOME']),
+          vd=col(H,['QTDE VIDAS','VIDAS']),cel=col(H,['CELULAR']),dt=col(H,['DATA DIGITACAO','DATA']),
+          pl=col(H,['NOME_PLANO']); if(pl<0)pl=col(H,['NM_PLANO']); if(pl<0)pl=col(H,['PLANO']);
+      var st=col(H,['STATUS OBRIGACAO','STATUS_OBRIGACAO','STATUS']);
+      for(i=1;i<rows.length;i++){ var r=rows[i]; if(!r||!(r[iProm]||'').trim()||!mes_ok(r))continue;
+        out.push({supervisor:(r[iSup]||'').trim(),promotor:(r[iProm]||'').trim(),
+          controle:c>=0?(r[c]||'').trim():'',cpf:cp>=0?(r[cp]||'').trim():'',
+          nome:nm>=0?(r[nm]||'').trim():'',vidas:vd>=0?num(r[vd]):1,
+          celular:cel>=0?(r[cel]||'').trim():'',plano:pl>=0?(r[pl]||'').trim():'',
+          data:fmtData(dt>=0?r[dt]:''),status:st>=0?(r[st]||'').trim():''}); }
+    } else if(kind==='ade'){
+      var cp2=col(H,['CPF']),nm2=col(H,['NM_USUARIO','NOME']),tp=col(H,['TP_USUARIO','TP_DEPENDENTE']),
+          ms=col(H,['VL_MENSALIDADE']),pl2=col(H,['NM_PLANO','PLANO']),
+          dt2=col(H,['DT_CADASTRAMENTO','DT_ADMISSAO','DATA']),si=col(H,['SITUACAO_USU','SITUACAO']);
+      for(i=1;i<rows.length;i++){ var r2=rows[i]; if(!r2||!(r2[iProm]||'').trim()||!mes_ok(r2))continue;
+        out.push({supervisor:(r2[iSup]||'').trim(),promotor:(r2[iProm]||'').trim(),
+          cpf:cp2>=0?(r2[cp2]||'').trim():'',nome:nm2>=0?(r2[nm2]||'').trim():'',
+          tp_usuario:tp>=0?(r2[tp]||'').trim():'',mensalidade:ms>=0?(r2[ms]||'').trim():'',
+          plano:pl2>=0?(r2[pl2]||'').trim():'',data:fmtData(dt2>=0?r2[dt2]:''),
+          situacao:si>=0?(r2[si]||'').trim():''}); }
+    } else { // pme
+      var cd=col(H,['CODIGO']),em=col(H,['NM FANTASIA','NOME']),fo=col(H,['FONE']),
+          qt=col(H,['QT.USU','QT USU','QTDE','VIDAS']),fa=col(H,['VL.FATURA','VL FATURA','FATURA']),
+          dt3=col(H,['DT.VALID','DT VALID','DATA']),st3=col(H,['STATUS']);
+      for(i=1;i<rows.length;i++){ var r3=rows[i]; if(!r3||!(r3[iProm]||'').trim()||!mes_ok(r3))continue;
+        out.push({supervisor:(r3[iSup]||'').trim(),promotor:(r3[iProm]||'').trim(),
+          codigo:cd>=0?(r3[cd]||'').trim():'',empresa:em>=0?(r3[em]||'').trim():'',
+          fone:fo>=0?String(r3[fo]||'').replace(/\.0+$/,'').trim():'',vidas:qt>=0?num(r3[qt]):1,
+          fatura:fa>=0?(r3[fa]||'').trim():'',data:fmtData(dt3>=0?r3[dt3]:''),
+          status:st3>=0?(r3[st3]||'').trim():''}); }
     }
+    return out;
+  }
 
-    // re-renderiza
-    try{ if(typeof renderKPIs==='function')renderKPIs();
-         if(typeof renderSupGrid==='function')renderSupGrid();
-         if(typeof render==='function')render();
-         if(typeof buildCharts==='function')buildCharts();
-         if(typeof buildNovatos==='function')buildNovatos();
+  // ── NOVATOS: primeira aparição (todos os meses) nas 3 abas ───────────────
+  // acumulador global: chave normalizada -> {first: timestamp, sup: equipe}
+  window._FIRST_SEEN = window._FIRST_SEEN || {};
+
+  function parseDataTS(v){
+    var s=fmtData(v); if(!s||!/^\d{2}\/\d{2}\/\d{4}$/.test(s))return null;
+    var p=s.split('/'); return Date.UTC(+p[2],+p[1]-1,+p[0]);
+  }
+  // varre TODOS os meses de uma aba e registra a 1ª data de cada promotor
+  function collectFirst(text,kind){
+    var rows=parseCSV(text); if(rows.length<2)return;
+    var H=rows[0], iSup=col(H,['SUPERVISOR']), iProm=col(H,['PROMOTOR']);
+    var iDt = kind==='pf'  ? (col(H,['DATA DIGITACAO'])>=0?col(H,['DATA DIGITACAO']):col(H,['DATA']))
+            : kind==='ade' ? (col(H,['DT_CADASTRAMENTO'])>=0?col(H,['DT_CADASTRAMENTO']):col(H,['DT_ADMISSAO','DATA']))
+            :                (col(H,['DT.VALID','DT VALID'])>=0?col(H,['DT.VALID','DT VALID']):col(H,['DATA']));
+    if(iProm<0||iDt<0)return;
+    for(var i=1;i<rows.length;i++){ var r=rows[i]; if(!r)continue;
+      var prom=(r[iProm]||'').trim(); if(!prom)continue;
+      var sup=(iSup>=0?r[iSup]:'')||''; if(!equipeOk(sup))continue;   // só 4 equipes
+      var ts=parseDataTS(r[iDt]); if(ts==null)continue;
+      var key=norm(prom), cur=window._FIRST_SEEN[key];
+      if(!cur||ts<cur.first) window._FIRST_SEEN[key]={first:ts,sup:sup.trim(),p:prom};
+      else if(cur&&!cur.sup&&sup) cur.sup=sup.trim();
+    }
+  }
+
+  // reconstrói NOVATOS_DATA: novato = 1ª aparição no MÊS ATIVO (junho/2026)
+  function rebuildNovatos(){
+    if(typeof NOVATOS_DATA==='undefined')return;
+    var hoje=Date.now(), MS=86400000;
+    var mesAtivo=(typeof MES_ATIVO!=='undefined')?MES_ATIVO:6, anoAtivo=2026;
+    var agg={}, agg2={}; if(window.JUN_DATA&&window.JUN_DATA.rawData)
+      window.JUN_DATA.rawData.forEach(function(r){ var k=norm(r.p); agg[k]=r; var k2=key2(r.p); if(!agg2[k2])agg2[k2]=r; });
+    var novos=[];
+    Object.keys(window._FIRST_SEEN).forEach(function(key){
+      var f=window._FIRST_SEEN[key];
+      var d=new Date(f.first);
+      if(d.getUTCMonth()+1!==mesAtivo || d.getUTCFullYear()!==anoAtivo)return;
+      var dias=Math.floor((hoje-f.first)/MS); if(dias<0)dias=0;
+      var a=agg[key] || agg2[key2(f.p)] || {};   // exato, senão 1º+2º nome
+      var admBR=('0'+d.getUTCDate()).slice(-2)+'/'+('0'+(d.getUTCMonth()+1)).slice(-2)+'/'+d.getUTCFullYear();
+      novos.push({ p:(a.p||f.p), s:(a.s||f.sup||''),
+        v:a.v||0, meta:a.meta||0, leads:a.leads||0, adm:admBR, dias:dias });
+    });
+    novos.sort(function(x,y){ return x.dias-y.dias; });
+    NOVATOS_DATA.length=0; novos.forEach(function(n){ NOVATOS_DATA.push(n); });
+  }
+  window._collectFirst=collectFirst; window._rebuildNovatos=rebuildNovatos;
+
+  function rerender(){
+    try{
+      if(typeof _rebuildNovatos==='function')_rebuildNovatos();
+      if(typeof renderKPIs==='function')renderKPIs();
+      if(typeof renderSupGrid==='function')renderSupGrid();
+      if(typeof render==='function')render();
+      if(typeof buildCharts==='function')buildCharts();
+      if(typeof buildNovatos==='function')buildNovatos();
+      if(typeof bRenderTable==='function')bRenderTable();
     }catch(e){}
-
-    // marca atualização na tela
     var hd=document.getElementById('header-date');
     if(hd){ var d=new Date();
-      hd.textContent='Atualizado da planilha em '+
-        ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()+
-        ' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    }
+      hd.textContent='Atualizado da planilha em '+('0'+d.getDate()).slice(-2)+'/'+
+        ('0'+(d.getMonth()+1)).slice(-2)+'/'+d.getFullYear()+' '+
+        ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
   }
+
+  function get(u){ return fetch(u,{cache:'no-store'})
+      .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.text(); }); }
 
   function load(){
-    fetch(CSV_URL,{cache:'no-store'})
-      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
-      .then(function(t){ apply(aggregate(t)); })
-      .catch(function(e){
-        // falha (offline/CORS): mantém dados embutidos; registra discretamente
-        console.warn('Planilha não carregada, usando dados embutidos:', e.message);
-      });
+    window._FIRST_SEEN={}; // zera acumulador a cada carga
+    // RANKING (agregados)
+    get(URLS.ranking).then(applyRanking)
+      .catch(function(e){ console.warn('RANKING não carregado:',e.message); })
+      .then(function(){
+        // Listas detalhadas em paralelo (mês ativo) + coleta de 1ª data (todos os meses)
+        return Promise.all([
+          get(URLS.pf).then(function(t){ window._RAW_PF=mapList(t,'pf'); collectFirst(t,'pf'); })
+            .catch(function(e){ console.warn('PF não carregado:',e.message); }),
+          get(URLS.ade).then(function(t){ window._RAW_ADE=mapList(t,'ade'); collectFirst(t,'ade'); })
+            .catch(function(e){ console.warn('ADESÃO não carregado:',e.message); }),
+          get(URLS.pme).then(function(t){ window._RAW_PME=mapList(t,'pme'); collectFirst(t,'pme'); })
+            .catch(function(e){ console.warn('PME não carregado:',e.message); })
+        ]);
+      })
+      .then(rerender)
+      .catch(function(e){ console.warn('Falha geral, mantendo dados embutidos:',e.message); });
   }
 
-  // expõe botão manual de atualização
   window.atualizarDaPlanilha=load;
-
-  if(document.readyState==='loading')
-    document.addEventListener('DOMContentLoaded', load);
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',load);
   else load();
 })();
 
