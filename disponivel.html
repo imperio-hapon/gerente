@@ -291,28 +291,36 @@ td{padding:6px 8px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align
 </script>
 
 <script>
+// ─── Feriados / emendas (não contam como dias úteis) ───────────────────────
+// Chave: "ano-mes0" (mes0 = mês JS 0-based). Valor: lista de dias do mês a excluir.
+var FERIADOS = {
+  '2026-5': [4, 5, 19] // junho/2026: Corpus Christi (4), emenda (5), feriado (19)
+};
+function _feriadosDoMes(mes0, ano){ return FERIADOS[ano+'-'+mes0] || []; }
+
 // ─── Cálculo dinâmico de dias úteis trabalhados ────────────────────────────
 function calcDiasTrab(diasUteisMes, mes0, ano) {
   // mes0 = mês JavaScript 0-based (jan=0, jun=5)
   var hoje = new Date();
+  var fer = _feriadosDoMes(mes0, ano);
   // Mês passado → encerrado → retorna total
   if(hoje.getFullYear() > ano || (hoje.getFullYear()===ano && hoje.getMonth() > mes0))
     return diasUteisMes;
-  // Contar dias úteis de 01 até hoje
+  // Contar dias úteis de 01 até hoje, descontando feriados/emendas
   var count = 0;
   var limDia = (hoje.getFullYear()===ano && hoje.getMonth()===mes0)
     ? hoje.getDate()
     : new Date(ano, mes0+1, 0).getDate();
   for(var d=1; d<=limDia; d++){
     var dow = new Date(ano, mes0, d).getDay();
-    if(dow!==0 && dow!==6) count++;
+    if(dow!==0 && dow!==6 && fer.indexOf(d)===-1) count++;
   }
   return Math.min(count, diasUteisMes);
 }
 
 // ─── PERÍODO ──────────────────────────────────────────────────────────────
-var DIAS_UTEIS_MES=19; // junho 2026
-var DIAS_TRAB=calcDiasTrab(21, 5, 2026); // dias úteis até hoje (6)
+var DIAS_UTEIS_MES=19; // junho 2026 (22 dias úteis − Corpus Christi 04, emenda 05, feriado 19)
+var DIAS_TRAB=calcDiasTrab(DIAS_UTEIS_MES, 5, 2026); // dias úteis até hoje, descontando feriados
 var RITMO_ESP=DIAS_TRAB/DIAS_UTEIS_MES;
 var ESP_PCT=+(RITMO_ESP*100).toFixed(1);
 var PROJ_FATOR=DIAS_TRAB>0?DIAS_UTEIS_MES/DIAS_TRAB:1;
@@ -547,10 +555,12 @@ function renderKPIs() {
   var _src=(MES_ATIVO===5&&typeof MAY_DATA!=='undefined')?MAY_DATA:((MES_ATIVO===4&&typeof APR_DATA!=='undefined')?APR_DATA:null);
   // Leads reativos: soma das equipes selecionadas
   var _ld;
-  if(activeSups.has('todos')){
-    _ld = _src?_src.leads_tot:null;
+  if(_src){
+    if(activeSups.has('todos')) _ld=_src.leads_tot;
+    else _ld=_src.leads_sup?[...activeSups].reduce((a,k)=>a+(_src.leads_sup[k]||0),0):null;
   } else {
-    _ld = _src&&_src.leads_sup ? [...activeSups].reduce((a,k)=>a+(_src.leads_sup[k]||0),0) : null;
+    // Junho (sem _src): soma os leads dos promotores filtrados, vindos do RANKING
+    _ld = rowsAtivos.reduce((a,r)=>a+(r.leads||0),0);
   }
   var _lg=_src?_src.leads_tot_geral:null;
   var _pct=(_ld&&_lg&&_lg>0)?(_ld/_lg*100).toFixed(2):null;
