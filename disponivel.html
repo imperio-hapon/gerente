@@ -129,6 +129,9 @@ td{padding:6px 8px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align
 .mes-btn.active{background:#4361ee;border-color:#4361ee;color:#fff}
 .mes-btn:not(.active):hover{border-color:#4361ee;color:#4361ee}
 .mes-badge{font-size:11px;color:#888;font-style:italic}
+.du-field{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#555;font-weight:600;background:#fff;border:2px solid #ddd;border-radius:20px;padding:3px 12px}
+.du-field input{width:48px;border:none;background:transparent;font-size:13px;font-weight:800;color:#4361ee;text-align:center;outline:none}
+.du-field input::-webkit-outer-spin-button,.du-field input::-webkit-inner-spin-button{opacity:1}
 </style>
 </head>
 <body>
@@ -141,6 +144,10 @@ td{padding:6px 8px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align
   <button class="mes-btn" data-mes="5" onclick="switchMes(5)">Maio/2026</button>
   <button class="mes-btn" data-mes="4" onclick="switchMes(4)">Abril/2026</button>
   <button class="mes-btn" onclick="atualizarDaPlanilha&&atualizarDaPlanilha()" title="Buscar dados mais recentes da planilha publicada">↻ Atualizar da planilha</button>
+  <span class="du-field" title="Total de dias úteis do mês (descontando feriados). Usado para projeção e ritmo.">
+    <label for="du-input">Dias úteis no mês:</label>
+    <input type="number" id="du-input" min="1" max="31" step="1" onchange="setDiasUteis(this.value)" />
+  </span>
   <span class="mes-badge" id="mes-badge">Dia 6 de 21 dias úteis · hoje em aberto</span>
 </div>
 <div id="kpi-row1" class="kpi-row"></div>
@@ -1021,6 +1028,7 @@ function switchMes(mes){
       ?'Dia '+DIAS_UTEIS_MES+' de '+DIAS_UTEIS_MES+' dias úteis · mês encerrado'
       :'Dia '+DIAS_TRAB+' de '+DIAS_UTEIS_MES+' dias úteis · hoje em aberto';
   }
+  var _du=document.getElementById('du-input');if(_du)_du.value=DIAS_UTEIS_MES;
   document.querySelectorAll('.mes-btn').forEach(function(b){b.classList.toggle('active',+b.dataset.mes===mes);});
   PROMS.length=0;Array.from(new Set(rawData.map(function(r){return r.p;}))).sort().forEach(function(p){PROMS.push(p);});
   filterDefs.promotor.opts=['todos'].concat(PROMS);
@@ -1033,6 +1041,41 @@ function switchMes(mes){
   renderKPIs();renderSupGrid();render();buildCharts();
   if(typeof bSyncFromMain==='function')bSyncFromMain();
   if(typeof bSwitch==='function')bSwitch(typeof bCurBase!=='undefined'?bCurBase:'pf');
+}
+
+// ─── Campo editável de dias úteis do mês (sem precisar editar o HTML) ───────
+function setDiasUteis(val){
+  var n=parseInt(val,10);
+  if(isNaN(n)||n<1){ var _i=document.getElementById('du-input'); if(_i)_i.value=DIAS_UTEIS_MES; return; }
+  DIAS_UTEIS_MES=n;
+  // recalcula dias trabalhados (até hoje) respeitando feriados do mês ativo
+  var _m0={4:3,5:4,6:5}; var _mes0=(_m0[MES_ATIVO]!==undefined)?_m0[MES_ATIVO]:(MES_ATIVO-1);
+  DIAS_TRAB=calcDiasTrab(DIAS_UTEIS_MES,_mes0,2026);
+  RITMO_ESP=DIAS_TRAB/DIAS_UTEIS_MES;
+  ESP_PCT=+(RITMO_ESP*100).toFixed(1);
+  PROJ_FATOR=DIAS_TRAB>0?DIAS_UTEIS_MES/DIAS_TRAB:1;
+  // re-deriva projeção/pct de cada linha
+  rawData.forEach(function(r){
+    r.pct  = r.meta>0?+(r.v/r.meta*100).toFixed(1):0;
+    r.gap  = r.v-r.meta;
+    r.proj = Math.round(r.v * PROJ_FATOR);
+    r.projPct = r.meta>0?+(r.proj/r.meta*100).toFixed(1):0;
+    r.cvDisp = r.cv!==null&&r.cv!==undefined ? r.cv.toFixed(2)+'%' : '—';
+  });
+  // mantém o valor salvo na fonte do mês ativo p/ persistir na troca de aba
+  var _src=(typeof APR_DATA!=='undefined')?(MES_ATIVO===4?APR_DATA:MES_ATIVO===5?MAY_DATA:JUN_DATA):null;
+  if(_src)_src.dias_uteis=DIAS_UTEIS_MES;
+  // atualiza badge + re-renderiza tudo
+  var bg=document.getElementById('mes-badge');
+  if(bg){
+    var _enc=DIAS_TRAB>=DIAS_UTEIS_MES;
+    bg.textContent=_enc
+      ?'Dia '+DIAS_UTEIS_MES+' de '+DIAS_UTEIS_MES+' dias úteis · mês encerrado'
+      :'Dia '+DIAS_TRAB+' de '+DIAS_UTEIS_MES+' dias úteis · hoje em aberto';
+  }
+  renderKPIs();renderSupGrid();render();buildCharts();
+  if(typeof buildNovatos==='function')buildNovatos();
+  if(typeof bRenderTable==='function')bRenderTable();
 }
 // ─── ALIMENTAÇÃO AO VIVO PELA PLANILHA PUBLICADA ──────────────────────────
 // RANKING  -> valores/agregados (vidas por promotor, totais)
@@ -1327,6 +1370,7 @@ function switchMes(mes){
 })();
 
 // ─── INIT ─────────────────────────────────────────────────────────────────
+var _duInit=document.getElementById('du-input');if(_duInit)_duInit.value=DIAS_UTEIS_MES;
 renderKPIs();
 render();
 buildCharts();
@@ -1792,3 +1836,4 @@ if(document.readyState==='loading'){
 
 </body>
 </html>
+  
