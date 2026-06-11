@@ -227,6 +227,28 @@ td{padding:6px 8px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align
     var wrap = document.getElementById('novatos-body');
     if(!wrap) return;
 
+    // Enriquecer cada novato com leads/vidas/meta da base agregada (JUN_DATA.rawData),
+    // casando pelo nome — sem isto leads e conversão aparecem zerados.
+    (function(){
+      var src = (typeof JUN_DATA!=='undefined' && JUN_DATA.rawData) ? JUN_DATA.rawData : null;
+      if(!src) return;
+      var _norm = function(s){ return String(s||'').toUpperCase()
+        .replace(/\s*-\s*VENDEDOR ADM\s*$/,'')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .replace(/\s+/g,' ').trim(); };
+      var _k2 = function(s){ return _norm(s).split(' ').slice(0,2).join(' '); };
+      var byKey={}, byKey2={};
+      src.forEach(function(r){ var k=_norm(r.p); byKey[k]=r; var k2=_k2(r.p); if(!byKey2[k2])byKey2[k2]=r; });
+      NOVATOS_DATA.forEach(function(n){
+        var a = byKey[_norm(n.p)] || byKey2[_k2(n.p)];
+        if(a){
+          if(a.leads!=null) n.leads = a.leads;
+          if(a.v!=null)     n.v = a.v;
+          if(a.meta!=null && a.meta>0) n.meta = a.meta;
+        }
+      });
+    })();
+
     // Filtrar por equipe ativa (chips de supervisor)
     var _novatosFilt = (typeof window.activeSups!=='undefined' && !window.activeSups.has('todos'))
       ? NOVATOS_DATA.filter(function(r){ return window.activeSups.has(r.s); })
@@ -316,6 +338,23 @@ function calcDiasTrab(diasUteisMes, mes0, ano) {
     if(dow!==0 && dow!==6 && fer.indexOf(d)===-1) count++;
   }
   return Math.min(count, diasUteisMes);
+}
+
+// Conta dias úteis ENTRE duas datas (exclusive da inicial, inclusive até hoje),
+// pulando fins de semana e feriados/emendas. Usado p/ "dias úteis sem vender".
+function diasUteisEntre(tsInicio, tsFim){
+  if(tsInicio==null || tsFim==null || tsFim<=tsInicio) return 0;
+  var ini = new Date(tsInicio); ini.setHours(0,0,0,0);
+  var fim = new Date(tsFim);    fim.setHours(0,0,0,0);
+  var count = 0;
+  var d = new Date(ini.getTime() + 86400000); // começa no dia seguinte à última venda
+  while(d.getTime() <= fim.getTime()){
+    var dow = d.getDay();
+    var fer = _feriadosDoMes(d.getMonth(), d.getFullYear());
+    if(dow!==0 && dow!==6 && fer.indexOf(d.getDate())===-1) count++;
+    d = new Date(d.getTime() + 86400000);
+  }
+  return count;
 }
 
 // ─── PERÍODO ──────────────────────────────────────────────────────────────
@@ -960,6 +999,15 @@ function switchMes(mes){
   DIAS_TRAB=calcDiasTrab(DIAS_UTEIS_MES,_mes0,2026);
   RITMO_ESP=DIAS_TRAB/DIAS_UTEIS_MES;ESP_PCT=+(RITMO_ESP*100).toFixed(1);PROJ_FATOR=DIAS_TRAB>0?DIAS_UTEIS_MES/DIAS_TRAB:1;
   rawData.length=0;src.rawData.forEach(function(r){rawData.push(r);});
+  // Recalcular campos derivados para o mês ativo (pct, gap, projeção) —
+  // sem isto o card "Ritmo do Dia" e o "No ritmo" das equipes ficam zerados
+  rawData.forEach(function(r){
+    r.pct  = r.meta>0?+(r.v/r.meta*100).toFixed(1):0;
+    r.gap  = r.v-r.meta;
+    r.proj = Math.round(r.v * PROJ_FATOR);
+    r.projPct = r.meta>0?+(r.proj/r.meta*100).toFixed(1):0;
+    r.cvDisp = r.cv!==null&&r.cv!==undefined ? r.cv.toFixed(2)+'%' : '—';
+  });
   SEMANAS.length=0;src.semanas.forEach(function(s){SEMANAS.push(s);});
   ['HUMBERTO BANQUERI','LUIZ ROBERTO','JOSY BOMFIM','REBECA MOURA','BENVE'].forEach(function(k){
     SUP_SEMS[k]=src.sems[k]||[0,0,0,0];SUP_MVP_SEMS[k]=src.mvpSems[k]||[0,0,0,0];
@@ -1042,7 +1090,8 @@ function switchMes(mes){
     var iSup=col(H,['SUPERVISOR']),iProm=col(H,['PROMOTOR']),
         iPF=col(H,['VIDAS PF']),iAD=col(H,['VIDAS ADE','ADESAO','ADESÃO']),
         iPM=col(H,['VIDAS PME']),iTOT=col(H,['VIDAS TOT','TOTAIS']),
-        iMeta=col(H,['META']),iLeads=col(H,['LEADS']);
+        iMeta=col(H,['META']),iLeads=col(H,['LEADS']),
+        iDZ=col(H,['DIAS ZERADOS','DIAS ZERO','D.UTEIS S/ VENDER','D.ÚTEIS S/ VENDER','DIAS S/ VENDER','DIAS SEM VENDA','DIAS SEM VENDER']);
     if(iProm<0)return;
     var byKey={}; window.JUN_DATA.rawData.forEach(function(r){ byKey[norm(r.p)]=r; });
     var supFF='', totPF=0,totA=0,totPME=0,totV=0,totMeta=0, found={}, metaSup={};
@@ -1055,10 +1104,12 @@ function switchMes(mes){
       var pf=iPF>=0?num(row[iPF]):0, ad=iAD>=0?num(row[iAD]):0,
           pm=iPM>=0?num(row[iPM]):0, tot=iTOT>=0?num(row[iTOT]):(pf+ad+pm);
       var metaV=iMeta>=0?num(row[iMeta]):null, leadsV=iLeads>=0?num(row[iLeads]):null;
+      var dzV=iDZ>=0?num(row[iDZ]):null;
       var key=norm(prom), rec=byKey[key];
       if(rec){ rec.pf=pf;rec.a=ad;rec.pme=pm;rec.v=tot;
-               if(metaV!==null)rec.meta=metaV; if(leadsV!==null)rec.leads=leadsV; found[key]=1; }
-      else { rec={s:supFF,p:prom,pf:pf,a:ad,pme:pm,v:tot,meta:metaV||0,leads:leadsV||0,dz:0,cv:null};
+               if(metaV!==null)rec.meta=metaV; if(leadsV!==null)rec.leads=leadsV;
+               if(dzV!==null)rec.dz=dzV; found[key]=1; }
+      else { rec={s:supFF,p:prom,pf:pf,a:ad,pme:pm,v:tot,meta:metaV||0,leads:leadsV||0,dz:dzV||0,cv:null};
              window.JUN_DATA.rawData.push(rec); byKey[key]=rec; found[key]=1; }
       totPF+=pf;totA+=ad;totPME+=pm;totV+=tot;
       if(metaV!==null){ totMeta+=metaV; var sk=supFF; metaSup[sk]=(metaSup[sk]||0)+metaV; }
@@ -1075,7 +1126,18 @@ function switchMes(mes){
     }
     if(typeof MES_ATIVO!=='undefined'&&MES_ATIVO===6){
       if(typeof VTOT!=='undefined'){VTOT=totV;VPF=totPF;VADE=totA;VPME=totPME;}
-      if(typeof rawData!=='undefined'){rawData.length=0;window.JUN_DATA.rawData.forEach(function(r){rawData.push(r);});}
+      if(typeof rawData!=='undefined'){
+        rawData.length=0;
+        window.JUN_DATA.rawData.forEach(function(r){rawData.push(r);});
+        // Recalcular derivados após atualizar da planilha (senão ritmo/pct zeram)
+        rawData.forEach(function(r){
+          r.pct  = r.meta>0?+(r.v/r.meta*100).toFixed(1):0;
+          r.gap  = r.v-r.meta;
+          r.proj = Math.round(r.v * PROJ_FATOR);
+          r.projPct = r.meta>0?+(r.proj/r.meta*100).toFixed(1):0;
+          r.cvDisp = r.cv!==null&&r.cv!==undefined ? r.cv.toFixed(2)+'%' : '—';
+        });
+      }
     }
   }
 
@@ -1163,15 +1225,64 @@ function switchMes(mes){
       var a=agg[key] || agg2[key2(f.p)] || {};   // exato, senão 1º+2º nome
       var admBR=('0'+d.getUTCDate()).slice(-2)+'/'+('0'+(d.getUTCMonth()+1)).slice(-2)+'/'+d.getUTCFullYear();
       novos.push({ p:(a.p||f.p), s:(a.s||f.sup||''),
-        v:a.v||0, meta:a.meta||0, leads:a.leads||0, adm:admBR, dias:dias });
+        v:(a.v!=null?a.v:0), meta:(a.meta!=null?a.meta:0),
+        leads:(a.leads!=null?a.leads:0), adm:admBR, dias:dias });
     });
     novos.sort(function(x,y){ return x.dias-y.dias; });
     NOVATOS_DATA.length=0; novos.forEach(function(n){ NOVATOS_DATA.push(n); });
   }
   window._collectFirst=collectFirst; window._rebuildNovatos=rebuildNovatos;
 
+  // ── DZ: dias úteis desde a ÚLTIMA venda aprovada/processada até hoje ───────
+  function statusOk(st){
+    var x=norm(st);
+    if(!x) return false; // sem status conhecido → não conta como venda
+    return x.indexOf('APROVAD')>=0 || x.indexOf('PROCESSAD')>=0 ||
+           x.indexOf('ATIVO')>=0 || x.indexOf('ATIVA')>=0;
+  }
+  function computeDZ(){
+    if(!window.JUN_DATA||!window.JUN_DATA.rawData)return;
+    // última venda aprovada por promotor (chave normalizada) nas 3 listas
+    var ultima={}; // key -> timestamp
+    function scan(list, statusField){
+      (list||[]).forEach(function(it){
+        if(!statusOk(it[statusField])) return;
+        var ts=parseDataTS(it.data); if(ts==null) return;
+        var k=norm(it.promotor||it.p||'');
+        if(!k) return;
+        if(ultima[k]==null || ts>ultima[k]) ultima[k]=ts;
+      });
+    }
+    scan(window._RAW_PF,  'status');
+    scan(window._RAW_ADE, 'situacao');
+    scan(window._RAW_PME, 'status');
+
+    var hoje=new Date(); hoje.setHours(0,0,0,0); var hojeTS=hoje.getTime();
+    window.JUN_DATA.rawData.forEach(function(rec){
+      var k=norm(rec.p);
+      var ts=ultima[k];
+      if(ts==null) ts=ultima[key2(rec.p)]; // tenta 1º+2º nome
+      if(ts==null){ return; } // sem venda aprovada conhecida → mantém dz atual
+      rec.dz = diasUteisEntre(ts, hojeTS);
+    });
+  }
+  window._computeDZ=computeDZ;
+
   function rerender(){
     try{
+      if(typeof computeDZ==='function')computeDZ();
+      // Re-sincroniza rawData (tabela lê de rawData) com dz atualizado + derivados
+      if(typeof MES_ATIVO!=='undefined'&&MES_ATIVO===6&&typeof rawData!=='undefined'&&window.JUN_DATA){
+        rawData.length=0;
+        window.JUN_DATA.rawData.forEach(function(r){rawData.push(r);});
+        rawData.forEach(function(r){
+          r.pct  = r.meta>0?+(r.v/r.meta*100).toFixed(1):0;
+          r.gap  = r.v-r.meta;
+          r.proj = Math.round(r.v * PROJ_FATOR);
+          r.projPct = r.meta>0?+(r.proj/r.meta*100).toFixed(1):0;
+          r.cvDisp = r.cv!==null&&r.cv!==undefined ? r.cv.toFixed(2)+'%' : '—';
+        });
+      }
       if(typeof _rebuildNovatos==='function')_rebuildNovatos();
       if(typeof renderKPIs==='function')renderKPIs();
       if(typeof renderSupGrid==='function')renderSupGrid();
