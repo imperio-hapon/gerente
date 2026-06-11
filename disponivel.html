@@ -50,6 +50,7 @@ h1{font-size:16px;font-weight:800;margin-bottom:2px}
 .pct-row{display:flex;justify-content:space-between;margin-top:3px}
 .pct-lbl{font-size:11px;font-weight:700}.st-lbl{font-size:10px}
 .sup-proj{font-size:9.5px;margin-top:4px;padding-top:4px;border-top:1px solid #f0f0f0;color:#555}
+.sup-meta-hoje{font-size:9px;margin-top:2px;color:#b0b3ba;font-weight:500}
 .sup-proj strong{color:#f4a261}
 .sup-ritmo{font-size:9.5px;margin-top:3px;color:#2a9d8f;font-weight:600}
 .sem-wrap{margin-top:8px}
@@ -556,6 +557,9 @@ function renderKPIs() {
   const pctR = +(vtGlobal/mtGlobal*100).toFixed(1);
   const proj = Math.round(vtGlobal * PROJ_FATOR);
   const projP= +(proj/mtGlobal*100).toFixed(1);
+  // Meta proporcional aos dias úteis já trabalhados (meta "até a data")
+  const metaAteData = DIAS_UTEIS_MES>0 ? Math.round(mtGlobal * DIAS_TRAB / DIAS_UTEIS_MES) : mtGlobal;
+  const pctAteData  = metaAteData>0 ? +(vtGlobal/metaAteData*100).toFixed(0) : 0;
   // Excluir inativos do cálculo de MVP e ritmo
   const rowsAtivos = rows.filter(r=>!INATIVOS.has(r.p));
   const mvp  = rowsAtivos.length>0?+(vtGlobal/rowsAtivos.length).toFixed(1):0;
@@ -587,7 +591,7 @@ function renderKPIs() {
 
   document.getElementById('kpi-row1').innerHTML=`
     <div class="kpi azul"><div class="kpi-label">Vidas Realizadas</div><div class="kpi-value">${N(vtGlobal)}</div><div class="kpi-pct" style="color:#4361ee">${pctR}% da meta</div></div>
-    <div class="kpi cinza"><div class="kpi-label">Meta do Período</div><div class="kpi-value">${N(mtGlobal)}</div><div class="kpi-sub">${rowsAtivos.length} promotores</div></div>
+    <div class="kpi cinza"><div class="kpi-label">Meta do Período</div><div class="kpi-value">${N(mtGlobal)}</div><div class="kpi-sub">${rowsAtivos.length} promotores · <span style="color:#9aa" title="Meta proporcional aos ${DIAS_TRAB} dias úteis já decorridos">meta até hoje: ${N(metaAteData)} (${pctAteData}% atingido)</span></div></div>
     <div class="kpi proj"><div class="kpi-label">Projeção de Fechamento</div><div class="kpi-value" style="color:#f4a261">${N(proj)}</div><div class="kpi-pct" style="color:#f4a261">${projP}% no ritmo atual</div></div>
     <div class="kpi verm"><div class="kpi-label">GAP Atual</div><div class="kpi-value" style="color:#c0392b">-${N(mtGlobal-vtGlobal)}</div><div class="kpi-sub">vidas faltantes p/ 100%</div></div>
     <div class="kpi" style="border-top-color:#0077b6"><div class="kpi-label">% Conversão Média</div><div class="kpi-value" style="color:#0077b6">${avgCv.toFixed(2)}%</div><div class="kpi-sub">${(()=>{if(!_srcData||!_srcData.leads_sup)return'0';if(activeSups.has('todos'))return N(_srcData.leads_tot||0);return N([...activeSups].reduce((a,k)=>a+(_srcData.leads_sup[k]||0),0));})() } leads</div></div>
@@ -701,6 +705,8 @@ function renderSupGrid() {
     const pct  = mt>0?+(vt/mt*100).toFixed(1):0;
     const proj = Math.round(vt * PROJ_FATOR);
     const pjp  = mt>0?+(proj/mt*100).toFixed(1):0;
+    const metaHoje = DIAS_UTEIS_MES>0 ? Math.round(mt * DIAS_TRAB / DIAS_UTEIS_MES) : mt;
+    const pctHoje  = metaHoje>0 ? +(vt/metaHoje*100).toFixed(0) : 0;
     const rat  = pct/ESP_PCT;
     const stC  = rat>=1?'#1a7a3a':'transparent';
     const stT  = rat>=1?'✅ No ritmo':'';
@@ -720,6 +726,7 @@ function renderSupGrid() {
       <div class="bar-bg"><div class="bar-fill bar-${cfg.cls}" style="width:${Math.min(pct,100)}%"></div><div class="bar-exp" style="left:${Math.min(ESP_PCT,100)}%"></div></div>
       <div class="pct-row"><span class="pct-lbl c-${cfg.cls}">${pct}%</span><span class="st-lbl" style="color:${stC}">${stT}</span></div>
       <div class="sup-proj">Projeção: <strong>${N(proj)} vidas (${pjp}% da meta)</strong></div>
+      <div class="sup-meta-hoje" title="Meta proporcional aos ${DIAS_TRAB} dias úteis já decorridos">Meta até hoje: ${N(metaHoje)} · ${pctHoje}% atingido</div>
       <div class="sup-ritmo">✅ No ritmo: ${nd} de ${n} (${n>0?+(nd/n*100).toFixed(0):0}%)</div>
       ${single?buildSemBlock(key,vt,pct):''}
     </div>`;
@@ -1836,4 +1843,3 @@ if(document.readyState==='loading'){
 
 </body>
 </html>
-  
