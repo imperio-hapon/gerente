@@ -1,0 +1,404 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Diagnóstico GUP Setembro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f2f4f8;--surface:#ffffff;--surface-2:#eef2f7;--line:#dce3ec;--line-2:#c9d3df;
+  --ink:#122033;--ink-2:#46566c;--muted:#6f7d90;--accent:#1d5fae;--accent-soft:#e3edf9;
+  --p1:#2a78d6;--p2:#eb6834;--p1-soft:#e2edfb;--p2-soft:#fdeee6;
+  --pf:#2a78d6;--pme:#1baf7a;
+  --good:#1f9254;--good-soft:#e2f3e9;--warn:#b77d00;--warn-soft:#fbf1d9;--bad:#cf3f36;--bad-soft:#fbe6e4;
+  --shadow:0 1px 2px rgba(18,32,51,.06),0 2px 8px rgba(18,32,51,.04);
+  --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#0d131b;--surface:#151e29;--surface-2:#1b2633;--line:#283545;--line-2:#34455a;
+  --ink:#edf1f6;--ink-2:#b4c0ce;--muted:#8795a8;--accent:#6aa5ec;--accent-soft:#1c2c42;
+  --p1:#3987e5;--p2:#e0662f;--p1-soft:#1a2c44;--p2-soft:#3a2418;--pf:#3987e5;--pme:#199e70;
+  --good:#3cb371;--good-soft:#16301f;--warn:#e0a82e;--warn-soft:#352a12;--bad:#ec6a61;--bad-soft:#3a1c1a;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#0d131b;--surface:#151e29;--surface-2:#1b2633;--line:#283545;--line-2:#34455a;
+  --ink:#edf1f6;--ink-2:#b4c0ce;--muted:#8795a8;--accent:#6aa5ec;--accent-soft:#1c2c42;
+  --p1:#3987e5;--p2:#e0662f;--p1-soft:#1a2c44;--p2-soft:#3a2418;--pf:#3987e5;--pme:#199e70;
+  --good:#3cb371;--good-soft:#16301f;--warn:#e0a82e;--warn-soft:#352a12;--bad:#ec6a61;--bad-soft:#3a1c1a;--shadow:none}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;padding:0 16px;font-variant-numeric:tabular-nums}
+.wrap{max-width:1320px;margin:0 auto;padding-block:20px 60px;display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:28px;font-weight:700}h2{font-size:21px;font-weight:700}
+h3{font-size:15px;font-weight:600;font-family:var(--body);letter-spacing:0}
+p{margin:0}
+.eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.muted{color:var(--muted)}.ink2{color:var(--ink-2)}.note{font-size:12px;color:var(--muted)}
+header.top{display:flex;flex-direction:column;gap:10px}
+.periods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.per{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line)}
+.per.p1{background:var(--p1-soft)}.per.p2{background:var(--p2-soft)}
+.per b{font-family:var(--display);font-size:17px}
+.per .days{font-size:12px;color:var(--ink-2)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:0}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;padding-block:8px;border-bottom:1px solid var(--line);overflow-x:auto}
+nav.tabs a{padding:7px 12px;border-radius:8px;color:var(--ink-2);text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap}
+nav.tabs a:hover{background:var(--surface-2);color:var(--ink)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section.sec{display:flex;flex-direction:column;gap:14px;scroll-margin-top:60px}
+.sechead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;padding-top:10px;border-top:2px solid var(--ink)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.panel .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+/* verdict */
+.verdict{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap:18px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--bad);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+.verdict .big{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.2}
+.vstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.vstats div{background:var(--surface-2);border-radius:10px;padding:10px 12px}
+.vstats b{display:block;font-family:var(--display);font-size:22px}
+.vstats span{font-size:12px;color:var(--ink-2)}
+/* analysis panels */
+.an{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.anp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--c)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface-2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.tile .l{font-size:12px;color:var(--ink-2);font-weight:600}
+.tile .v{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.15}
+.tile .s{font-size:12px;color:var(--muted)}
+.delta{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:3px;font-family:var(--body)}
+.delta.up{background:var(--good-soft);color:var(--good)}.delta.down{background:var(--bad-soft);color:var(--bad)}.delta.flat{background:var(--surface);color:var(--ink-2)}
+.delta.up.inv{background:var(--bad-soft);color:var(--bad)}.delta.down.inv{background:var(--good-soft);color:var(--good)}
+/* questions */
+.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.q .qh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.q h3{font-size:16px;font-family:var(--display)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.good{background:var(--good-soft);color:var(--good)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.info{background:var(--accent-soft);color:var(--accent)}
+.q ul,.sc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--ink-2)}
+.q li b,.sc li b{color:var(--ink)}
+.cmp{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:12.5px}
+.cmp .t{height:10px;background:var(--surface-2);border-radius:0 4px 4px 0;overflow:hidden}.cmp .t span{display:block;height:100%;border-radius:0 4px 4px 0}
+.cmp .n{font-weight:700;text-align:right}
+/* scenarios */
+.scs{display:flex;flex-direction:column;gap:14px}
+.sc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px}
+.sc .txt{display:flex;flex-direction:column;gap:10px}
+.sc h3{font-size:16px;font-family:var(--display)}
+.sc .tags{display:flex;gap:6px;flex-wrap:wrap}
+/* tables & charts */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;background:var(--surface-2)}
+td.num,th.num{text-align:right}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}svg text{font-family:var(--body)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend i.ln{height:3px;border-radius:2px;vertical-align:3px;width:14px}
+.tt{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:7px 9px;border-radius:7px;z-index:20;max-width:280px;line-height:1.4}
+.recs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.rec{background:var(--accent-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2);font-size:13px}
+.rec b{color:var(--ink);font-size:14px}
+.trow2{display:grid;grid-template-columns:minmax(0,1fr) 90px auto;gap:10px;align-items:center;font-size:12.5px;height:32px;border-bottom:1px solid var(--line)}
+.trow2:last-child{border-bottom:none}
+.trow2 .nm{display:flex;gap:7px;align-items:center;min-width:0}.trow2 .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trow2 .nm i{flex:none;width:8px;height:8px;border-radius:50%}
+.trow2 .bb{height:8px;background:var(--surface-2);border-radius:0 4px 4px 0;overflow:hidden}.trow2 .bb span{display:block;height:100%;border-radius:0 4px 4px 0}
+.trow2 .vv{text-align:right;font-weight:700;white-space:nowrap;min-width:118px;display:flex;align-items:center;justify-content:flex-end}.trow2 .vv small{font-weight:500;color:var(--muted);margin-left:4px}
+footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:1000px){.verdict,.sc{grid-template-columns:1fr}.recs,.g3{grid-template-columns:1fr}}
+@media (max-width:760px){.an,.qs,.g2,.periods{grid-template-columns:1fr}.vstats{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:23px}}
+</style>
+
+<style>
+.samp{font-size:11.5px;color:var(--muted);margin-top:4px}
+.cmp .ln2{display:flex;flex-direction:column;gap:1px}.cmp .ln2 small{font-size:10.5px;color:var(--muted)}
+.defs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.def{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--c)}
+.def h3{font-family:var(--display);font-size:17px}
+.def ul{margin:0;padding-left:18px;color:var(--ink-2);display:flex;flex-direction:column;gap:3px;font-size:13px}
+.def .cnt{display:flex;gap:10px;flex-wrap:wrap}.def .cnt div{background:var(--surface-2);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--ink-2)}.def .cnt b{font-family:var(--display);font-size:16px;color:var(--ink);display:block}
+.oftbl td.b{font-weight:700}
+@media (max-width:1000px){.defs{grid-template-columns:1fr}}
+</style>
+</head><body><div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Hapvida · Comercial Digital · Setembro/2026 · Base GUP · somente dias úteis</span>
+    <h1>1ª × 2ª quinzena: o que explica a queda</h1>
+    <div class="periods">
+      <div class="per p1"><span class="eyebrow"><i class="dot" style="background:var(--p1)"></i>Análise 1</span><b>01/09 a 14/09</b><span class="days">9 dias úteis: 01, 02, 03, 04, 08, 09, 10, 11 e 14/09</span></div>
+      <div class="per p2"><span class="eyebrow"><i class="dot" style="background:var(--p2)"></i>Análise 2</span><b>15/09 a 25/09</b><span class="days">9 dias úteis: 15, 16, 17, 18, 21, 22, 23, 24 e 25/09</span></div>
+    </div>
+    <span class="note" id="exclNote"></span>
+  </header>
+
+  <div class="verdict" id="verdict"></div>
+
+  <nav class="tabs" aria-label="Seções">
+    <a href="#analises">Análise 1 × Análise 2</a><a href="#evolucao">Evolução diária</a><a href="#perguntas">Diagnóstico</a><a href="#conceito">Quente × frio</a><a href="#tags">Tags de encerramento</a><a href="#promotor">Resposta do promotor</a><a href="#cenarios">Outros cenários</a><a href="#acoes">Onde agir</a>
+  </nav>
+
+  <section class="sec" id="analises">
+    <div class="sechead"><div><span class="eyebrow">Resultados por período</span><h2>Leads, orçamentos e qualidade</h2></div>
+      <span class="note">Totais do período e média por dia útil · variação da Análise 2 sobre a Análise 1</span></div>
+    <div class="an" id="an"></div>
+  </section>
+
+  <section class="sec" id="evolucao">
+    <div class="sechead"><div><span class="eyebrow">Dia a dia</span><h2>Onde a curva vira</h2></div>
+      <div class="legend"><span><i style="background:var(--p1)"></i>Análise 1</span><span><i style="background:var(--p2)"></i>Análise 2</span></div></div>
+    <div class="grid g3">
+      <div class="panel"><div class="ph"><h3>Leads por dia (sessões)</h3></div><div class="chart" id="cLeads"></div><div class="samp" id="nLeads"></div></div>
+      <div class="panel"><div class="ph"><h3>Orçamentos por dia (cotações)</h3></div><div class="chart" id="cOrc"></div><div class="samp" id="nOrc"></div></div>
+      <div class="panel"><div class="ph"><h3>Leads quentes por dia</h3></div><div class="chart" id="cQ"></div><div class="samp" id="nQ"></div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="perguntas">
+    <div class="sechead"><div><span class="eyebrow">Diagnóstico</span><h2>As quatro perguntas</h2></div>
+      <span class="note">Comparação por dia útil entre as duas análises</span></div>
+    <div class="qs" id="qs"></div>
+  </section>
+
+  <section class="sec" id="conceito">
+    <div class="sechead"><div><span class="eyebrow">Conceito</span><h2>O que é um lead quente e o que é um lead frio</h2></div>
+      <span class="note">Classificação feita a partir da tag de encerramento de cada sessão</span></div>
+    <div class="panel"><p class="ink2">A temperatura mede o <b>engajamento</b> do cliente com a oferta. O lead é <b>quente</b> quando conversou com o promotor e deu um retorno concreto sobre a cotação, mesmo que não tenha fechado. É <b>frio</b> quando não se engajou: não respondeu ou recusou sem dizer por quê. Os contatos que não são oportunidade de venda ficam fora da classificação. Sessões ainda sem tag não são classificadas.</p></div>
+    <div class="defs" id="defs"></div>
+  </section>
+
+  <section class="sec" id="tags">
+    <div class="sechead"><div><span class="eyebrow">Coluna Tag de encerramento</span><h2>Como os atendimentos terminaram em cada análise</h2></div>
+      <span class="note">Sessões encerradas com tag · dias úteis · mesma ordem nos dois quadros</span></div>
+    <div class="panel"><ul class="ink2" id="tagIns" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px"></ul></div>
+    <div class="an">
+      <div class="anp" style="--c:var(--p1)"><div class="ph"><div><span class="eyebrow">Análise 1</span><h3 style="font-family:var(--display);font-size:18px">01/09 a 14/09</h3></div><span class="note" id="tagTot1"></span></div><div id="tag1"></div></div>
+      <div class="anp" style="--c:var(--p2)"><div class="ph"><div><span class="eyebrow">Análise 2</span><h3 style="font-family:var(--display);font-size:18px">15/09 a 25/09</h3></div><span class="note" id="tagTot2"></span></div><div id="tag2"></div></div>
+    </div>
+    <div class="legend" id="tagLeg"></div>
+  </section>
+
+  <section class="sec" id="promotor">
+    <div class="sechead"><div><span class="eyebrow">Tempo de resposta do promotor · coluna O → coluna N</span><h2>Quanto o promotor leva para responder o chat que recebeu</h2></div>
+      <span class="note">Da atribuição (Time of Chat Assignment, coluna O) até a 1ª resposta (Agent First Response At, coluna N)</span></div>
+    <div class="vstats" id="lgStats" style="grid-template-columns:repeat(5,minmax(0,1fr))"></div>
+    <div id="lgIns"></div>
+    <div class="grid g2">
+      <div class="panel"><div class="ph"><h3>Resposta acima de 2 min por hora da atribuição</h3></div><div id="lgHour"></div></div>
+      <div class="panel"><div class="ph"><h3>Promotores que mais perderam agilidade</h3><span class="note">% de chats respondidos em até 2 min · promotores com 100+ chats em cada análise</span></div><div id="lgAg"></div></div>
+    </div>
+    <div class="panel"><div class="ph"><h3>Promotores ofensores</h3><span class="note" id="ofNote"></span></div><div class="chips" id="ofChips" style="display:flex;gap:6px;flex-wrap:wrap"></div><div id="ofTbl"></div></div>
+  </section>
+
+  <section class="sec" id="cenarios">
+    <div class="sechead"><div><span class="eyebrow">Levantamento adicional</span><h2>Outros cenários que contribuíram para a queda</h2></div>
+      <span class="note">Ordenados pelo peso estimado no resultado · cada gráfico informa a amostra de leads</span></div>
+    <div class="scs" id="scs"></div>
+  </section>
+
+  <section class="sec" id="acoes">
+    <div class="sechead"><div><span class="eyebrow">Próximos passos</span><h2>Onde agir primeiro</h2></div></div>
+    <div class="recs" id="recs"></div>
+  </section>
+
+  <footer>
+    <span>Fonte única: Base_GUP_Tratado_com_Origem-higienizada. Dias úteis: segunda a sexta, sem o feriado de 07/09. A base termina em 27/09 (domingo), então as duas análises têm 9 dias úteis cada.</span>
+    <span>Leads = sessões de chat. Orçamentos = sessões encerradas com tag de cotação (13, 14, 16, 17, 18, 24 e 33). Origem = coluna ORIGEM da base tratada; tipo de produto = coluna TIPO.</span>
+    <span>Sessões encerradas com tags de venda (tag 10, Ag Pagamento e Ag Assinatura) contam como leads, mas seus resultados não são exibidos. A base não traz vidas nem um identificador único de cliente, por isso esses indicadores não aparecem.</span>
+    <span>Tempo de resposta do promotor = Agent First Response At (coluna N) − Time of Chat Assignment (coluna O). Ficam fora os registros com resposta antes da atribuição ou acima de 30 dias. Promotor = coluna NOME ABREVIADO. Padrão de 1ª resposta: 2 min. Ofensor = menos de 80% dos chats respondidos em até 2 min, com 100+ chats em cada análise.</span>
+  </footer>
+</div>
+<div class="tt" id="tt" hidden></div>
+<script id="data" type="application/json">{"R": {"P1": {"s": 48185, "sd": 5353.9, "cot": 16255, "cotd": 1806.1, "enc": 42940, "cot_enc": 37.9, "q": 3180, "f": 27086, "fora": 12674, "semtag": 3673, "q_enc": 7.4, "f_enc": 63.1, "fora_enc": 29.5, "t23": 32.4, "n23": 13907, "lg_n": 43970, "med_s": 38, "le1": 63.6, "le2": 77.7, "gt2": 22.3, "gt60": 2.9, "p90": 6.5, "n_gt2": 9815, "assigned": 48185, "noG": 6.2, "n_noG": 2995, "neg": 2.5, "await": 2672}, "P2": {"s": 49141, "sd": 5460.1, "cot": 11824, "cotd": 1313.8, "enc": 36416, "cot_enc": 32.5, "q": 2606, "f": 22872, "fora": 10938, "semtag": 11971, "q_enc": 7.2, "f_enc": 62.8, "fora_enc": 30.0, "t23": 37.3, "n23": 13597, "lg_n": 44267, "med_s": 39, "le1": 62.3, "le2": 75.6, "gt2": 24.4, "gt60": 3.3, "p90": 8.5, "n_gt2": 10786, "assigned": 49141, "noG": 9.8, "n_noG": 4794, "neg": 0.2, "await": 10519}}, "daily": [{"d": "01/09", "wd": "Ter", "per": "P1", "s": 5061, "cot": 1864, "q": 346, "semtag": 242, "open": 143, "le2": 71.1}, {"d": "02/09", "wd": "Qua", "per": "P1", "s": 6710, "cot": 2215, "q": 467, "semtag": 394, "open": 207, "le2": 75.7}, {"d": "03/09", "wd": "Qui", "per": "P1", "s": 4784, "cot": 1719, "q": 344, "semtag": 305, "open": 177, "le2": 76.3}, {"d": "04/09", "wd": "Sex", "per": "P1", "s": 4059, "cot": 1309, "q": 248, "semtag": 285, "open": 167, "le2": 76.1}, {"d": "08/09", "wd": "Ter", "per": "P1", "s": 5828, "cot": 1907, "q": 382, "semtag": 425, "open": 314, "le2": 76.6}, {"d": "09/09", "wd": "Qua", "per": "P1", "s": 5107, "cot": 1912, "q": 365, "semtag": 379, "open": 296, "le2": 78.7}, {"d": "10/09", "wd": "Qui", "per": "P1", "s": 4824, "cot": 1898, "q": 358, "semtag": 393, "open": 316, "le2": 80.5}, {"d": "11/09", "wd": "Sex", "per": "P1", "s": 5046, "cot": 1430, "q": 267, "semtag": 482, "open": 363, "le2": 81.2}, {"d": "14/09", "wd": "Seg", "per": "P1", "s": 6766, "cot": 2001, "q": 403, "semtag": 768, "open": 689, "le2": 81.6}, {"d": "15/09", "wd": "Ter", "per": "P2", "s": 7865, "cot": 1896, "q": 423, "semtag": 1119, "open": 890, "le2": 81.7}, {"d": "16/09", "wd": "Qua", "per": "P2", "s": 7153, "cot": 1896, "q": 386, "semtag": 773, "open": 606, "le2": 81.3}, {"d": "17/09", "wd": "Qui", "per": "P2", "s": 4778, "cot": 1546, "q": 302, "semtag": 676, "open": 519, "le2": 75.3}, {"d": "18/09", "wd": "Sex", "per": "P2", "s": 6104, "cot": 1690, "q": 356, "semtag": 840, "open": 563, "le2": 76.7}, {"d": "21/09", "wd": "Seg", "per": "P2", "s": 5854, "cot": 1503, "q": 314, "semtag": 1289, "open": 947, "le2": 53.9}, {"d": "22/09", "wd": "Ter", "per": "P2", "s": 4024, "cot": 1135, "q": 235, "semtag": 1005, "open": 913, "le2": 74.9}, {"d": "23/09", "wd": "Qua", "per": "P2", "s": 4210, "cot": 937, "q": 232, "semtag": 1523, "open": 1393, "le2": 79.3}, {"d": "24/09", "wd": "Qui", "per": "P2", "s": 4870, "cot": 854, "q": 216, "semtag": 2244, "open": 2180, "le2": 79.5}, {"d": "25/09", "wd": "Sex", "per": "P2", "s": 4283, "cot": 367, "q": 142, "semtag": 2502, "open": 2508, "le2": 78.2}], "tags": {"rows": [["23 - Improdutivo | Sem resposta do cliente (abordagem)", "Frio", 13907, 13597], ["24 - Cotação | Perdido | Sem resposta do cliente", "Frio", 11014, 7614], ["11 - Improdutivo | SAC | agendamentos | Teste", "Fora da classificação", 7391, 6155], ["17 - Cotação | Perdido | Não disse o motivo", "Frio", 2165, 1661], ["15 - Improdutivo | Sem abrangência", "Fora da classificação", 1885, 1421], ["33 - Cotação | Contato futuro", "Quente", 1531, 1274], ["50 - Improdutivo | Excluir Contato", "Fora da classificação", 1175, 1159], ["32 - Improdutivo | WhatsApp Business", "Fora da classificação", 1072, 1438], ["13 - Cotação | Perdido | Preço", "Quente", 1054, 861], ["29 - Improdutivo | Dúvidas após contratação", "Fora da classificação", 490, 352], ["19 - Improdutivo | Exclusivo Odonto", "Fora da classificação", 467, 263], ["18 - Cotação | Perdido | Carências", "Quente", 245, 209], ["16 - Cotação | Perdido | Rede", "Quente", 148, 137], ["30 - Portabilidade", "Quente", 104, 57], ["14 - Cotação | Perdido | Concorrente", "Quente", 98, 68], ["27 - Improdutivo | Fora da Regra PME", "Fora da classificação", 94, 83], ["28 - Improdutivo | Corretor/Vendedor informações", "Fora da classificação", 71, 42], ["34 - Improdutivo | Auditoria Médica", "Fora da classificação", 29, 25]], "tot": {"P1": 42940, "P2": 36416}, "semtag": {"P1": 3673, "P2": 11971}}, "lgh": {"h": [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "P1": {"gt2": [24.3, 26.8, 22.7, 19.0, 23.2, 24.6, 20.3, 20.3, 18.6, 21.6, 28.6, 26.2, 37.2], "n": [4793, 3833, 4650, 4920, 3319, 3086, 4409, 4140, 3537, 2184, 1529, 889, 632], "med": [45, 45, 36, 35, 41, 40, 35, 35, 34, 35, 45, 42, 59]}, "P2": {"gt2": [24.7, 22.2, 21.3, 20.4, 21.8, 18.7, 21.4, 27.5, 28.0, 30.2, 39.9, 39.6, 49.4], "n": [4231, 4444, 4482, 4183, 3103, 3188, 4545, 5223, 4059, 2412, 1492, 778, 512], "med": [42, 35, 35, 34, 36, 37, 36, 43, 43, 45, 65, 70, 109]}}, "lga": [{"k": "Wendel Andrade", "a": 63.2, "b": 38.5, "n1": 440, "n2": 291, "m1": 81, "m2": 168}, {"k": "Leidiane Paulino", "a": 79.9, "b": 58.1, "n1": 219, "n2": 227, "m1": 61, "m2": 100}, {"k": "Davi Magalhaes", "a": 90.4, "b": 72.8, "n1": 209, "n2": 180, "m1": 22, "m2": 42}, {"k": "Giovanna Barbieri", "a": 87.0, "b": 71.9, "n1": 276, "n2": 192, "m1": 29, "m2": 57}, {"k": "Alan Kelber Leal", "a": 85.4, "b": 70.4, "n1": 295, "n2": 230, "m1": 36, "m2": 62}, {"k": "Larissa Bizeli", "a": 67.1, "b": 52.3, "n1": 246, "n2": 264, "m1": 64, "m2": 110}, {"k": "Bruna Soares", "a": 92.3, "b": 77.5, "n1": 531, "n2": 454, "m1": 2, "m2": 8}, {"k": "Larissa Machado", "a": 82.2, "b": 67.5, "n1": 320, "n2": 271, "m1": 35, "m2": 37}], "ofp": [{"k": "Unildo Ferreira", "a": 27.3, "b": 22.3, "n1": 231, "n2": 376, "m1": 253, "m2": 316}, {"k": "Miriam Ferreira", "a": 31.0, "b": 31.2, "n1": 510, "n2": 414, "m1": 256, "m2": 350}, {"k": "Danielle Muzell", "a": 43.3, "b": 38.5, "n1": 305, "n2": 382, "m1": 175, "m2": 180}, {"k": "Wendel Andrade", "a": 63.2, "b": 38.5, "n1": 440, "n2": 291, "m1": 81, "m2": 168}, {"k": "Jonatas Quaresma", "a": 39.8, "b": 39.7, "n1": 492, "n2": 519, "m1": 186, "m2": 190}, {"k": "Bruno Ferreira", "a": 32.8, "b": 39.8, "n1": 192, "n2": 241, "m1": 346, "m2": 298}, {"k": "Francisco Thiago", "a": 54.0, "b": 40.7, "n1": 300, "n2": 324, "m1": 109, "m2": 214}, {"k": "Paulo Levi", "a": 52.0, "b": 44.7, "n1": 227, "n2": 273, "m1": 118, "m2": 147}, {"k": "Atiley Campos", "a": 38.3, "b": 45.6, "n1": 274, "n2": 296, "m1": 702, "m2": 253}, {"k": "Clebson Alves", "a": 51.3, "b": 47.0, "n1": 337, "n2": 353, "m1": 113, "m2": 146}, {"k": "Larissy Ramos", "a": 50.4, "b": 50.5, "n1": 258, "n2": 220, "m1": 119, "m2": 114}, {"k": "Larissa Bizeli", "a": 67.1, "b": 52.3, "n1": 246, "n2": 264, "m1": 64, "m2": 110}, {"k": "Luana Araujo", "a": 60.7, "b": 53.3, "n1": 539, "n2": 353, "m1": 67, "m2": 104}, {"k": "Vladia Soares", "a": 58.7, "b": 55.1, "n1": 322, "n2": 441, "m1": 83, "m2": 98}, {"k": "Eboly Neves", "a": 56.7, "b": 56.1, "n1": 307, "n2": 385, "m1": 83, "m2": 92}, {"k": "Rogerio Stivanello", "a": 57.0, "b": 56.7, "n1": 579, "n2": 605, "m1": 82, "m2": 71}, {"k": "Leidiane Paulino", "a": 79.9, "b": 58.1, "n1": 219, "n2": 227, "m1": 61, "m2": 100}, {"k": "Thaisa Almeida", "a": 59.1, "b": 58.2, "n1": 435, "n2": 546, "m1": 78, "m2": 84}, {"k": "Juliana Nunes", "a": 53.0, "b": 59.8, "n1": 661, "n2": 684, "m1": 103, "m2": 80}, {"k": "Victor Freitas", "a": 61.6, "b": 60.6, "n1": 138, "n2": 193, "m1": 74, "m2": 77}, {"k": "Maraisa Fernanda", "a": 60.1, "b": 60.7, "n1": 193, "n2": 214, "m1": 62, "m2": 73}, {"k": "Edilza Silva", "a": 40.1, "b": 60.8, "n1": 167, "n2": 189, "m1": 185, "m2": 82}, {"k": "Andreia Chaves", "a": 57.2, "b": 60.9, "n1": 346, "n2": 299, "m1": 92, "m2": 85}, {"k": "Gilson Silveira", "a": 60.4, "b": 62.4, "n1": 230, "n2": 255, "m1": 87, "m2": 83}, {"k": "Thamiris Francisquelli", "a": 59.0, "b": 65.5, "n1": 234, "n2": 223, "m1": 96, "m2": 66}, {"k": "Kauan Regis", "a": 60.4, "b": 65.8, "n1": 144, "n2": 152, "m1": 78, "m2": 48}, {"k": "Renan Oliveira", "a": 53.8, "b": 65.9, "n1": 208, "n2": 252, "m1": 88, "m2": 58}, {"k": "Patricia Lima - Vendedor Adm", "a": 61.3, "b": 66.3, "n1": 124, "n2": 104, "m1": 76, "m2": 73}, {"k": "Romario Souza", "a": 74.9, "b": 66.6, "n1": 430, "n2": 449, "m1": 52, "m2": 64}, {"k": "Rebeca Moura", "a": 72.2, "b": 67.5, "n1": 381, "n2": 292, "m1": 33, "m2": 38}, {"k": "Maria Magalhaes", "a": 75.4, "b": 68.1, "n1": 806, "n2": 401, "m1": 39, "m2": 53}, {"k": "Taiza Ribeiro", "a": 58.0, "b": 68.1, "n1": 295, "n2": 251, "m1": 91, "m2": 58}, {"k": "Raissa Burin", "a": 61.3, "b": 68.7, "n1": 230, "n2": 249, "m1": 86, "m2": 73}, {"k": "Angelo Ribeiro", "a": 73.3, "b": 69.0, "n1": 277, "n2": 313, "m1": 43, "m2": 40}, {"k": "Kayky Bernardo", "a": 77.4, "b": 70.4, "n1": 469, "n2": 416, "m1": 44, "m2": 56}, {"k": "Thaina Bercheli", "a": 74.2, "b": 71.1, "n1": 376, "n2": 253, "m1": 47, "m2": 40}, {"k": "Natalia Lourenco", "a": 73.0, "b": 71.2, "n1": 226, "n2": 243, "m1": 64, "m2": 54}, {"k": "Eduarda Franca", "a": 78.5, "b": 73.1, "n1": 223, "n2": 324, "m1": 33, "m2": 29}, {"k": "Vania Silva", "a": 66.3, "b": 73.5, "n1": 412, "n2": 234, "m1": 71, "m2": 42}, {"k": "Nathaly Vieira", "a": 77.1, "b": 75.0, "n1": 327, "n2": 544, "m1": 47, "m2": 44}, {"k": "Arlyson Silva", "a": 79.2, "b": 75.2, "n1": 130, "n2": 137, "m1": 33, "m2": 52}, {"k": "Felipe Souza", "a": 79.3, "b": 75.2, "n1": 376, "n2": 331, "m1": 37, "m2": 51}, {"k": "Leia Ferreira", "a": 71.7, "b": 75.4, "n1": 357, "n2": 179, "m1": 59, "m2": 65}, {"k": "Raiane Lima", "a": 79.3, "b": 76.5, "n1": 285, "n2": 481, "m1": 46, "m2": 51}, {"k": "Ana Beatriz Machuca", "a": 71.9, "b": 76.6, "n1": 391, "n2": 501, "m1": 59, "m2": 52}, {"k": "Jaqueline Bezerra", "a": 62.2, "b": 76.9, "n1": 188, "n2": 471, "m1": 52, "m2": 35}, {"k": "Andre Brito", "a": 76.8, "b": 77.0, "n1": 224, "n2": 209, "m1": 39, "m2": 34}, {"k": "Vanessa Andrioti", "a": 56.9, "b": 78.1, "n1": 195, "n2": 178, "m1": 85, "m2": 52}, {"k": "Camila Gomes", "a": 67.1, "b": 78.3, "n1": 346, "n2": 281, "m1": 64, "m2": 35}, {"k": "Keila Oliveira", "a": 78.9, "b": 79.2, "n1": 242, "n2": 259, "m1": 50, "m2": 47}, {"k": "Flavia Rombach", "a": 72.2, "b": 79.5, "n1": 126, "n2": 263, "m1": 66, "m2": 56}], "ofn": [{"k": "Larissa Machado", "a": 82.2, "b": 67.5, "n1": 320, "n2": 271, "m1": 35, "m2": 37}, {"k": "Jonathas Reis", "a": 82.2, "b": 69.1, "n1": 157, "n2": 152, "m1": 41, "m2": 60}, {"k": "Aline Ribeiro", "a": 80.1, "b": 70.0, "n1": 381, "n2": 333, "m1": 46, "m2": 43}, {"k": "Alan Kelber Leal", "a": 85.4, "b": 70.4, "n1": 295, "n2": 230, "m1": 36, "m2": 62}, {"k": "Giovanna Barbieri", "a": 87.0, "b": 71.9, "n1": 276, "n2": 192, "m1": 29, "m2": 57}, {"k": "Davi Magalhaes", "a": 90.4, "b": 72.8, "n1": 209, "n2": 180, "m1": 22, "m2": 42}, {"k": "Suelen Dorneles", "a": 80.0, "b": 73.3, "n1": 120, "n2": 303, "m1": 34, "m2": 31}, {"k": "Felipe Soares", "a": 83.7, "b": 73.7, "n1": 663, "n2": 323, "m1": 35, "m2": 43}, {"k": "Kauan Pereira", "a": 82.9, "b": 75.0, "n1": 181, "n2": 204, "m1": 23, "m2": 42}, {"k": "Jenifer Ireno", "a": 81.2, "b": 76.0, "n1": 239, "n2": 283, "m1": 39, "m2": 54}, {"k": "Davi Assuncao", "a": 84.9, "b": 76.1, "n1": 469, "n2": 380, "m1": 26, "m2": 37}, {"k": "Gisele Oliveira", "a": 88.3, "b": 76.9, "n1": 264, "n2": 286, "m1": 35, "m2": 41}, {"k": "Wesley Bacoccini", "a": 81.3, "b": 77.0, "n1": 219, "n2": 269, "m1": 34, "m2": 36}, {"k": "Gabriela Reis", "a": 84.2, "b": 77.4, "n1": 336, "n2": 115, "m1": 49, "m2": 58}, {"k": "Camila Moreira", "a": 87.9, "b": 77.4, "n1": 323, "n2": 372, "m1": 37, "m2": 39}, {"k": "Bruna Soares", "a": 92.3, "b": 77.5, "n1": 531, "n2": 454, "m1": 2, "m2": 8}, {"k": "Gabriela Moraes", "a": 82.9, "b": 77.9, "n1": 111, "n2": 262, "m1": 37, "m2": 38}, {"k": "Leonardo Murarolli", "a": 81.3, "b": 78.9, "n1": 166, "n2": 171, "m1": 41, "m2": 48}, {"k": "Murilo Vassao", "a": 80.0, "b": 79.1, "n1": 466, "n2": 425, "m1": 42, "m2": 45}, {"k": "Antonio Nobre", "a": 83.6, "b": 79.7, "n1": 463, "n2": 600, "m1": 38, "m2": 40}], "ofr": [{"k": "Thiago Abelo", "a": 73.8, "b": 80.9, "n1": 160, "n2": 204, "m1": 40, "m2": 40}, {"k": "Taisse Macario", "a": 69.5, "b": 81.2, "n1": 220, "n2": 144, "m1": 56, "m2": 44}, {"k": "Giovanna Ragonezi", "a": 60.4, "b": 83.4, "n1": 235, "n2": 175, "m1": 73, "m2": 39}, {"k": "Beatriz Giglio", "a": 79.3, "b": 84.1, "n1": 420, "n2": 414, "m1": 46, "m2": 47}, {"k": "Victor Martins", "a": 69.1, "b": 85.8, "n1": 191, "n2": 225, "m1": 65, "m2": 52}, {"k": "Karol Bueno", "a": 74.7, "b": 86.5, "n1": 233, "n2": 178, "m1": 36, "m2": 19}, {"k": "Viviane Gumbio", "a": 55.3, "b": 87.7, "n1": 152, "n2": 138, "m1": 76, "m2": 19}, {"k": "Rafaela Santos", "a": 63.0, "b": 87.7, "n1": 119, "n2": 106, "m1": 58, "m2": 34}], "lgas": {"n": 129, "worse5": 34, "better5": 23, "meta": 80, "off1": 59, "off2": 71}, "orig": [{"k": "Carrinho Abandonado Conecta", "s1": 3897, "s2": 11243, "e1": 3477, "e2": 9005, "q1": 278, "q2": 659, "c1": 1308, "c2": 2919}, {"k": "Campanhas Marketing", "s1": 7905, "s2": 11147, "e1": 6966, "e2": 8503, "q1": 467, "q2": 450, "c1": 2287, "c2": 1794}, {"k": "EugenIA Cotação", "s1": 5492, "s2": 6587, "e1": 5202, "e2": 5118, "q1": 262, "q2": 240, "c1": 1587, "c2": 1577}, {"k": "Outros", "s1": 5879, "s2": 4670, "e1": 5282, "e2": 3122, "q1": 423, "q2": 294, "c1": 2137, "c2": 1397}, {"k": "Carrinho Abandonado", "s1": 9899, "s2": 4139, "e1": 8843, "e2": 2950, "q1": 641, "q2": 230, "c1": 3700, "c2": 1052}, {"k": "EugenIA", "s1": 3218, "s2": 3111, "e1": 2684, "e2": 2253, "q1": 283, "q2": 201, "c1": 1194, "c2": 874}, {"k": "Repique Comercial", "s1": 4870, "s2": 1963, "e1": 4464, "e2": 1317, "q1": 303, "q2": 118, "c1": 1724, "c2": 512}, {"k": "Espontâneo", "s1": 2102, "s2": 1944, "e1": 1853, "e2": 1290, "q1": 192, "q2": 134, "c1": 835, "c2": 563}, {"k": "VPC", "s1": 2561, "s2": 1941, "e1": 2387, "e2": 1253, "q1": 166, "q2": 112, "c1": 705, "c2": 364}, {"k": "Conecta", "s1": 832, "s2": 1010, "e1": 683, "e2": 726, "q1": 45, "q2": 76, "c1": 301, "c2": 332}, {"k": "EugenIA Seller", "s1": 610, "s2": 833, "e1": 315, "e2": 504, "q1": 44, "q2": 54, "c1": 160, "c2": 286}, {"k": "Televendas", "s1": 419, "s2": 413, "e1": 344, "e2": 277, "q1": 41, "q2": 31, "c1": 169, "c2": 126}], "tipo": [{"k": "ADESÃO", "s1": 1502, "s2": 1124, "q1": 91, "q2": 74, "c1": 527, "c2": 314}, {"k": "OUTROS", "s1": 17833, "s2": 19021, "q1": 1043, "q2": 844, "c1": 5487, "c2": 3685}, {"k": "PF", "s1": 20624, "s2": 23723, "q1": 1396, "q2": 1369, "c1": 7365, "c2": 6330}, {"k": "PME", "s1": 7048, "s2": 4059, "q1": 571, "q2": 285, "c1": 2632, "c2": 1194}, {"k": "PME PPO", "s1": 1178, "s2": 1214, "q1": 79, "q2": 34, "c1": 244, "c2": 301}], "qd": [["PF | HAP", 520, 257, 6799, 3386], ["PF | NDI", 215, 65, 2490, 844], ["Base de cancelados", 125, 41, 2128, 777], ["PPO", 96, 19, 1400, 731], ["PME EUGENIA | NDI", 52, 15, 394, 324], ["PME | HAP", 115, 84, 1230, 1037]], "fu": [["PF CARRINHO | HAP", 2787, 4383, 5578, 8883], ["PF CARRINHO | NDI", 1208, 1746, 2381, 3633], ["PF | Eugenia Seller", 180, 387, 601, 837], ["PF EUGENIA COTACAO | HAP", 2942, 3080, 3926, 5006], ["PF_Carrinho_NDI", 57, 173, 101, 308], ["PME - SP | RJ - CHAT VENDAS", 19, 104, 31, 167]], "excl": {"07/09": 3336, "19/09": 2946, "12/09": 2369, "13/09": 2093, "20/09": 1917, "05/09": 1751, "06/09": 1634, "26/09": 1476, "27/09": 835}}</script>
+<script>
+const G=JSON.parse(document.getElementById('data').textContent);
+const R=G.R,A=R.P1,B=R.P2,DL=G.daily;
+const nf=new Intl.NumberFormat('pt-BR'),f1=new Intl.NumberFormat('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ch=(a,b)=>(b-a)/a*100;
+const dp=(a,b,inv)=>{const v=ch(a,b);const c=Math.abs(v)<1.5?'flat':v>0?'up':'down';return `<span class="delta ${c}${inv?' inv':''}">${v>0?'▲':v<0?'▼':'■'} ${f1.format(Math.abs(v))}%</span>`};
+const sg=v=>(v>0?'+':'−')+f1.format(Math.abs(v))+'%';
+const pct=(a,b)=>f1.format(a/b*100)+'%';
+const tt=$('tt');
+function tip(e,h){tt.innerHTML=h;tt.hidden=false;const w=tt.offsetWidth,hh=tt.offsetHeight;let x=e.clientX+14,y=e.clientY+14;if(x+w>innerWidth-8)x=e.clientX-w-14;if(y+hh>innerHeight-8)y=e.clientY-hh-14;tt.style.left=x+'px';tt.style.top=y+'px'}
+function bind(root){root.querySelectorAll('[data-tip]').forEach(el=>{el.addEventListener('mousemove',e=>tip(e,el.dataset.tip));el.addEventListener('mouseleave',()=>tt.hidden=true)})}
+const nice=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));const m=v/p;return (m<=1?1:m<=2?2:m<=5?5:10)*p};
+const LEG='<div class="legend"><span><i style="background:var(--p1)"></i>Análise 1</span><span><i style="background:var(--p2)"></i>Análise 2</span></div>';
+const samp=(a,b,what='sessões')=>`<div class="samp">Amostra: ${nf.format(a)} ${what} na Análise 1 · ${nf.format(b)} na Análise 2</div>`;
+/* rows: [label,v1,v2,n1?,n2?] */
+const cmpRows=(rows,fmt=nf.format,nlab='sessões')=>{const mx=Math.max(...rows.flatMap(r=>[r[1],r[2]]));return `<div class="cmp">${rows.map(r=>`<span class="ln2 ink2">${esc(r[0])}${r[3]!=null?`<small>n = ${nf.format(r[3])} → ${nf.format(r[4])} ${nlab}</small>`:''}</span><span style="display:flex;flex-direction:column;gap:3px"><span class="t"><span style="width:${r[1]/mx*100}%;background:var(--p1)"></span></span><span class="t"><span style="width:${r[2]/mx*100}%;background:var(--p2)"></span></span></span><span class="n">${fmt(r[1])}<br>${fmt(r[2])}</span>`).join('')}</div>`};
+
+const ex=G.excl;
+$('exclNote').textContent=`Fora da análise: fins de semana e o feriado de 07/09 (${nf.format(Object.values(ex).reduce((a,b)=>a+b,0))} sessões).`;
+
+/* verdict */
+$('verdict').innerHTML=`<div style="display:flex;flex-direction:column;gap:8px"><span class="pill bad" style="align-self:flex-start"><i></i>Houve queda</span>
+ <p class="big">Os leads cresceram ${f1.format(ch(A.sd,B.sd))}%, mas os orçamentos caíram ${f1.format(-ch(A.cot,B.cot))}% e os leads quentes ${f1.format(-ch(A.q,B.q))}%.</p>
+ <p class="ink2">Chegaram mais leads, mas eles viraram menos orçamento: caiu a taxa de orçamento das campanhas, o PME e o repique comercial encolheram e a 2ª quinzena terminou com muito mais sessões sem encerramento.</p></div>
+ <div class="vstats">
+  <div><b>${sg(ch(A.sd,B.sd))}</b><span>leads por dia útil</span></div>
+  <div><b>${sg(ch(A.cot,B.cot))}</b><span>orçamentos (cotações)</span></div>
+  <div><b>${sg(ch(A.q,B.q))}</b><span>leads quentes</span></div>
+  <div><b>${sg(ch(A.f,B.f))}</b><span>leads frios</span></div>
+  <div><b>${f1.format(A.cot_enc)}% → ${f1.format(B.cot_enc)}%</b><span>das sessões encerradas viraram orçamento</span></div>
+  <div><b>${nf.format(A.semtag)} → ${nf.format(B.semtag)}</b><span>sessões sem encerramento</span></div>
+  <div><b>${A.med_s} s → ${B.med_s} s</b><span>resposta do promotor (O → N, mediana)</span></div>
+  <div><b>${f1.format(A.noG)}% → ${f1.format(B.noG)}%</b><span>chats atribuídos sem resposta</span></div>
+ </div>`;
+
+/* panels */
+function panel(k,L,O){const t=(l,v,s,d)=>`<div class="tile"><span class="l">${l}</span><span class="v">${v}${d||''}</span><span class="s">${s}</span></div>`;const D=(a,b,inv)=>O?dp(a,b,inv):'';
+ return `<div class="anp" style="--c:${k==='P1'?'var(--p1)':'var(--p2)'}"><div class="ph"><div><span class="eyebrow">${k==='P1'?'Análise 1':'Análise 2'}</span><h3 style="font-family:var(--display);font-size:18px">${k==='P1'?'01/09 a 14/09':'15/09 a 25/09'}</h3></div><span class="note">9 dias úteis</span></div>
+ <h3 class="muted" style="font-size:12px">Leads e orçamentos</h3>
+ <div class="tiles">
+  ${t('Leads (sessões)',nf.format(L.s),`${nf.format(L.sd)} por dia útil`,D(A.s,L.s))}
+  ${t('Orçamentos (cotações)',nf.format(L.cot),`${nf.format(L.cotd)} por dia · ${f1.format(L.cot_enc)}% das encerradas`,D(A.cot,L.cot))}
+  ${t('Sessões encerradas',nf.format(L.enc),`base dos percentuais · sem tags de venda`,D(A.enc,L.enc))}
+  ${t('Sessões sem encerramento',nf.format(L.semtag),`${pct(L.semtag,L.s)} dos leads`,D(A.semtag,L.semtag,1))}
+ </div>
+ <h3 class="muted" style="font-size:12px">Qualidade do lead (pelas tags)</h3>
+ <div class="tiles">
+  ${t('Leads quentes',nf.format(L.q),`${f1.format(L.q_enc)}% das sessões encerradas`,D(A.q,L.q))}
+  ${t('Leads frios',nf.format(L.f),`${f1.format(L.f_enc)}% das sessões encerradas`,D(A.f,L.f,1))}
+ </div>
+ <h3 class="muted" style="font-size:12px">Resposta do promotor (O → N)</h3>
+ <div class="tiles">
+  ${t('Tempo de resposta',L.med_s+' s',`mediana · ${f1.format(L.le2)}% em até 2 min`,O?dp(A.le2,L.le2):'')}
+  ${t('Chats atribuídos sem resposta',f1.format(L.noG)+'%',`${nf.format(L.n_noG)} chats`,D(A.noG,L.noG,1))}
+ </div>
+ <span class="note">Vidas: não disponível nesta base.</span></div>`}
+$('an').innerHTML=panel('P1',A)+panel('P2',B,A);
+
+/* daily */
+function cols(el,vals,{h=180,tipf}={}){const W=440,pad={l:36,r:6,t:14,b:36},iw=W-pad.l-pad.r,ih=h-pad.t-pad.b;const mx=nice(Math.max(...vals));const bw=iw/DL.length,gap=bw*.24;let s='';
+ for(let k=0;k<=2;k++){const y=pad.t+ih-ih*k/2;s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${pad.l-5}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${nf.format(mx*k/2)}</text>`}
+ DL.forEach((d,i)=>{const x=pad.l+i*bw+gap/2,hh=vals[i]/mx*ih;s+=`<rect x="${x}" y="${pad.t+ih-hh}" width="${bw-gap}" height="${hh}" rx="2" fill="${d.per==='P1'?'var(--p1)':'var(--p2)'}"/><rect x="${pad.l+i*bw}" y="${pad.t}" width="${bw}" height="${ih}" fill="transparent" data-tip="${esc(`<b>${d.wd} ${d.d}</b><br>`+tipf(d))}"/><text x="${x+(bw-gap)/2}" y="${h-22}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${d.d.slice(0,2)}</text>`});
+ const sep=pad.l+9*bw;s+=`<line x1="${sep}" x2="${sep}" y1="${pad.t-6}" y2="${pad.t+ih}" stroke="var(--ink-2)" stroke-dasharray="3 3"/>`;
+ ['P1','P2'].forEach((p,k)=>{const v=vals.filter((_,i)=>DL[i].per===p),a=v.reduce((x,y)=>x+y,0)/v.length,y=pad.t+ih-a/mx*ih,x0=pad.l+(k?9:0)*bw;s+=`<line x1="${x0}" x2="${x0+9*bw}" y1="${y}" y2="${y}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 3"/><text x="${x0+4}" y="${y-4}" font-size="10.5" font-weight="700" fill="var(--ink)">média ${nf.format(Math.round(a))}</text>`});
+ s+=`<text x="${pad.l+4.5*bw}" y="${h-6}" text-anchor="middle" font-size="10.5" fill="var(--p1)" font-weight="700">Análise 1</text><text x="${pad.l+13.5*bw}" y="${h-6}" text-anchor="middle" font-size="10.5" fill="var(--p2)" font-weight="700">Análise 2</text>`;
+ el.innerHTML=`<svg viewBox="0 0 ${W} ${h}">${s}</svg>`;bind(el)}
+const tipD=d=>`${nf.format(d.s)} sessões · ${nf.format(d.cot)} orçamentos<br>${nf.format(d.q)} quentes · ${nf.format(d.semtag)} sem encerramento`;
+cols($('cLeads'),DL.map(d=>d.s),{tipf:tipD});cols($('cOrc'),DL.map(d=>d.cot),{tipf:tipD});cols($('cQ'),DL.map(d=>d.q),{tipf:tipD});
+$('nLeads').innerHTML=`Amostra: ${nf.format(A.s)} sessões na Análise 1 · ${nf.format(B.s)} na Análise 2`;
+$('nOrc').innerHTML=`Amostra: ${nf.format(A.enc)} sessões encerradas na Análise 1 · ${nf.format(B.enc)} na Análise 2`;
+$('nQ').innerHTML=$('nOrc').innerHTML;
+
+/* questions */
+const LH=G.lgh;
+const Q=[
+ {q:'O volume de leads diminuiu?',v:['good','Não, aumentou'],b:[`Leads por dia útil: <b>${nf.format(A.sd)} → ${nf.format(B.sd)}</b> (${sg(ch(A.sd,B.sd))}).`,`Total do período: <b>${nf.format(A.s)} → ${nf.format(B.s)}</b> sessões.`,`A base não tem um identificador único de cliente (telefone e CPF vêm higienizados), então a contagem é por sessão.`],c:cmpRows([['Sessões',A.s,B.s]])+samp(A.s,B.s)},
+ {q:'O volume de orçamentos diminuiu?',v:['bad','Sim'],b:[`Orçamentos (sessões encerradas com tag de cotação): <b>${nf.format(A.cot)} → ${nf.format(B.cot)}</b> (${sg(ch(A.cot,B.cot))}).`,`A queda não é só efeito das sessões ainda abertas: entre as sessões encerradas, a parcela que virou orçamento caiu de <b>${f1.format(A.cot_enc)}% para ${f1.format(B.cot_enc)}%</b>.`,`Por dia útil: ${nf.format(A.cotd)} → ${nf.format(B.cotd)} orçamentos.`],c:cmpRows([['Orçamentos',A.cot,B.cot]])+samp(A.enc,B.enc,'sessões encerradas')},
+ {q:'Os leads quentes diminuíram?',v:['warn','Sim, em volume; não em proporção'],b:[`Leads quentes: <b>${nf.format(A.q)} → ${nf.format(B.q)}</b> (${sg(ch(A.q,B.q))}).`,`Entre as sessões encerradas, a parcela de quentes ficou estável: <b>${f1.format(A.q_enc)}% → ${f1.format(B.q_enc)}%</b>. A de frios também: ${f1.format(A.f_enc)}% → ${f1.format(B.f_enc)}%.`,`A queda vem de menos sessões encerradas e do encolhimento de filas com muitos quentes (${G.qd.slice(0,4).map(r=>r[0]).join(', ')}), não de leads piores.`],c:cmpRows([['Leads quentes',A.q,B.q],['Leads frios',A.f,B.f]])+samp(A.enc,B.enc,'sessões encerradas')},
+ {q:'O tempo de resposta do promotor aumentou?',v:['warn','Na média não; à tarde e à noite, sim'],b:[`Da atribuição (coluna O) à 1ª resposta (coluna N): mediana de <b>${A.med_s} s → ${B.med_s} s</b>. Respondidos em até 2 min: <b>${f1.format(A.le2)}% → ${f1.format(B.le2)}%</b>.`,`Chats respondidos depois do padrão de 2 min: <b>${f1.format(A.gt2)}% → ${f1.format(B.gt2)}%</b> (${nf.format(A.n_gt2)} → ${nf.format(B.n_gt2)}).`,`A partir das 15h a resposta acima de 2 min piorou: às 16h foi de ${f1.format(LH.P1.gt2[8])}% para ${f1.format(LH.P2.gt2[8])}% e às 18h de ${f1.format(LH.P1.gt2[10])}% para ${f1.format(LH.P2.gt2[10])}%.`,`Chats atribuídos que nunca receberam resposta: <b>${f1.format(A.noG)}% → ${f1.format(B.noG)}%</b> (${nf.format(A.n_noG)} → ${nf.format(B.n_noG)}).`],c:cmpRows([['Até 2 min (%)',A.le2,B.le2],['Acima de 2 min (%)',A.gt2,B.gt2],['Sem resposta (%)',A.noG,B.noG]],v=>f1.format(v))+samp(A.lg_n,B.lg_n,'chats com tempo válido')}
+];
+$('qs').innerHTML=Q.map(x=>`<div class="q"><div class="qh"><h3>${x.q}</h3><span class="pill ${x.v[0]}"><i></i>${x.v[1]}</span></div><ul>${x.b.map(b=>`<li>${b}</li>`).join('')}</ul>${x.c?x.c+(x.c.includes('cmp')?LEG:''):''}</div>`).join('');
+
+/* concept */
+const TG=G.tags,code=k=>k.split(' ')[0],cnt=(grp,p)=>TG.rows.filter(r=>r[1]===grp).reduce((a,r)=>a+(p==='P1'?r[2]:r[3]),0);
+const DEF=[['Quente','var(--good)','Cliente conversou, recebeu a cotação e deu retorno concreto.',['33 · Contato futuro: pediu para ser procurado depois','30 · Portabilidade: quer trazer as carências de outro plano','13 · Preço: negociou valor','18 · Carências: questionou prazos','16 · Rede: questionou hospitais e clínicas','14 · Concorrente: comparou com outra operadora']],
+ ['Frio','var(--bad)','Cliente não se engajou com a oferta.',['23 · Sem resposta na abordagem: não respondeu ao primeiro contato','24 · Sem resposta após a cotação: sumiu depois de receber o preço','17 · Não disse o motivo: recusou sem explicar']],
+ ['Fora da classificação','var(--muted)','Contato que não é oportunidade de venda.',['11 · SAC, agendamentos e testes','15 · Sem abrangência','50 · Excluir contato','32 · WhatsApp Business','29 · Dúvidas após contratação','19 · Exclusivo odonto · 27 · Fora da regra PME','28 · Corretor/vendedor · 34 · Auditoria médica']]];
+$('defs').innerHTML=DEF.map(([k,c,d,l])=>`<div class="def" style="--c:${c}"><h3>${k==='Fora da classificação'?k:'Lead '+k.toLowerCase()}</h3><p class="ink2">${d}</p><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul><div class="cnt"><div><b>${nf.format(cnt(k,'P1'))}</b>Análise 1</div><div><b>${nf.format(cnt(k,'P2'))}</b>Análise 2 ${dp(cnt(k,'P1'),cnt(k,'P2'),k!=='Quente')}</div></div></div>`).join('');
+
+/* tags */
+(function(){const GCOL={'Quente':'var(--good)','Frio':'var(--bad)','Fora da classificação':'var(--muted)'};const T=TG;
+ const mx=Math.max(...T.rows.flatMap(r=>[r[2]/T.tot.P1,r[3]/T.tot.P2]));const short=s=>s.replace(' (abordagem)','');
+ const good=r=>r[1]==='Quente';
+ const rows=k=>T.rows.map(r=>{const v=k==='P1'?r[2]:r[3],sh=v/T.tot[k]*100;const c=k==='P1'?'var(--p1)':'var(--p2)';
+   return `<div class="trow2" data-tip="${esc(`<b>${r[0]}</b><br>${r[1]}<br>Análise 1: ${nf.format(r[2])} · Análise 2: ${nf.format(r[3])}`)}"><span class="nm"><i style="background:${GCOL[r[1]]}"></i><span title="${esc(r[0])}">${esc(short(r[0]))}</span></span><span class="bb"><span style="width:${sh/(mx*100)*100}%;background:${c}"></span></span><span class="vv">${nf.format(v)}<small>${f1.format(sh)}%</small>${k==='P2'?dp(r[2],r[3],!good(r)):''}</span></div>`}).join('');
+ $('tag1').innerHTML=rows('P1');$('tag2').innerHTML=rows('P2');
+ $('tagTot1').textContent=`${nf.format(T.tot.P1)} sessões encerradas · ${nf.format(T.semtag.P1)} sem tag`;$('tagTot2').textContent=`${nf.format(T.tot.P2)} sessões encerradas · ${nf.format(T.semtag.P2)} sem tag`;
+ $('tagLeg').innerHTML=Object.entries(GCOL).map(([k,c])=>`<span><i style="background:${c};border-radius:50%"></i>${k==='Fora da classificação'?k:'Lead '+k.toLowerCase()}</span>`).join('')+'<span class="muted">Na Análise 2, verde = variação favorável, vermelho = desfavorável · tags de venda não exibidas</span>';
+ const Rr=Object.fromEntries(T.rows.map(r=>[code(r[0]),r]));const pp=(k,p)=>Rr[k][p==='P1'?2:3]/T.tot[p]*100;
+ $('tagIns').innerHTML=[
+  `<b>Tag 23 (sem resposta na abordagem)</b> ficou estável em volume (${nf.format(Rr['23'][2])} → ${nf.format(Rr['23'][3])}), mas passou de ${f1.format(pp('23','P1'))}% para ${f1.format(pp('23','P2'))}% dos encerramentos, porque o resto encolheu.`,
+  `<b>Tag 24 (sem resposta após a cotação)</b> caiu de ${nf.format(Rr['24'][2])} para ${nf.format(Rr['24'][3])} (${sg(ch(Rr['24'][2],Rr['24'][3]))}). Menos cotações enviadas significa menos clientes sumindo depois do preço.`,
+  `<b>Tag 33 (contato futuro)</b> foi de ${nf.format(Rr['33'][2])} para ${nf.format(Rr['33'][3])} (${sg(ch(Rr['33'][2],Rr['33'][3]))}) e a <b>tag 13 (preço)</b> de ${nf.format(Rr['13'][2])} para ${nf.format(Rr['13'][3])} (${sg(ch(Rr['13'][2],Rr['13'][3]))}).`,
+  `As sessões sem tag mais que triplicaram (${nf.format(T.semtag.P1)} → ${nf.format(T.semtag.P2)}), o que reduz o total encerrado na Análise 2.`].map(x=>`<li>${x}</li>`).join('');
+ bind($('tags'))})();
+
+/* promotor */
+const LS=G.lgas;
+const st=(v,l)=>`<div><b>${v}</b><span>${l}</span></div>`;
+$('lgStats').innerHTML=[st(`${f1.format(A.le1)}% → ${f1.format(B.le1)}%`,'em até 1 min'),st(`${f1.format(A.le2)}% → ${f1.format(B.le2)}%`,'em até 2 min'),st(`${f1.format(A.p90)} → ${f1.format(B.p90)} min`,'prazo em que 90% dos chats já tinham recebido a 1ª resposta'),st(`${f1.format(A.gt60)}% → ${f1.format(B.gt60)}%`,'acima de 1 hora'),st(`${f1.format(A.noG)}% → ${f1.format(B.noG)}%`,'atribuídos sem resposta')].join('');
+const ins=[
+ ['good','Não explica a queda sozinho','A reação do promotor segue rápida',`Metade dos chats recebe resposta em cerca de ${B.med_s} segundos depois de chegar ao promotor, nas duas análises. A parcela em até 2 min caiu pouco (${f1.format(A.le2)}% → ${f1.format(B.le2)}%).`],
+ ['warn','Ponto de melhoria','A tarde e o fim do expediente pioraram',`A partir das 15h, a resposta acima de 2 min subiu: ${f1.format(LH.P1.gt2[7])}% → ${f1.format(LH.P2.gt2[7])}% (15h), ${f1.format(LH.P1.gt2[8])}% → ${f1.format(LH.P2.gt2[8])}% (16h) e ${f1.format(LH.P1.gt2[10])}% → ${f1.format(LH.P2.gt2[10])}% (18h). Às 15h e 16h também chegaram mais chats.`],
+ ['warn','Ponto de melhoria','Mais chats ficaram sem nenhuma resposta',`Chats atribuídos e nunca respondidos subiram de ${nf.format(A.n_noG)} (${f1.format(A.noG)}%) para ${nf.format(B.n_noG)} (${f1.format(B.noG)}%).`],
+ ['bad','Atenção','Ofensores persistentes',`${G.ofp.length} promotores já estavam abaixo da meta de ${LS.meta}% em até 2 min na Análise 1 e continuaram abaixo na Análise 2. Outros ${G.ofn.length} entraram na lista na Análise 2 e ${G.ofr.length} saíram dela.`],
+ ['warn','Ponto de melhoria','Mais promotores perderam agilidade do que ganharam',`Dos ${LS.n} promotores com volume nas duas análises, ${LS.worse5} pioraram 5 pontos ou mais no % de respostas em até 2 min e ${LS.better5} melhoraram.`],
+ ['info','Leitura dos dados','Registros fora do cálculo',`Na Análise 1, ${f1.format(A.neg)}% dos chats tinham a resposta registrada antes da atribuição (Análise 2: ${f1.format(B.neg)}%). Esses casos ficaram de fora.`]];
+$('lgIns').innerHTML=`<div class="grid g3">${ins.map(x=>`<div class="q"><div class="qh"><h3 style="font-size:15px">${x[2]}</h3></div><span class="pill ${x[0]}" style="align-self:flex-start"><i></i>${x[1]}</span><p class="ink2">${x[3]}</p></div>`).join('')}</div>`;
+function hourChart(){const W=460,h=200,pad={l:40,r:10,t:12,b:26},iw=W-pad.l-pad.r,ih=h-pad.t-pad.b;const hrs=LH.h;const mx=60;let s='';
+ for(let k=0;k<=6;k++){const v=k*10,y=pad.t+ih-v/mx*ih;s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${pad.l-5}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${v}%</text>`}
+ const X=i=>pad.l+i*iw/(hrs.length-1),Y=v=>pad.t+ih-Math.min(v,mx)/mx*ih;
+ ['P1','P2'].forEach(p=>{const c=p==='P1'?'var(--p1)':'var(--p2)';const pts=LH[p].gt2.map((v,i)=>[X(i),Y(v)]);s+=`<polyline points="${pts.map(q=>q.join(',')).join(' ')}" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`+pts.map(q=>`<circle cx="${q[0]}" cy="${q[1]}" r="3" fill="${c}" stroke="var(--surface)" stroke-width="1.5"/>`).join('')});
+ hrs.forEach((hr,i)=>{s+=`<rect x="${X(i)-iw/(2*(hrs.length-1))}" y="${pad.t}" width="${iw/(hrs.length-1)}" height="${ih}" fill="transparent" data-tip="${esc(`<b>Atribuídos às ${hr}h</b><br>Análise 1: ${f1.format(LH.P1.gt2[i])}% acima de 2 min · ${nf.format(LH.P1.n[i])} chats<br>Análise 2: ${f1.format(LH.P2.gt2[i])}% acima de 2 min · ${nf.format(LH.P2.n[i])} chats`)}"/>`;if(i%2===0)s+=`<text x="${X(i)}" y="${h-8}" text-anchor="middle" font-size="10" fill="var(--muted)">${hr}h</text>`});
+ return `<div class="chart"><svg viewBox="0 0 ${W} ${h}">${s}</svg></div><div class="legend"><span><i class="ln" style="background:var(--p1)"></i>Análise 1</span><span><i class="ln" style="background:var(--p2)"></i>Análise 2</span><span class="muted">% de chats com resposta acima de 2 min, pela hora da atribuição</span></div>${samp(LH.P1.n.reduce((a,b)=>a+b,0),LH.P2.n.reduce((a,b)=>a+b,0),'chats (8h às 20h)')}`}
+$('lgHour').innerHTML=hourChart();
+$('lgAg').innerHTML=cmpRows(G.lga.map(a=>[a.k,a.a,a.b,a.n1,a.n2]),v=>f1.format(v)+'%','chats')+LEG;
+let ofSel='p';const OF={p:['Ofensores nos dois períodos',G.ofp,'bad'],n:['Novos ofensores na Análise 2',G.ofn,'warn'],r:['Deixaram de ser ofensores',G.ofr,'good']};
+function drawOf(){$('ofChips').innerHTML=Object.entries(OF).map(([k,v])=>`<button class="chip" aria-pressed="${k===ofSel}" data-k="${k}" style="border:1px solid var(--line-2);background:${k===ofSel?'var(--ink)':'var(--surface)'};color:${k===ofSel?'var(--surface)':'var(--ink-2)'};border-radius:999px;padding:5px 11px;font:600 12px var(--body);cursor:pointer">${v[0]} (${v[1].length})</button>`).join('');
+ $('ofChips').querySelectorAll('button').forEach(b=>b.onclick=()=>{ofSel=b.dataset.k;drawOf()});
+ const [lab,rows,cls]=OF[ofSel];
+ $('ofTbl').innerHTML=`<div class="tbl-wrap"><table class="oftbl"><thead><tr><th>Promotor</th><th class="num">Até 2 min A1</th><th class="num">Até 2 min A2</th><th class="num">Diferença</th><th class="num">Mediana A1</th><th class="num">Mediana A2</th><th class="num">Chats A1</th><th class="num">Chats A2</th><th>Situação</th></tr></thead><tbody>${rows.map(r=>`<tr><td class="b">${esc(r.k)}</td><td class="num">${f1.format(r.a)}%</td><td class="num">${f1.format(r.b)}%</td><td class="num">${(r.b-r.a>=0?'+':'−')+f1.format(Math.abs(r.b-r.a))} p.p.</td><td class="num">${nf.format(r.m1)} s</td><td class="num">${nf.format(r.m2)} s</td><td class="num">${nf.format(r.n1)}</td><td class="num">${nf.format(r.n2)}</td><td><span class="pill ${cls}"><i></i>${ofSel==='p'?(r.b<r.a?'Piorou':'Melhorou, ainda abaixo'):ofSel==='n'?'Entrou na lista':'Saiu da lista'}</span></td></tr>`).join('')}</tbody></table></div>`}
+$('ofNote').textContent=`Ofensor = menos de ${LS.meta}% dos chats respondidos em até 2 min · promotores com 100+ chats em cada análise · ${LS.off1} ofensores na Análise 1 e ${LS.off2} na Análise 2`;
+drawOf();bind($('promotor'));
+
+/* scenarios */
+const O=k=>G.orig.find(o=>o.k===k)||{},TP=k=>G.tipo.find(t=>t.k===k)||{};
+const camp=O('Campanhas Marketing'),rep=O('Repique Comercial'),car=O('Carrinho Abandonado'),carc=O('Carrinho Abandonado Conecta'),pme=TP('PME');
+const cr=(c,e)=>c/e*100;
+function openBars(){const W=460,h=170,pad={l:36,r:6,t:12,b:24},iw=W-pad.l-pad.r,ih=h-pad.t-pad.b;const mx=nice(Math.max(...DL.map(d=>d.semtag)));const bw=iw/DL.length;let s='';
+ for(let k=0;k<=2;k++){const y=pad.t+ih-ih*k/2;s+=`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${pad.l-5}" y="${y+4}" text-anchor="end" font-size="10" fill="var(--muted)">${nf.format(mx*k/2)}</text>`}
+ DL.forEach((d,i)=>{const hh=d.semtag/mx*ih;s+=`<rect x="${pad.l+i*bw+bw*.12}" y="${pad.t+ih-hh}" width="${bw*.76}" height="${hh}" rx="2" fill="${d.per==='P1'?'var(--p1)':'var(--p2)'}" data-tip="${esc(`<b>${d.wd} ${d.d}</b><br>${nf.format(d.semtag)} sessões sem encerramento<br>de ${nf.format(d.s)} recebidas no dia`)}"/><text x="${pad.l+i*bw+bw/2}" y="${h-8}" text-anchor="middle" font-size="9.5" fill="var(--muted)">${d.d.slice(0,2)}</text>`});
+ return `${H3('Sessões sem encerramento por dia',A.s,B.s)}<div class="chart"><svg viewBox="0 0 ${W} ${h}">${s}</svg></div><span class="note">Sessões iniciadas em cada dia que continuavam sem tag de encerramento na extração da base</span>`}
+const origTop=G.orig.filter(o=>o.e1>=600||o.e2>=600);
+const sum=(arr,f)=>arr.reduce((a,x)=>a+f(x),0);
+const H3=(title,a,b,what='leads')=>`<h3 class="muted" style="font-size:12px;margin-bottom:2px">${title}</h3><div class="samp" style="margin:0 0 8px">Amostra: ${nf.format(a+b)} ${what} (${nf.format(a)} na Análise 1 · ${nf.format(b)} na Análise 2)</div>`;
+const SC=[
+ {t:'Menos leads quentes e menos orçamentos dentro dos canais',imp:['bad','Impacto alto'],area:'Qualidade do lead',b:[
+   `Leads quentes: <b>${nf.format(A.q)} → ${nf.format(B.q)}</b> (${sg(ch(A.q,B.q))}). Entre as sessões encerradas, a parcela de quentes ficou praticamente igual (${f1.format(A.q_enc)}% → ${f1.format(B.q_enc)}%): a queda vem de menos sessões encerradas e do encolhimento de filas com muitos quentes.`,
+   `<b>Filas com maior queda de quentes:</b> ${G.qd.slice(0,4).map(r=>`${r[0]} (${nf.format(r[1])} → ${nf.format(r[2])})`).join(', ')}. Essas filas também perderam volume de leads.`,
+   `<b>Filas com maior aumento de frios:</b> ${G.fu.slice(0,3).map(r=>`${r[0]} (${nf.format(r[1])} → ${nf.format(r[2])})`).join(', ')}. O carrinho abandonado ganhou volume e trouxe mais leads frios.`,
+   `A taxa de orçamento (cotações ÷ sessões encerradas) caiu em várias das origens de maior volume, como Campanhas Marketing (${f1.format(cr(camp.c1,camp.e1))}% → ${f1.format(cr(camp.c2,camp.e2))}%) e Carrinho Abandonado (${f1.format(cr(car.c1,car.e1))}% → ${f1.format(cr(car.c2,car.e2))}%).`],
+  viz:()=>`<div style="display:flex;flex-direction:column;gap:16px">
+   <div>${H3('Parcela de leads quentes por origem (% das sessões encerradas)',sum(origTop,o=>o.e1),sum(origTop,o=>o.e2),'leads encerrados')}${cmpRows(origTop.map(o=>[o.k,o.q1/o.e1*100,o.q2/o.e2*100,o.e1,o.e2]),v=>f1.format(v)+'%','encerradas')}${LEG}</div>
+   <div>${H3('Filas com maior queda de leads quentes',sum(G.qd,r=>r[3]),sum(G.qd,r=>r[4]))}${cmpRows(G.qd)}${LEG}</div>
+   <div>${H3('Filas com maior aumento de leads frios',sum(G.fu,r=>r[3]),sum(G.fu,r=>r[4]))}${cmpRows(G.fu)}${LEG}</div>
+</div>`},
+ {t:'Campanhas de marketing trouxeram mais leads, mas menos orçamento',imp:['bad','Impacto alto'],area:'Origem do lead',b:[
+   `Sessões de Campanhas Marketing: <b>${nf.format(camp.s1)} → ${nf.format(camp.s2)}</b> (${sg(ch(camp.s1,camp.s2))}). É a origem que mais cresceu em volume.`,
+   `Mas a taxa de orçamento caiu de <b>${f1.format(cr(camp.c1,camp.e1))}% para ${f1.format(cr(camp.c2,camp.e2))}%</b>, e os orçamentos vindos dela caíram de ${nf.format(camp.c1)} para ${nf.format(camp.c2)}.`,
+   `Vale revisar com Marketing o público e as peças das campanhas da 2ª quinzena.`],
+  viz:()=>`<div>${H3('Campanhas Marketing',camp.s1,camp.s2)}${cmpRows([['Sessões',camp.s1,camp.s2],['Orçamentos',camp.c1,camp.c2],['Leads quentes',camp.q1,camp.q2]])}${LEG}</div>`},
+ {t:'O PME encolheu em leads, orçamentos e quentes',imp:['bad','Impacto alto'],area:'Produto',b:[
+   `Leads PME: <b>${nf.format(pme.s1)} → ${nf.format(pme.s2)}</b> (${sg(ch(pme.s1,pme.s2))}).`,
+   `Orçamentos PME: <b>${nf.format(pme.c1)} → ${nf.format(pme.c2)}</b> (${sg(ch(pme.c1,pme.c2))}); leads quentes PME: ${nf.format(pme.q1)} → ${nf.format(pme.q2)} (${sg(ch(pme.q1,pme.q2))}).`,
+   `O PME responde por ${f1.format((pme.c1-pme.c2)/(A.cot-B.cot)*100)}% da queda total de orçamentos. No PF, os leads subiram (${sg(ch(TP('PF').s1,TP('PF').s2))}), mas os orçamentos caíram ${f1.format(-ch(TP('PF').c1,TP('PF').c2))}%.`],
+  viz:()=>`<div>${H3('Orçamentos por tipo de produto',sum(G.tipo,x=>x.s1),sum(G.tipo,x=>x.s2))}${cmpRows(G.tipo.slice().sort((a,b)=>b.c1-a.c1).map(t=>[({OUTROS:'Outros','ADESÃO':'Adesão'})[t.k]||t.k,t.c1,t.c2,t.s1,t.s2]))}${LEG}</div>`},
+ {t:'Repique comercial e carrinho mudaram de tamanho',imp:['warn','Impacto médio'],area:'Origem do lead',b:[
+   `O Repique Comercial caiu de <b>${nf.format(rep.s1)} para ${nf.format(rep.s2)}</b> sessões (${sg(ch(rep.s1,rep.s2))}) e seus orçamentos de ${nf.format(rep.c1)} para ${nf.format(rep.c2)}. É o retorno a clientes que já tinham cotado.`,
+   `O carrinho abandonado migrou de origem: "Carrinho Abandonado" foi de ${nf.format(car.s1)} para ${nf.format(car.s2)} e "Carrinho Abandonado Conecta" de ${nf.format(carc.s1)} para ${nf.format(carc.s2)}. Somados, cresceram ${f1.format(ch(car.s1+carc.s1,car.s2+carc.s2))}%, mas os orçamentos somados caíram de ${nf.format(car.c1+carc.c1)} para ${nf.format(car.c2+carc.c2)}.`],
+  viz:()=>`<div>${H3('Sessões por origem',rep.s1+car.s1+carc.s1,rep.s2+car.s2+carc.s2)}${cmpRows([['Repique Comercial',rep.s1,rep.s2],['Carrinho Abandonado',car.s1,car.s2],['Carrinho Abandonado Conecta',carc.s1,carc.s2]])}${LEG}</div>`},
+ {t:'Mais leads param de responder já na abordagem',imp:['warn','Impacto médio'],area:'Abordagem',b:[
+   `A tag 23 (sem resposta do cliente já na abordagem) passou de <b>${f1.format(A.t23)}% para ${f1.format(B.t23)}%</b> das sessões encerradas (${nf.format(A.n23)} → ${nf.format(B.n23)}).`,
+   `Mais de um terço dos leads encerrados na Análise 2 nunca respondeu ao primeiro contato. Vale revisar a mensagem de abordagem e o horário do primeiro contato.`],
+  viz:()=>H3('Tag 23 e leads frios (% das sessões encerradas)',A.enc,B.enc,'leads encerrados')+cmpRows([['Tag 23 (%)',A.t23,B.t23],['Leads frios (%)',A.f_enc,B.f_enc]],v=>f1.format(v))+LEG},
+ {t:'Sessões ainda sem encerramento na 2ª quinzena',imp:['warn','Impacto médio'],area:'Operação e dados',b:[
+   `Sessões sem tag de encerramento: <b>${nf.format(A.semtag)} → ${nf.format(B.semtag)}</b>. Sessões não encerradas (abertas, pendentes ou aguardando resposta): ${nf.format(A.await)} → ${nf.format(B.await)}.`,
+   `O acúmulo cresce a partir de 21/09. Parte dessas sessões ainda pode virar orçamento, parte é fila sem tratamento.`,
+   `Mesmo olhando só as sessões encerradas, a taxa de orçamento caiu (${f1.format(A.cot_enc)}% → ${f1.format(B.cot_enc)}%), então a queda não é só efeito dessas sessões abertas.`],
+  viz:openBars}
+];
+$('scs').innerHTML=SC.map(s=>`<div class="sc"><div class="txt"><div class="tags"><span class="pill ${s.imp[0]}"><i></i>${s.imp[1]}</span><span class="pill info" style="background:var(--surface-2);color:var(--ink-2)">${s.area}</span></div><h3>${s.t}</h3><ul>${s.b.map(b=>`<li>${b}</li>`).join('')}</ul></div><div>${s.viz()}</div></div>`).join('');
+bind($('scs'));
+
+$('recs').innerHTML=[
+ ['Qualificar campanhas e PME','Revisar com Marketing o público das campanhas da 2ª quinzena e entender por que o PME perdeu leads e orçamentos.'],
+ ['Zerar a fila sem encerramento','Tratar as sessões abertas desde 21/09 e acompanhar diariamente os chats atribuídos que ficam sem resposta.'],
+ ['Atacar os ofensores persistentes','Plano individual para os promotores que ficaram abaixo da meta nas duas análises e reforço de escala a partir das 15h.']
+].map(r=>`<div class="rec"><b>${r[0]}</b><span>${r[1]}</span></div>`).join('');
+</script>
+</body></html>
