@@ -1,382 +1,257 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Monitorias Setembro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Monitorias Comerciais</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{
-  --bg:#f2f4f8;--surface:#ffffff;--surface-2:#eef2f7;--line:#dce3ec;--line-2:#c9d3df;
-  --ink:#122033;--ink-2:#46566c;--muted:#6f7d90;--accent:#1d5fae;--accent-soft:#e3edf9;
-  --p1:#2a78d6;--p2:#eb6834;--p1-soft:#e2edfb;--p2-soft:#fdeee6;
-  --pf:#2a78d6;--pme:#1baf7a;
-  --good:#1f9254;--good-soft:#e2f3e9;--warn:#b77d00;--warn-soft:#fbf1d9;--bad:#cf3f36;--bad-soft:#fbe6e4;
-  --shadow:0 1px 2px rgba(18,32,51,.06),0 2px 8px rgba(18,32,51,.04);
-  --display:"Bricolage Grotesque","Figtree",system-ui,sans-serif;
-  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --bg:#F3F6F9;--surface:#FFFFFF;--ink:#15212D;--ink2:#3B4A59;--muted:#5A6A7A;--line:#DAE2EA;--head:#EAF0F5;
+  --accent:#1F5FA8;--accent-2:#7FA6D6;--accent-3:#C9D9EE;--neutral-bar:#9AA8B6;
+  --s1:#EAF1FA;--s2:#C9DAF0;--s3:#8FB2E0;--s4:#4F84C7;--s5:#1F5FA8;
+  --ok:#1E7F4F;--ok-bg:#E2F3EA;--warn:#9A6200;--warn-bg:#FBF0DA;--bad:#B3261E;--bad-bg:#FBE4E2;--info:#1F5FA8;--info-bg:#E2ECF8;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
-  --bg:#0d131b;--surface:#151e29;--surface-2:#1b2633;--line:#283545;--line-2:#34455a;
-  --ink:#edf1f6;--ink-2:#b4c0ce;--muted:#8795a8;--accent:#6aa5ec;--accent-soft:#1c2c42;
-  --p1:#3987e5;--p2:#e0662f;--p1-soft:#1a2c44;--p2-soft:#3a2418;--pf:#3987e5;--pme:#199e70;
-  --good:#3cb371;--good-soft:#16301f;--warn:#e0a82e;--warn-soft:#352a12;--bad:#ec6a61;--bad-soft:#3a1c1a;--shadow:none}}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#0E151C;--surface:#16202A;--ink:#E4EBF2;--ink2:#C2CEDA;--muted:#95A5B5;--line:#283645;--head:#1C2834;
+  --accent:#78AEEA;--accent-2:#4A78AE;--accent-3:#2A4466;--neutral-bar:#6B7A89;
+  --s1:#1A2838;--s2:#22406A;--s3:#2F5E99;--s4:#4F86C9;--s5:#8DBBF0;
+  --ok:#6FD19D;--ok-bg:#16362A;--warn:#F0BE62;--warn-bg:#3A2E14;--bad:#F2908A;--bad-bg:#3D1D1C;--info:#8DBBF0;--info-bg:#1A2E47;}}
 :root[data-theme="dark"]{color-scheme:dark;
-  --bg:#0d131b;--surface:#151e29;--surface-2:#1b2633;--line:#283545;--line-2:#34455a;
-  --ink:#edf1f6;--ink-2:#b4c0ce;--muted:#8795a8;--accent:#6aa5ec;--accent-soft:#1c2c42;
-  --p1:#3987e5;--p2:#e0662f;--p1-soft:#1a2c44;--p2-soft:#3a2418;--pf:#3987e5;--pme:#199e70;
-  --good:#3cb371;--good-soft:#16301f;--warn:#e0a82e;--warn-soft:#352a12;--bad:#ec6a61;--bad-soft:#3a1c1a;--shadow:none}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45;padding:0 16px;font-variant-numeric:tabular-nums}
-.wrap{max-width:1320px;margin:0 auto;padding-block:20px 60px;display:flex;flex-direction:column;gap:22px}
-h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;letter-spacing:-.01em}
-h1{font-size:28px;font-weight:700}h2{font-size:21px;font-weight:700}
-h3{font-size:15px;font-weight:600;font-family:var(--body);letter-spacing:0}
+  --bg:#0E151C;--surface:#16202A;--ink:#E4EBF2;--ink2:#C2CEDA;--muted:#95A5B5;--line:#283645;--head:#1C2834;
+  --accent:#78AEEA;--accent-2:#4A78AE;--accent-3:#2A4466;--neutral-bar:#6B7A89;
+  --s1:#1A2838;--s2:#22406A;--s3:#2F5E99;--s4:#4F86C9;--s5:#8DBBF0;
+  --ok:#6FD19D;--ok-bg:#16362A;--warn:#F0BE62;--warn-bg:#3A2E14;--bad:#F2908A;--bad-bg:#3D1D1C;--info:#8DBBF0;--info-bg:#1A2E47;}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:flex;flex-direction:column;gap:24px}
+.eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{margin:4px 0 0;font-size:26px;line-height:1.2;font-weight:700;text-wrap:balance}
+h2{margin:0;font-size:16px;font-weight:600}
+h3{margin:0;font-size:14px;font-weight:600}
 p{margin:0}
-.eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.muted{color:var(--muted)}.ink2{color:var(--ink-2)}.note{font-size:12px;color:var(--muted)}
-header.top{display:flex;flex-direction:column;gap:10px}
-.periods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.per{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line)}
-.per.p1{background:var(--p1-soft)}.per.p2{background:var(--p2-soft)}
-.per b{font-family:var(--display);font-size:17px}
-.per .days{font-size:12px;color:var(--ink-2)}
-.dot{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:0}
-nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;padding-block:8px;border-bottom:1px solid var(--line);overflow-x:auto}
-nav.tabs a{padding:7px 12px;border-radius:8px;color:var(--ink-2);text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap}
-nav.tabs a:hover{background:var(--surface-2);color:var(--ink)}
-a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-section.sec{display:flex;flex-direction:column;gap:14px;scroll-margin-top:60px}
-.sechead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px;padding-top:10px;border-top:2px solid var(--ink)}
-.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.panel .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
-/* verdict */
-.verdict{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr);gap:18px;background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--bad);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
-.verdict .big{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.2}
-.vstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.vstats div{background:var(--surface-2);border-radius:10px;padding:10px 12px}
-.vstats b{display:block;font-family:var(--display);font-size:22px}
-.vstats span{font-size:12px;color:var(--ink-2)}
-/* analysis panels */
-.an{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.anp{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--c)}
-.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.tile{background:var(--surface-2);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
-.tile .l{font-size:12px;color:var(--ink-2);font-weight:600}
-.tile .v{font-family:var(--display);font-size:24px;font-weight:700;line-height:1.15}
-.tile .s{font-size:12px;color:var(--muted)}
-.delta{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:3px;font-family:var(--body)}
-.delta.up{background:var(--good-soft);color:var(--good)}.delta.down{background:var(--bad-soft);color:var(--bad)}.delta.flat{background:var(--surface);color:var(--ink-2)}
-.delta.up.inv{background:var(--bad-soft);color:var(--bad)}.delta.down.inv{background:var(--good-soft);color:var(--good)}
-/* questions */
-.qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.q{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px}
-.q .qh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
-.q h3{font-size:16px;font-family:var(--display)}
-.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
-.pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
-.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.good{background:var(--good-soft);color:var(--good)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.info{background:var(--accent-soft);color:var(--accent)}
-.q ul,.sc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--ink-2)}
-.q li b,.sc li b{color:var(--ink)}
-.cmp{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:12.5px}
-.cmp .t{height:10px;background:var(--surface-2);border-radius:0 4px 4px 0;overflow:hidden}.cmp .t span{display:block;height:100%;border-radius:0 4px 4px 0}
-.cmp .n{font-weight:700;text-align:right}
-/* scenarios */
-.scs{display:flex;flex-direction:column;gap:14px}
-.sc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px}
-.sc .txt{display:flex;flex-direction:column;gap:10px}
-.sc h3{font-size:16px;font-family:var(--display)}
-.sc .tags{display:flex;gap:6px;flex-wrap:wrap}
-/* tables & charts */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;font-size:12.5px}
-th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;background:var(--surface-2)}
-td.num,th.num{text-align:right}
-.chart svg{display:block;width:100%;height:auto;overflow:visible}svg text{font-family:var(--body)}
-.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink-2)}
-.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.legend i.ln{height:3px;border-radius:2px;vertical-align:3px;width:14px}
-.tt{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:7px 9px;border-radius:7px;z-index:20;max-width:280px;line-height:1.4}
-.recs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.rec{background:var(--accent-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;color:var(--ink-2);font-size:13px}
-.rec b{color:var(--ink);font-size:14px}
-.trow2{display:grid;grid-template-columns:minmax(0,1fr) 90px auto;gap:10px;align-items:center;font-size:12.5px;height:32px;border-bottom:1px solid var(--line)}
-.trow2:last-child{border-bottom:none}
-.trow2 .nm{display:flex;gap:7px;align-items:center;min-width:0}.trow2 .nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.trow2 .nm i{flex:none;width:8px;height:8px;border-radius:50%}
-.trow2 .bb{height:8px;background:var(--surface-2);border-radius:0 4px 4px 0;overflow:hidden}.trow2 .bb span{display:block;height:100%;border-radius:0 4px 4px 0}
-.trow2 .vv{text-align:right;font-weight:700;white-space:nowrap;min-width:118px;display:flex;align-items:center;justify-content:flex-end}.trow2 .vv small{font-weight:500;color:var(--muted);margin-left:4px}
-footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:12px}
-@media (max-width:1000px){.verdict,.sc{grid-template-columns:1fr}.recs,.g3{grid-template-columns:1fr}}
-@media (max-width:760px){.an,.qs,.g2,.periods{grid-template-columns:1fr}.vstats{grid-template-columns:repeat(2,minmax(0,1fr))}h1{font-size:23px}}
-</style>
-<style>
-.mtxt{gap:10px}.mtxt p{margin:0;max-width:none;color:var(--ink-2);line-height:1.6;text-align:justify;hyphens:auto}.mtxt p.lead{color:var(--ink);font-weight:600;font-size:15px}
-.mtbl{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
-.mrow{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(0,1.6fr) minmax(0,1.3fr);border-bottom:1px solid var(--line)}
-.mrow:last-child{border-bottom:none}
-.mrow>div{padding:14px 16px}
-.mf{font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink);background:var(--surface-2)}
-.ml p,.mo p{margin:0;line-height:1.55;font-size:13.5px}.ml p{color:var(--ink-2)}
-.mo{background:var(--accent-soft)}.mo p{color:var(--ink)}
-.mlab{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;margin-bottom:5px}
-.mconc{border-left:5px solid var(--accent)}.mconc p{margin:0;max-width:none;line-height:1.65;color:var(--ink);font-size:14.5px;text-align:justify;hyphens:auto}
-@media (max-width:860px){.mrow{grid-template-columns:1fr}}
-</style>
-
-<style>
-.samp{font-size:11.5px;color:var(--muted);margin-top:4px}
-.cmp .ln2{display:flex;flex-direction:column;gap:1px}.cmp .ln2 small{font-size:10.5px;color:var(--muted)}
-.defs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.def{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--c)}
-.def h3{font-family:var(--display);font-size:17px}
-.def ul{margin:0;padding-left:18px;color:var(--ink-2);display:flex;flex-direction:column;gap:3px;font-size:13px}
-.def .cnt{display:flex;gap:10px;flex-wrap:wrap}.def .cnt div{background:var(--surface-2);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--ink-2)}.def .cnt b{font-family:var(--display);font-size:16px;color:var(--ink);display:block}
-.oftbl td.b{font-weight:700}
-@media (max-width:1000px){.defs{grid-template-columns:1fr}}
-</style>
-<style>
-
-.orc{--fg:var(--ink);--fg2:var(--ink-2);--axis:var(--line-2);--ring:var(--line);--crit:var(--bad);--good-ink:var(--good);
-  --s1:#d6e5f7;--s2:#a7c7ee;--s3:#6a9fdf;--s4:#2f6fc0;--s5:#184f95}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .orc{--s1:#1d3350;--s2:#24497a;--s3:#2f66ab;--s4:#4c89d6;--s5:#8dbaf0}}
-:root[data-theme="dark"] .orc{--s1:#1d3350;--s2:#24497a;--s3:#2f66ab;--s4:#4c89d6;--s5:#8dbaf0}
-.orc .filters select{font-size:13px}
-.orc .sechead .note{display:block;margin-top:4px}
-.orc .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
-.orc .filters label{display:flex;flex-direction:column;gap:4px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
-.orc select,.orc input[type=search]{font:inherit;font-size:14px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0;max-width:100%}
-.orc select:focus-visible,.orc input:focus-visible,.orc button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.orc button.reset{font:inherit;font-size:13px;background:none;border:1px solid var(--line);color:var(--fg2);border-radius:8px;padding:7px 12px;cursor:pointer}
-.orc button.reset:hover{background:var(--accent-soft);color:var(--fg)}
-.orc .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.orc .kpi{background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:2px}
-.orc .kpi .v{font-family:var(--display);font-size:30px;font-weight:700;line-height:1.1;letter-spacing:-.01em}
-.orc .kpi .n{font-size:12.5px;color:var(--fg2)}
-.orc .kpi.hi .v{color:var(--accent)}
-.orc .phead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px}
-.orc .grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
-.orc .grid2b{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
-.orc .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.orc .seg button{font:inherit;font-size:12.5px;background:none;border:0;padding:6px 11px;color:var(--fg2);cursor:pointer}
-.orc .seg button+button{border-left:1px solid var(--line)}
-.orc .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--fg);font-weight:600}
-.orc .mapbox{position:relative}
-.orc #map{width:100%;height:auto;display:block;max-height:560px}
-.orc #map path{stroke:var(--surface);stroke-width:.8;cursor:pointer;transition:opacity .15s}
-.orc #map path:hover{stroke:var(--fg);stroke-width:1.4}
-.orc #map .dim{opacity:.28}
-.orc .rlab rect{fill:var(--surface);stroke:var(--ring)}
-.orc .rlab .t{fill:var(--fg2);font:600 11px var(--body);letter-spacing:.04em;text-transform:uppercase}
-.orc .rlab .b{fill:var(--fg);font:700 22px var(--display)}
-.orc .rlab .s{fill:var(--muted);font:500 10.5px var(--body)}
-.orc .rlab{cursor:pointer}
-.orc .legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg2);flex-wrap:wrap}
-.orc .ramp{display:flex;gap:2px}
-.orc .ramp i{width:26px;height:10px;border-radius:2px;display:block}
-.orc .note{font-size:12px;color:var(--muted)}
-.orc .tip{position:fixed;pointer-events:none;background:var(--surface);color:var(--fg);border:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.14);border-radius:8px;padding:8px 10px;font-size:12.5px;z-index:10;min-width:150px}
-.orc .tip b{font-family:var(--display);font-size:14px}
-.orc .tip .r{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
-.orc .tip .r span:first-child{color:var(--fg2)}
-.orc .tscroll{overflow-x:auto}
-.orc table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.orc th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;text-align:right;padding:6px 8px;border-bottom:1px solid var(--axis);white-space:nowrap}
-.orc th:first-child,.orc td:first-child{text-align:left}
-.orc td{padding:8px 7px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-.orc tbody tr:last-child td{border-bottom:0}
-.orc tr.click{cursor:pointer}
-.orc tr.click:hover td{background:var(--accent-soft)}
-.orc tr.sel td{background:var(--accent-soft);font-weight:600}
-.orc th.sort{cursor:pointer;user-select:none}
-.orc th.sort:hover{color:var(--fg)}
-.orc th.sort[data-dir]::after{content:" ↓"}
-.orc th.sort[data-dir="asc"]::after{content:" ↑"}
-.orc .bar{display:inline-block;height:8px;border-radius:0 4px 4px 0;background:var(--accent);vertical-align:middle}
-.orc .bar.bg{background:var(--axis)}
-.orc .cellbar{display:flex;align-items:center;gap:8px;justify-content:flex-end}
-.orc .cellbar .track{width:64px;height:8px;background:var(--line);border-radius:0 4px 4px 0;overflow:hidden;flex:none}
-.orc .cellbar .track i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0}
-.orc .pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;border:1px solid var(--line);color:var(--fg2)}
-.orc .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-.orc .pill.good{color:var(--good-ink)}
-.orc .pill.warn{color:var(--warn)}
-.orc .pill.crit{color:var(--crit)}
-.orc .status-list{display:flex;flex-direction:column;gap:9px}
-.orc .srow{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:13px}
-.orc .srow .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.orc .srow .trk{height:10px}
-.orc .srow .trk i{display:block;height:100%;border-radius:0 4px 4px 0}
-.orc .srow .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--fg2)}
-.orc .groups{display:flex;gap:8px;flex-wrap:wrap}
-.orc #daily{width:100%;height:220px;display:block}
-.orc #daily text{fill:var(--muted);font:11px var(--body)}
-.orc #daily .grid{stroke:var(--line)}
-.orc #daily .base{stroke:var(--axis)}
-.orc #daily rect.b{fill:var(--accent)}
-.orc #daily rect.hit{fill:transparent;cursor:default}
-.orc #daily rect.b.on{fill:var(--s5)}
-.orc .vtools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.orc .vscroll{max-height:520px;overflow:auto;border-top:1px solid var(--line)}
-.orc .vscroll thead th{position:sticky;top:0;background:var(--surface);z-index:1}
-.orc .rank{color:var(--muted);width:28px}
-@media (max-width:980px){.orc .grid2,.orc .grid2b{grid-template-columns:minmax(0,1fr)}
-.orc .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:560px){.orc .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-.orc .kpi .v{font-size:24px}
-.orc .kpi:last-child{grid-column:1/-1}
-.orc .srow{grid-template-columns:minmax(0,120px) minmax(0,1fr) 52px}
-.orc .cellbar .track{width:48px}}
-@media (prefers-reduced-motion:reduce){.orc *{transition:none!important}}
-.qv button{font-family:inherit}
-.qv :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.qv .view{display:none}
-.qv .view.on{display:block}
-.qv .grid{display:grid;gap:14px}
-.qv .g4{grid-template-columns:repeat(4,1fr)}
-.qv .g3{grid-template-columns:repeat(3,1fr)}
-.qv .g2{grid-template-columns:1fr 1fr}
-.qv .g21{grid-template-columns:2fr 1fr}
-.qv .g12{grid-template-columns:1fr 2fr}
-@media (max-width:980px){.qv .g4{grid-template-columns:1fr 1fr}
-.qv .g3,.qv .g2,.qv .g21,.qv .g12{grid-template-columns:1fr}}
-@media (max-width:520px){.qv .g4{grid-template-columns:1fr}}
-.qv .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
-.qv .panel h2{font:600 15px/1.3 var(--body);margin:0 0 4px}
-.qv .panel .hint{color:var(--ink-2);font-size:13px;margin:0 0 12px}
-.qv .kpi{position:relative;overflow:hidden}
-.qv .kpi .lab{color:var(--ink-2);font-size:13px}
-.qv .kpi .val{font:600 30px/1.15 var(--display);margin:4px 0 2px}
-.qv .kpi .det{font-size:13px;color:var(--ink-2)}
-.qv .kpi.good .val{color:var(--good)}
-.qv .kpi.warn .val{color:var(--warn)}
-.qv .kpi.bad .val{color:var(--bad)}
-.qv .lead{font:600 20px/1.45 var(--display);margin:0 0 6px;max-width:none}
-.qv .leadsub{color:var(--ink-2);margin:0;max-width:none;text-align:justify;hyphens:auto}
-.qv .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.qv .seg{display:inline-flex;background:var(--surface-2);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
-.qv .seg button{border:0;background:none;padding:6px 11px;border-radius:6px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer}
-.qv .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
-.qv .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;user-select:none}
-.qv .toggle input{width:34px;height:20px;appearance:none;background:var(--line);border-radius:20px;position:relative;cursor:pointer;margin:0;transition:background .15s}
-.qv .toggle input::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s}
-.qv .toggle input:checked{background:var(--warn)}
-.qv .toggle input:checked::after{left:17px}
-.qv .toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
-.qv .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.qv .cal .wd{font-size:11px;color:var(--ink-2);text-align:center;font-weight:600}
-.qv .cal button{height:52px;border:1px solid transparent;border-radius:6px;background:var(--surface-2);color:var(--ink-2);font-size:13px;font-weight:600;cursor:pointer;position:relative;padding:4px}
-.qv .cal button .dot{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.qv .cal button.p1{box-shadow:inset 0 -3px 0 var(--good)}
-.qv .cal button.p2{box-shadow:inset 0 -3px 0 var(--bad-soft)}
-.qv .cal button.l{background:var(--warn-soft);color:var(--ink)}
-.qv .cal button.g{background:var(--bad);color:#fff}
-.qv .cal button.sel{border-color:var(--ink);outline:2px solid var(--ink);outline-offset:1px}
-.qv .cal .empty{height:52px}
-.qv .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:12px;color:var(--ink-2)}
-.qv .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
-.qv .detail h3{font:600 18px/1.3 var(--display);margin:0 0 4px}
-.qv .detail .meta{color:var(--ink-2);font-size:13px;margin-bottom:12px}
-.qv .item{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
-.qv .tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:12px;background:var(--bad-soft);color:var(--bad);white-space:nowrap;height:fit-content}
-.qv .tag.n{background:var(--accent-soft);color:var(--accent)}
-.qv .tag.w{background:var(--warn-soft);color:var(--warn)}
-.qv .empty-state{color:var(--ink-2);font-size:14px;padding:10px 0}
-.qv .chain{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr;align-items:center}
-.qv .chain .c{background:var(--surface-2);border-radius:8px;padding:12px 14px;height:100%}
-.qv .chain .c small{color:var(--accent);font-weight:700;font-size:12px}
-.qv .chain .c b{display:block;margin:2px 0 4px}
-.qv .chain .c span{font-size:13px;color:var(--ink-2)}
-.qv .chain .ar{text-align:center;color:var(--p1);font-size:20px}
-@media (max-width:760px){.qv .chain{grid-template-columns:1fr}
-.qv .chain .ar{transform:rotate(90deg)}}
-.qv .heat{display:grid;grid-template-columns:minmax(150px,1.6fr) repeat(9,1fr);gap:3px;min-width:640px}
-.qv .heat div,.qv .heat button{padding:7px 4px;border-radius:4px;text-align:center;font-size:12px}
-.qv .heat .h{color:var(--ink-2);font-weight:600}
-.qv .heat .r{text-align:left;padding-left:0}
-.qv .heat button{border:0;cursor:pointer;background:var(--surface-2);min-height:30px}
-.qv .heat button.x{background:var(--bad);color:#fff}
-.qv .heat button.fade{opacity:.25}
-.qv .scroll{overflow-x:auto}
-.qv table{border-collapse:collapse;width:100%;font-size:13px}
-.qv th,.qv td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-.qv th:first-child,.qv td:first-child,.qv th.l,.qv td.l{text-align:left}
-.qv th{color:var(--ink-2);font-weight:600;font-size:12px;position:sticky;top:0;background:var(--surface)}
-.qv th.s{cursor:pointer}
-.qv th.s:hover{color:var(--ink)}
-.qv tr.mc td{color:var(--warn)}
-.qv td.up{color:var(--good);font-weight:600}
-.qv td.dn{color:var(--bad);font-weight:600}
-.qv .tscroll{max-height:380px;overflow:auto}
-.qv input[type=search]{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);min-width:200px}
-.qv svg{display:block;width:100%;height:auto}
-.qv svg text{font-family:var(--body);fill:var(--ink-2);font-size:11px}
-.qv .ax{stroke:var(--line)}
-.qv .b1{fill:var(--p1)}
-.qv .b2{fill:var(--accent)}
-.qv .b3{fill:var(--warn)}
-.qv .bbad{fill:var(--bad)}
-.qv .ln{fill:none;stroke:var(--accent);stroke-width:2.2}
-.qv .pt{fill:var(--accent)}
-.qv .band{fill:var(--bad-soft)}
-.qv [data-tip]{cursor:pointer}
-.qv rect[data-tip]:hover,.qv circle[data-tip]:hover{opacity:.8}
-.qv #qvTip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:7px 10px;border-radius:6px;max-width:260px;z-index:50;opacity:0;transition:opacity .1s;line-height:1.4}
-.qv .comment{margin-top:12px;padding:10px 12px;border-left:3px solid var(--p1);background:var(--surface-2);border-radius:0 6px 6px 0;font-size:14px;color:var(--ink)}
-.qv .comment p{margin:0 0 6px}
-.qv .comment p:last-child{margin:0}
-.qv .mini{display:grid;gap:10px;align-content:start}
-.qv .mini div{background:var(--surface-2);border-radius:8px;padding:10px 12px}
-.qv .mini b{display:block;font:600 22px/1.2 var(--display)}
-.qv .mini span{font-size:13px;color:var(--ink-2)}
-.qv .mini .bad b{color:var(--bad)}
-.qv .mini .good b{color:var(--good)}
-.qv .prog{height:10px;background:var(--surface-2);border-radius:10px;overflow:hidden;margin:8px 0 4px}
-.qv .prog div{height:100%;background:var(--good);width:0;transition:width .3s}
-.qv .act{display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:14px 0;border-top:1px solid var(--line)}
-.qv .act h3{margin:0;font-size:15px}
-.qv .act p{margin:0;color:var(--ink-2);font-size:14px;grid-column:1}
-.qv .act .ctl{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.qv .pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
-.qv .st{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;min-width:118px}
-.qv .pillst{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap}
-.qv .pillst.r{background:var(--good-soft);color:var(--good)}
-.qv .pillst.p{background:var(--warn-soft);color:var(--warn)}
-.qv .pillst.s{background:var(--bad-soft);color:var(--bad)}
-.qv td.wrap{white-space:normal;min-width:180px}
-.qv .st.s1{background:var(--warn-soft);color:var(--warn);border-color:transparent}
-.qv .st.s2{background:var(--good-soft);color:var(--good);border-color:transparent}
-.qv .foot{color:var(--ink-2);font-size:12px;margin-top:24px}
-@media (max-width:640px){.qv .act{grid-template-columns:1fr}
-.qv .act .ctl{grid-row:auto;grid-column:1;flex-direction:row;align-items:center}}
-
-.qv{font-size:14px}
-.qv .panel{display:block;border-radius:12px;padding:16px}
-.qv .kpi{border-top:4px solid var(--accent)}
-.qv .kpi.good{border-top-color:var(--good)}.qv .kpi.warn{border-top-color:var(--warn)}.qv .kpi.bad{border-top-color:var(--bad)}
-.qv .b1{fill:var(--p1)}.qv .b2{fill:var(--p2)}
-.qv .qtabs{display:flex;gap:6px;flex-wrap:wrap}
-.qv .qtabs button{border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:6px 12px;font:600 12.5px var(--body);cursor:pointer}
-.qv .qtabs button:hover{border-color:var(--accent);color:var(--ink)}
-.qv .qtabs button[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
-.qv .qnext{display:grid;gap:8px}
-.qv .qnext ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--ink-2)}
-.qv .foot{margin-top:14px}
-
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity;border-bottom:1px solid var(--line)}
+.tab{all:unset;cursor:pointer;scroll-snap-align:start;flex:0 0 auto;display:flex;flex-direction:column;gap:2px;padding:10px 14px 12px;border-bottom:3px solid transparent;margin-bottom:-1px;min-width:120px}
+.tab b{font-size:14px;font-weight:600;color:var(--ink2)}
+.tab span{font-size:12px;color:var(--muted)}
+.tab:hover b{color:var(--ink)}
+.tab[aria-selected="true"]{border-bottom-color:var(--accent)}
+.tab[aria-selected="true"] b{color:var(--accent)}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;border-radius:6px}
+.panel{display:flex;flex-direction:column;gap:24px}
+.phead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.kpi .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi b{font:500 28px/1.1 "IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.kpi b.txt{font:600 17px/1.3 "IBM Plex Sans",sans-serif}
+.kpi .sub{font-size:12px;color:var(--muted)}
+.kpi.hl{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.chead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px}
+.note{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:20px}
+/* bars */
+.bars{display:flex;flex-direction:column;gap:12px}
+.brow{display:grid;grid-template-columns:minmax(140px,240px) 1fr 104px;gap:12px;align-items:center}
+.brow .name{font-size:13px;color:var(--ink2);display:flex;flex-direction:column;gap:2px}
+.brow .name small{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.track{position:relative;height:18px;background:var(--head);border-radius:4px}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:0 4px 4px 0;min-width:2px}
+.brow .val{font:500 13px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right;color:var(--ink)}
+.brow .val span{color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:10px;border-radius:2px;display:inline-block}
+/* matrix */
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--head);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:center;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.mx td.c{text-align:center;padding:4px}
+.cell{display:block;border-radius:4px;padding:6px 0;font:500 12px "IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;min-width:52px}
+.c0{background:transparent;color:var(--line)}
+.cl1{background:var(--s1);color:var(--ink)}.cl2{background:var(--s2);color:var(--ink)}.cl3{background:var(--s3);color:#0B1A2B}.cl4{background:var(--s4);color:#fff}.cl5{background:var(--s5);color:#fff}
+:root[data-theme="dark"] .cl5,:root[data-theme="dark"] .cl4{color:#0B1A2B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cl5,:root:not([data-theme="light"]) .cl4{color:#0B1A2B}}
+.scale{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.scale i{width:22px;height:10px;border-radius:2px;display:inline-block}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.dot.no{background:transparent;border:1.5px solid var(--line)}
+td.obs{min-width:280px;max-width:520px;color:var(--ink2);font-size:12.5px}
+td.id,.mono{font-family:"IBM Plex Mono",monospace;font-size:12.5px;white-space:nowrap}
+/* evidence */
+.evs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px}
+.ev{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.ev .top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.ev .who{font-weight:600}
+.ev p{font-size:13px;color:var(--ink2)}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.p-ok{color:var(--ok);background:var(--ok-bg)}.p-bad{color:var(--bad);background:var(--bad-bg)}.p-info{color:var(--info);background:var(--info-bg)}.p-warn{color:var(--warn);background:var(--warn-bg)}
+.opp{background:var(--info-bg);border:1px solid var(--accent-3);border-radius:10px;padding:14px 18px;display:flex;flex-direction:column;gap:6px}
+.opp .lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.opp p{font-size:14.5px;line-height:1.55;max-width:80ch}
+.read{display:flex;flex-direction:column;gap:10px;max-width:82ch}
+.read p{color:var(--ink2)}
+details summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13px;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+details[open] summary{margin-bottom:10px}
+#tip{position:fixed;pointer-events:none;z-index:10;background:var(--ink);color:var(--surface);font-size:12px;line-height:1.4;padding:7px 10px;border-radius:6px;max-width:260px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.hit{cursor:default}
+@media (max-width:560px){.brow{grid-template-columns:1fr 64px}.brow .name{grid-column:1/-1}}
+@media (prefers-reduced-motion:no-preference){.fill{transition:width .35s ease}}
 </style>
 </head>
 <body>
+
 <div class="wrap">
-  <section class="sec" id="monitorias">
-    <div class="sechead"><div><span class="eyebrow">Monitorias</span><h2>Análise Gerencial das Monitorias | Principais Ofensores e Oportunidades de Conversão</h2></div></div>
-    <div class="panel mtxt"><p class="lead">Apesar das particularidades de cada fila, os mesmos comportamentos aparecem de forma recorrente.</p><p>O primeiro é que estamos cotando mais do que recomendando. Em vários atendimentos, apresentamos uma ou duas opções — frequentemente as mais baratas — sem primeiro descobrir quanto o cliente está disposto a investir. Com isso, o promotor acaba decidindo antecipadamente pelo bolso do cliente.</p><p>O segundo é que respondemos objeções, mas nem sempre negociamos sobre elas. Quando o cliente diz que está caro, questiona coparticipação, rede, carência ou contrato, muitas vezes esclarecemos a dúvida e aguardamos. Precisamos descobrir o que está por trás da objeção, apresentar uma alternativa e voltar para o fechamento.</p><p>O terceiro ponto é o SLA durante a jornada. Existe forte preocupação com os 2 minutos iniciais porque o promotor sabe que será despontuado na monitoria e poderá ter impacto na premiação. Porém, encontramos intervalos muito maiores durante o atendimento. Não adianta atender rapidamente para cumprir o indicador e deixar o cliente esperando quando ele já está negociando.</p><p>Também temos oportunidade em follow-up. Principalmente depois da cotação, a retomada precisa trabalhar a última barreira apresentada pelo cliente. Se ele parou no preço, retomamos preço; se parou no contrato, retomamos contrato. Follow-up não deveria ser apenas “ainda tem interesse?”.</p><p>Por último, precisamos melhorar o aproveitamento das informações que já possuímos. Isso é especialmente importante em Cancelados, Eugênia e Repique. Quanto mais histórico temos, menos sentido faz começar novamente a venda.</p></div>
-    <div class="mtbl"><div class="mrow"><div class="mf">Base de Cancelados</div><div class="ml"><span class="mlab">Leitura gerencial</span><p>Estamos trabalhando clientes que já conhecem o produto e possuem uma experiência anterior conosco. Porém, nem sempre exploramos por que cancelaram e o que faria sentido diferente hoje. Sem entender o motivo da saída, corremos o risco de repetir a mesma oferta que anteriormente não sustentou a permanência.</p></div><div class="mo"><span class="mlab">Principal oportunidade</span><p>Usar o motivo do cancelamento como ponto de partida da venda. Entender o que fez o cliente sair e apresentar uma solução que responda diretamente a essa causa.</p></div></div><div class="mrow"><div class="mf">Adesão</div><div class="ml"><span class="mlab">Leitura gerencial</span><p>Temos clientes perguntando, negociando valores, solicitando desconto e demonstrando intenção, porém parte das oportunidades perde força depois da cotação. Identificamos SPIN pouco explorado, tratamento superficial das objeções e follow-up que nem sempre sustenta a oportunidade até uma decisão.</p></div><div class="mo"><span class="mlab">Principal oportunidade</span><p>Sustentar a negociação após a cotação. Trabalhar objeção + follow-up + fechamento. A monitoria da Thami Francisquelli com a cliente Gaby mostrou que, quando houve acompanhamento até boleto e pagamento, houve conversão.</p></div></div><div class="mrow"><div class="mf">Eugênia / Eugênia Cotação / Eugênia Seller</div><div class="ml"><span class="mlab">Leitura gerencial</span><p>A automação já entrega diversas informações sobre o cliente, mas nem sempre o promotor utiliza esse histórico. Em alguns casos, repetimos perguntas ou praticamente reiniciamos a jornada, mesmo quando o cliente já recebeu produtos e valores.</p></div><div class="mo"><span class="mlab">Principal oportunidade</span><p>Transformar os dados da Eugênia em inteligência comercial. A automação qualifica; o promotor precisa assumir daquele ponto, identificar o que impediu a decisão e conduzir para fechamento.</p></div></div><div class="mrow"><div class="mf">PME</div><div class="ml"><span class="mlab">Leitura gerencial</span><p>A condução ainda aparece muito concentrada em coletar CNPJ/dados → cotar → apresentar preço. Falta aprofundar necessidade, perfil da empresa, orçamento e prioridades. Além disso, há tendência de apresentar poucas opções, muitas vezes priorizando os menores valores.</p></div><div class="mo"><span class="mlab">Principal oportunidade</span><p>Transformar o promotor em consultor da venda. Abrir o leque de produtos e valores, entender orçamento e necessidade e então recomendar a melhor composição, em vez de decidir antecipadamente pelo bolso do cliente.</p></div></div><div class="mrow"><div class="mf">Carrinho</div><div class="ml"><span class="mlab">Leitura gerencial</span><p>É uma fila que recebe clientes relativamente aquecidos. Encontramos manifestações como “Sim, tenho interesse”, escolhas de modalidade e perguntas de compra. Mesmo assim, parte dessas oportunidades não é sustentada até o fechamento.</p></div><div class="mo"><span class="mlab">Principal oportunidade</span><p>Reduzir o espaço entre “tenho interesse” e “venda concluída”. Cliente de Carrinho precisa de prioridade, velocidade, investigação e condução ativa até documentação/pagamento.</p></div></div><div class="mrow"><div class="mf">Repique</div><div class="ml"><span class="mlab">Leitura gerencial</span><p>Estamos recuperando clientes que já passaram anteriormente pelo funil. Porém, em alguns casos, a retomada acontece como uma nova abordagem, sem utilizar suficientemente o motivo pelo qual a negociação anterior não avançou. Também encontramos oportunidade sendo encerrada sem tempo/cadência adequada mesmo após manifestação de interesse.</p></div><div class="mo"><span class="mlab">Principal oportunidade</span><p>Deixar de apenas “tentar contato novamente” e efetivamente recuperar a venda. Identificar onde o cliente parou, trabalhar aquela barreira e esgotar a oportunidade antes do encerramento.</p></div></div></div>
-    <div class="panel mconc"><p>Minha leitura das monitorias é que temos oportunidade dentro da própria base. Não precisamos olhar somente para quantos leads entram, mas principalmente para quanto estamos aproveitando dos leads que já demonstram intenção. Hoje existe um vazamento entre interesse, cotação e fechamento. O ganho mais imediato está em melhorar investigação, recomendação, tratamento de objeções, follow-up e velocidade durante toda a negociação. Quando sustentamos a oportunidade até o final, as próprias monitorias mostram que conseguimos converter.</p></div>
-  </section>
+  <header>
+    <div class="eyebrow">Monitorias comerciais · amostras recuperadas até 28/09/2026</div>
+    <h1>Diagnóstico gerencial das monitorias</h1>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="Filas monitoradas" id="tabs"></nav>
+  <main id="panel" class="panel" role="tabpanel"></main>
 </div>
+<div id="tip" hidden></div>
+
+<script>
+const DATA=[{"key": "eugenia", "short": "Eugênia", "long": "Eugênia · Cotação · Seller", "title": "EUGÊNIA | EUGÊNIA COTAÇÃO | EUGÊNIA SELLER — DIAGNÓSTICO GERENCIAL", "pauta": null, "rows": [{"id": "732707095", "fila": "Eugênia Cotação", "colab": "Kamila Oliveira", "obj": true, "sla": true, "cot": true, "fup": true, "apr": true, "obs": "Cliente pediu plano nacional e já havia informado CNPJ/MEI e perfil de viagem. Na retomada, voltou-se a perguntar CNPJ/idades e o follow-up posterior ficou genérico, mesmo após o cliente reforçar que precisava de cobertura nacional."}, {"id": "731868771", "fila": "Eugênia Seller", "colab": "Kamila Oliveira", "obj": false, "sla": true, "cot": true, "fup": true, "apr": false, "obs": "Foram apresentadas duas opções e a escolha ficou com o cliente. A explicação trouxe diferença de coparticipação, mas a retomada posterior foi genérica ('não deixa para depois'), sem trabalhar a última dúvida/critério de decisão."}, {"id": "735194305", "fila": "Eugênia Cotação", "colab": "Maria Eduarda", "obj": false, "sla": false, "cot": true, "fup": false, "apr": false, "obs": "Cotação familiar iniciada pelo bot com várias opções; evidência recuperada sustenta apresentação de alternativas, sem recomendação humana específica nesta sessão."}, {"id": "735230468", "fila": "Eugênia Cotação", "colab": "Maria Eduarda", "obj": true, "sla": true, "cot": false, "fup": true, "apr": true, "obs": "Cliente já havia visto opções e chegou a dizer que não tinha mais interesse. Maria investigou o motivo (preço, cobertura, rede, carência), mas os follow-ups seguintes voltaram a mensagens genéricas de continuidade/carência zero."}, {"id": "734097771", "fila": "Eugênia", "colab": "Mirella Pereira", "obj": true, "sla": true, "cot": true, "fup": false, "apr": true, "obs": "Primeira oferta foi restrita; o cliente precisou perguntar se era a mais barata e se havia outros planos. Só depois foi investigado que queria apenas consultas e então surgiu o ambulatorial. O follow-up posterior foi mais direcionado ao valor."}, {"id": "733715356", "fila": "Eugênia Seller", "colab": "Miriam Ferreira", "obj": true, "sla": false, "cot": true, "fup": true, "apr": true, "obs": "Cliente já havia informado que tinha Hapvida e queria reduzir o valor. Ao assumir, Miriam perguntou se a simulação era para plano novo e direcionou ao SAC, sem aproveitar adequadamente o histórico comercial construído pelo bot."}, {"id": "733824882", "fila": "Eugênia Seller", "colab": "Miriam Ferreira", "obj": false, "sla": false, "cot": false, "fup": false, "apr": true, "obs": "Continuação do caso Stefany: evidência vinculada ao histórico de cliente Hapvida buscando redução de valor; oportunidade de continuidade sem reiniciar a jornada."}, {"id": "731950714", "fila": "Eugênia Seller", "colab": "Carina Siena", "obj": true, "sla": false, "cot": false, "fup": false, "apr": false, "obs": "Contraponto: o bot recomenda plano completo para cliente de 64 anos e, diante da preocupação com orçamento, apresenta alternativa ambulatorial explicando a limitação. Há recomendação contextualizada."}, {"id": "733072620", "fila": "Eugênia Seller", "colab": "Carina Siena", "obj": true, "sla": false, "cot": false, "fup": false, "apr": false, "obs": "Cliente buscava ressonância cardíaca. A jornada recomenda o plano completo por cobertura de alta complexidade, relacionando produto à necessidade declarada."}, {"id": "733130072", "fila": "Eugênia Seller", "colab": "Carina Siena", "obj": false, "sla": false, "cot": false, "fup": false, "apr": false, "obs": "Continuação do atendimento 733072620; sem evidência forte adicional de ofensor comercial nos trechos recuperados."}, {"id": "730947212", "fila": "Eugênia Seller", "colab": "Carolina Ribeiro", "obj": true, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Cliente estava em etapa de pagamento e apresentou erro no cartão. Houve condução até ativação, com ocorrências de SLA durante a jornada; usado como contraponto de persistência no fechamento."}, {"id": "735156907", "fila": "Eugênia", "colab": "Jady Queiroz", "obj": true, "sla": true, "cot": true, "fup": true, "apr": true, "obs": "Cliente informou que só poderia pagar em dia útil. A retomada posterior foi genérica e, quando voltou, Jady perguntou novamente em qual opção seguir, apesar de o cliente já ter indicado a opção que fazia mais sentido."}, {"id": "732029131", "fila": "Eugênia Cotação", "colab": "Jady Queiroz", "obj": true, "sla": true, "cot": true, "fup": true, "apr": true, "obs": "Cliente ainda não havia escolhido. A abordagem foi feita às 22h32 perguntando diretamente em qual opção seguir; o cliente reagiu negativamente. Faltou entender o motivo da não escolha e retomar a barreira real."}, {"id": "730917090", "fila": "Eugênia", "colab": "Rogério Stivanello", "obj": false, "sla": true, "cot": true, "fup": false, "apr": false, "obs": "Após cidade, idade e quantidade de vidas, foram apresentados valores e diferenças de coparticipação. A evidência recuperada mostra cotação, mas pouca recomendação baseada no perfil."}, {"id": "729561716", "fila": "Eugênia Seller", "colab": "Rogério Stivanello", "obj": false, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Cliente já estava em fechamento e enviou documentação. Apesar de vários SLAs, houve continuidade até pagamento/boas-vindas; contraponto de condução ao fechamento."}, {"id": "731085457", "fila": "Eugênia", "colab": "Sofia Lunga", "obj": false, "sla": false, "cot": true, "fup": true, "apr": true, "obs": "Atendimento de Eugênia recuperado no mesmo bloco; classificado conservadoramente como oportunidade de recomendação/continuidade a partir do histórico já existente."}, {"id": "731004390", "fila": "Eugênia Seller", "colab": "Sofia Lunga", "obj": false, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Contraponto positivo de follow-up: Sofia retomou repetidamente a pendência real de pagamento, perguntou sobre dificuldade e alertou sobre expiração da proposta."}, {"id": "734063770", "fila": "Eugênia Seller", "colab": "Raiane Lima", "obj": true, "sla": true, "cot": false, "fup": false, "apr": true, "obs": "Cliente chegou transferido porque o link de pagamento travava. A primeira pergunta humana foi se queria seguir com a adesão, apesar de o histórico mostrar contratação já concluída e problema específico no pagamento."}, {"id": "732082685", "fila": "Eugênia", "colab": "Thaisa Almeida", "obj": false, "sla": false, "cot": true, "fup": true, "apr": true, "obs": "Atendimento recuperado no bloco de Eugênia; oportunidade concentrada em usar o contexto já coletado e avançar para recomendação/follow-up específico."}, {"id": "731202822", "fila": "Eugênia Seller", "colab": "Thaisa Almeida", "obj": false, "sla": false, "cot": true, "fup": true, "apr": true, "obs": "Bot já havia apresentado três opções. Ao assumir, a promotora enviou lista de documentos e pediu 'valor do plano escolhido', sem antes confirmar/recomendar qual produto atendia melhor; follow-ups posteriores foram genéricos."}, {"id": "732709243", "fila": "Eugênia Cotação", "colab": "Unildo Ferreira Gois Junior", "obj": false, "sla": true, "cot": false, "fup": true, "apr": true, "obs": "Bot transferiu após simulações. Unildo retomou apenas com 'ficou alguma dúvida?' e 'deseja prosseguir?', sem usar detalhes das opções/necessidade para construir uma retomada específica."}, {"id": "735162492", "fila": "Eugênia Cotação", "colab": "Thais Santos", "obj": false, "sla": true, "cot": false, "fup": true, "apr": true, "obs": "Bot já havia apresentado ambulatorial e completo para criança de 6 anos. A retomada humana foi genérica ('você pode falar agora?') e os contatos seguintes focaram campanha/carência zero, sem recuperar a escolha pendente entre os planos."}], "ev": [{"id": "734097771", "who": "Mirella Pereira — Eugênia", "txt": "Cliente recebeu inicialmente oferta restrita e precisou perguntar se era a mais barata e se existiam outros planos. Só depois foi identificado que queria apenas consultas e surgiu o ambulatorial. Evidência de cotação antes da investigação/recomendação."}, {"id": "733715356", "who": "Miriam Ferreira — Eugênia Seller", "txt": "O histórico já mostrava que Stefany era cliente Hapvida e queria reduzir a mensalidade. Na transferência, a primeira pergunta foi se a simulação era para plano novo. A oportunidade é continuar a negociação do ponto em que o bot parou, sem reiniciar a descoberta."}, {"id": "732707095", "who": "Kamila Oliveira — Eugênia Cotação", "txt": "Antônio informou desde o início que viajava muito e precisava de plano nacional, além de já ter enviado o CNPJ. Na retomada, voltou-se a perguntar sobre CNPJ e o follow-up posterior não trabalhou a exigência de cobertura nacional, que continuou sendo a barreira declarada."}, {"id": "735156907", "who": "Jady Queiroz — Eugênia", "txt": "Maria Clara indicou qual opção fazia mais sentido e explicou que só não pagaria naquele dia porque receberia em dia útil. Na retomada, a abordagem voltou a perguntar em qual opção seguir, perdendo uma informação decisiva já disponível."}, {"id": "731004390", "who": "Sofia Lunga — Eugênia Seller — CONTRAPONTO", "txt": "Sofia fez follow-up sobre a pendência real: pagamento. Perguntou se o pagamento deu certo, ofereceu apoio em caso de dificuldade e alertou sobre expiração da proposta. É o comportamento esperado para retomada orientada pela última barreira."}], "lei": "Na amostra consolidada de 22 IDs de Eugênia, Eugênia Cotação e Eugênia Seller, o SLA aparece como um sinal operacional relevante, mas não deve ser a pauta central desta leitura. O maior risco comercial está na perda de continuidade entre o que o cliente já informou e a forma como o atendimento humano assume a negociação.\n\nO principal ofensor comercial classificado foi aproveitamento das informações, presente em 13 de 22 atendimentos (59.1%). Em diferentes jornadas, o bot já havia coletado cidade, idade, composição, produto, motivo de compra, orçamento ou até a barreira específica para fechar. Quando o promotor repete perguntas, pergunta novamente qual opção o cliente quer ou inicia uma abordagem genérica, parte do valor desse histórico é perdida.\n\nTambém há recorrência de 'cotando mais do que recomendando': opções são apresentadas, porém o cliente muitas vezes permanece responsável por decidir sozinho. O comportamento esperado é transformar as informações coletadas em uma indicação objetiva: qual plano faz mais sentido, por quê, qual limitação precisa ser considerada e qual próximo passo deve ser tomado.\n\nNo follow-up, a oportunidade é sair de mensagens amplas como 'vamos seguir?' e retomar a última barreira real. Se o cliente parou por preço, a retomada deve trabalhar preço; se precisava de cobertura nacional, essa deve ser a pauta; se faltava pagamento, o contato deve ser sobre pagamento. O caso de Sofia Lunga mostra essa prática aplicada de forma mais aderente.\n\nImpacto comercial: quando o histórico não é utilizado e a recomendação não é clara, alongamos a jornada, aumentamos o esforço do cliente e reduzimos a chance de transformar intenção em fechamento. A solução é estabelecer uma passagem de bastão: antes de interagir, ler as últimas informações, identificar a barreira atual e iniciar a conversa exatamente desse ponto.", "op": "OPORTUNIDADE PRINCIPAL: criar uma regra de continuidade para as três filas. Antes da primeira mensagem humana, o promotor deve identificar no histórico: 1) o que o cliente procura; 2) quais opções/valores já recebeu; 3) qual foi a última objeção ou pendência; e 4) qual recomendação será feita. A abordagem deve começar pela última barreira, e não por uma nova descoberta.", "nota": "Nota metodológica: foram considerados os 22 IDs recuperados no bloco de arquivos enviado para Eugênia, Eugênia Cotação e Eugênia Seller em 28/09/2026. A classificação é conservadora e baseada nas evidências recuperadas dos próprios atendimentos; um mesmo ID pode conter mais de um ofensor, portanto os percentuais não somam 100%. Arquivos identificados como 'continuação' foram mantidos como IDs distintos porque representam sessões distintas no histórico."}, {"key": "pme", "short": "PME", "long": "PME", "title": "PME | DIAGNÓSTICO DOS 5 PRINCIPAIS OFENSORES", "pauta": null, "rows": [{"id": "725155532", "colab": "Deliane Gonzaga Gomes", "obj": true, "sla": true, "cot": true, "fup": true, "apr": true, "obs": "Cliente buscava o menor valor possível, considerou o preço 'um pouco salgado', comparou CPF/CNPJ e perguntou se incluir outra pessoa reduziria o valor. Houve novas simulações e follow-up, mas faltou transformar orçamento, composição e barreira de preço em recomendação objetiva e fechamento."}, {"id": "735187102", "colab": "Julia Silva", "obj": false, "sla": true, "cot": true, "fup": false, "apr": false, "obs": "Promotora confirmou plano novo, cidade/idade, apresentou opções de coparticipação e explicou diferenças. Ao final perguntou 'Qual plano ficaria melhor?', deixando a escolha com o cliente em vez de recomendar a opção mais aderente ao perfil levantado."}, {"id": "732192095", "colab": "Bruna Campassi", "obj": false, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Atendimento PME/NDI com documentação empresarial, boleto, desconto de 50% + taxa de adesão e follow-ups sobre pagamento/comprovante. Houve múltiplos registros de SLA, mas a jornada comercial avançou para etapa de pagamento."}], "ev": [{"id": "725155532", "who": "Deliane Gonzaga Gomes", "txt": "CASO MAIS REPRESENTATIVO: cliente busca o menor valor possível, considera o preço 'um pouco salgado', compara CPF/CNPJ e pergunta se incluir outra pessoa reduziria o valor. Foram feitas simulações, mas havia oportunidade de usar orçamento, composição e objeção para recomendar a melhor estrutura e conduzir ao fechamento."}, {"id": "735187102", "who": "Julia Silva", "txt": "Após levantar plano novo, cidade e idade, são apresentadas opções e diferenças de coparticipação. A pergunta 'Qual plano ficaria melhor?' transfere a decisão ao cliente. Oportunidade: o promotor deveria recomendar qual opção é mais adequada e explicar por quê."}, {"id": "732192095", "who": "Bruna Campassi", "txt": "CONTRAPONTO: apesar de múltiplos registros de SLA, a jornada avançou para documentação empresarial, boleto, desconto/taxa de adesão e follow-ups sobre pagamento e comprovante. Mostra que SLA deve ser acompanhado, mas não é a única variável comercial da análise."}], "lei": "Na amostra recuperada de 3 atendimentos PME, o SLA aparece nos 3 casos (100%), mas não é o eixo principal desta leitura. O comportamento comercial mais relevante é 'cotando mais do que recomendando', identificado em 2 dos 3 atendimentos (66,7%).\n\nNo PME, o cliente normalmente entrega várias informações que deveriam orientar a construção da proposta: quantidade e idade das vidas, possibilidade de CPF ou CNPJ, faixa de investimento, preferência por coparticipação e composição da contratação. O risco aparece quando essas informações geram apenas novas simulações e comparações, sem que o promotor assuma uma posição consultiva e diga qual configuração recomenda, por qual motivo e qual deve ser o próximo passo.\n\nA sessão 725155532 concentra os principais sinais: a cliente pede o menor valor possível, considera o preço ainda 'salgado', compara CPF/CNPJ e pergunta se acrescentar uma pessoa reduziria o valor. Essas informações já permitiam estruturar uma recomendação comercial baseada em orçamento e composição. Na sessão 735187102, depois de apresentar as opções, a condução termina perguntando ao próprio cliente qual plano ficaria melhor, quando a oportunidade era justamente recomendar a alternativa mais aderente.\n\nO impacto comercial é transformar uma venda consultiva em uma sequência de cotações. A solução é usar as informações coletadas para reduzir o leque, recomendar uma composição objetiva e conduzir para fechamento. Objeção e follow-up devem partir do mesmo princípio: se preço foi a barreira, a retomada precisa voltar com uma alternativa construída sobre o orçamento já informado.", "op": "OPORTUNIDADE PRINCIPAL: no PME, sair da lógica de apenas simular possibilidades e assumir uma condução consultiva. Depois de entender vidas, CNPJ/CPF, orçamento e cobertura, o promotor deve recomendar a composição mais adequada, justificar a escolha e direcionar o cliente para o fechamento.", "nota": "Nota metodológica: este dashboard considera os 3 atendimentos PME recuperados do bloco indicado no histórico: 725155532, 735187102 e 732192095. A classificação é conservadora e só marca um ofensor quando a evidência recuperada sustenta o comportamento. Um mesmo atendimento pode conter mais de um ofensor; por isso, os percentuais não somam 100%."}, {"key": "carrinho", "short": "Carrinho", "long": "Carrinho", "title": "CARRINHO | DIAGNÓSTICO DOS 5 PRINCIPAIS OFENSORES", "pauta": null, "rows": [{"id": "733796322", "colab": "Isabella Souza", "obj": false, "sla": false, "cot": true, "fup": false, "apr": true, "obs": "Cliente informou Goiânia, 25 anos e que havia tido Hapvida dois meses antes. A condução seguiu para explicação genérica entre ambulatorial/completo, sem usar o histórico recente do cliente para personalizar a recomendação. Quando ele perguntou a diferença de valor, havia oportunidade clara de comparar e recomendar."}, {"id": "735912843", "colab": "Giovanna Barbieri", "obj": false, "sla": true, "cot": true, "fup": true, "apr": true, "obs": "Cliente informou composição/possível dependente e depois respondeu que não possuía CNPJ/MEI. Ainda assim foram mostradas contratação individual e empresarial. Foram enviadas opções e o cliente ficou responsável por analisar qual se adequava melhor. Follow-ups posteriores perguntaram qual opção chamou atenção, sem retomar de forma objetiva a necessidade já informada."}, {"id": "733799804", "colab": "Mariana Prado", "obj": false, "sla": true, "cot": true, "fup": true, "apr": false, "obs": "Cliente disse que precisava voltar a ter plano e pediu para ver os dois tipos. Foram apresentadas opções e diferenças de coparticipação, mas a decisão voltou ao cliente com 'qual deles te atenderia melhor?'. Após a última dúvida, não há evidência de retomada humana antes da mensagem automática posterior."}, {"id": "729973352", "colab": "Aline Gunello", "obj": false, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Contraponto positivo: cliente já estava em etapa documental. Aline acompanhou assinatura/certidão, retomou no dia seguinte, reforçou prazo e pendência documental e manteve condução para conclusão. Houve registro de SLA, mas o follow-up foi direcionado à barreira real."}, {"id": "726855598", "colab": "Aline Gunello", "obj": false, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Cliente declarou interesse e informou que seria plano novo empresarial. Aline retomou a simulação pedindo idade e cidade para montar proposta. Há violação de SLA na entrada, mas a evidência disponível mostra continuidade coerente com o contexto informado."}, {"id": "737974317", "colab": "Gabriela Reis", "obj": false, "sla": false, "cot": true, "fup": false, "apr": true, "obs": "Cliente informou possuir MEI e CPF, mas que seria apenas uma pessoa; após esclarecer que PME exigia duas pessoas, definiu contratação por CPF. A condução apresentou ambulatorial/completo e perguntou 'qual fica melhor?', em vez de recomendar com base no contexto já esclarecido."}], "ev": [{"id": "733796322", "who": "Isabella Souza", "txt": "Cliente informa que teve Hapvida há apenas dois meses. Mesmo com esse histórico disponível, a condução volta para uma explicação genérica de ambulatorial x completo. Quando pergunta a diferença de valor, havia oportunidade de aproveitar o histórico e recomendar diretamente uma alternativa."}, {"id": "735912843", "who": "Giovanna Barbieri", "txt": "Cliente informa que não possui CNPJ/MEI, mas depois recebe opção individual e empresarial. Também diz que vai analisar qual se adequa melhor. Aqui se cruzam três oportunidades: usar corretamente a informação já fornecida, recomendar em vez de deixar a escolha totalmente com o cliente e fazer follow-up retomando a necessidade real."}, {"id": "729973352", "who": "Aline Gunello — CONTRAPONTO", "txt": "Cliente estava travado em documentação. Aline retoma exatamente a pendência — certidão/assinatura —, reforça prazo e acompanha a regularização. Mostra o comportamento desejado no Carrinho: usar o estágio já alcançado e atuar sobre a barreira que impede a conclusão."}], "lei": "Na amostra recuperada de 6 atendimentos do Carrinho, o principal comportamento comercial identificado é 'cotando mais do que recomendando', presente em 4 casos (66,7%). O SLA também aparece em 4 atendimentos (66,7%), mas, para esta fila, o ponto central da discussão deve ser a qualidade da continuidade da venda, porque o cliente do Carrinho já chega com intenção demonstrada e, em muitos casos, com informações previamente fornecidas.\n\nEm 3 atendimentos (50,0%), encontramos oportunidade de aproveitar melhor informações já disponíveis. Há exemplos de cliente que havia tido Hapvida recentemente, cliente que informou não possuir CNPJ/MEI e cliente que já havia definido que a contratação seria por CPF. Quando a condução volta para perguntas ou apresentações genéricas, perdemos justamente a vantagem do Carrinho: o histórico deveria permitir avançar mais rápido para recomendação e fechamento.\n\nTambém identificamos 2 casos (33,3%) com oportunidade de follow-up. O ponto não é apenas voltar a falar com o cliente, mas retomar a última barreira ou decisão pendente. O contraponto da sessão 729973352 mostra essa diferença: Aline Gunello acompanha a documentação que estava impedindo a conclusão e mantém o contato direcionado à pendência real.\n\nO impacto comercial é transformar um lead já aquecido em uma nova jornada de descoberta e comparação. A solução é tratar o Carrinho como continuidade de venda: ler o histórico antes da abordagem, partir do ponto em que o cliente parou, recomendar uma alternativa com base no que já sabemos e usar o follow-up para remover a barreira específica que impede o fechamento.", "op": "OPORTUNIDADE PRINCIPAL: no Carrinho, não reiniciar a venda. Usar o histórico e as informações já coletadas para chegar rapidamente à recomendação, retomar a última barreira do cliente e conduzir a oportunidade aquecida para conclusão.", "nota": "Nota metodológica: dashboard construído com 6 atendimentos únicos do Carrinho recuperados dos arquivos/histórico disponíveis: 733796322, 735912843, 733799804, 729973352, 726855598 e 737974317. A classificação é conservadora: um ofensor só foi marcado quando a evidência recuperada o sustenta. Um mesmo atendimento pode conter mais de um ofensor; portanto, os percentuais não somam 100%. No tópico Objeção, a evidência disponível não foi suficiente para classificar ocorrência com segurança."}, {"key": "cancelados", "short": "Base Cancelados", "long": "Base de Cancelados", "title": "BASE DE CANCELADOS | DIAGNÓSTICO DAS MONITORIAS", "pauta": null, "rows": [{"id": "729806776", "colab": "Raissa Burin", "sla": true, "status": "Violação SLA", "obs": "Registro de violação de SLA durante a jornada."}, {"id": "730667151", "colab": "Beatriz Rafaela Silvestre", "sla": true, "status": "Violação SLA", "obs": "Mauro relata preço alto às 09:36:28; SLA às 09:32:01, 09:43:01 e 11:27:01."}, {"id": "729636928", "colab": "Andrezza Machini", "sla": true, "status": "Violação SLA", "obs": "Registro de violação de SLA durante a jornada."}, {"id": "729636952", "colab": "Raissa Burin", "sla": true, "status": "Violação SLA", "obs": "Sthéfany pede as duas opções às 09:11:04; SLA às 09:15:01; cotação às 09:25:03."}, {"id": "732150926", "colab": "Victor Hugo Martins", "sla": true, "status": "Violação SLA", "obs": "Registro de violação de SLA durante a jornada."}, {"id": "729784154", "colab": "Bruno Ferreira", "sla": true, "status": "Violação SLA", "obs": "Cliente quer permanecer no Smart 500 às 12:00:45; SLA às 12:02:01; resposta às 13:50:46 (~1h50)."}, {"id": "732720290", "colab": "Andrezza Machini", "sla": true, "status": "Venda convertida + SLA", "obs": "Houve violação de SLA, mas a negociação foi sustentada até pagamento e comprovante."}, {"id": "730010714", "colab": "Thaisa Almeida", "sla": true, "status": "Violação SLA", "obs": "Registro de violação de SLA durante a jornada."}, {"id": "730785975", "colab": "Victor Hugo Martins", "sla": false, "status": "Sem violação identificada", "obs": "Cliente apresentou objeção de preço; sem violação de SLA identificada na monitoria."}, {"id": "729637733", "colab": "Beatriz Rafaela Silvestre", "sla": false, "status": "Sem violação identificada", "obs": "Cliente declarou 'Sem dinheiro'; atendimento encerrado sem abordagem comercial registrada."}], "ev": [{"id": "730667151", "who": "Beatriz Rafaela", "txt": "Mauro informa às 09:36:28 que o plano ficou muito caro. SLA às 09:32:01, 09:43:01 e 11:27:01. Às 11:23:36 reforça a objeção de preço."}, {"id": "729636952", "who": "Raissa Burin", "txt": "Sthéfany pede às 09:11:04 para ver as duas opções. Há violação às 09:15:01 e a cotação aparece às 09:25:03."}, {"id": "729784154", "who": "Bruno Ferreira — CASO CRÍTICO", "txt": "Cliente diz às 12:00:45 que quer permanecer no Smart 500. SLA às 12:02:01 e resposta somente às 13:50:46 — aproximadamente 1h50 depois."}], "lei": "Na amostra de 10 atendimentos da Base de Cancelados, identificamos violação de SLA em 8 casos, representando 80% dos atendimentos monitorados e envolvendo 6 colaboradores diferentes. A recorrência em diferentes promotores demonstra que o ponto de atenção não está concentrado em um único atendimento ou colaborador, mas aparece como um comportamento recorrente dentro da amostra analisada.\n\nAs evidências também mostram que a demora não acontece somente na abordagem inicial. Encontramos clientes aguardando retorno durante momentos importantes da negociação, inclusive após demonstrarem interesse, solicitarem opções de cotação ou apresentarem objeções. No caso mais crítico, o cliente informou que desejava permanecer no plano e aguardou aproximadamente 1h50 pela continuidade do atendimento.\n\nA oportunidade, portanto, é ampliar a gestão do SLA para toda a jornada comercial. Além de garantir a abordagem inicial em até 2 minutos, precisamos acompanhar o tempo de resposta sempre que o cliente voltar a interagir, principalmente após sinais de intenção de compra. O objetivo é preservar o ritmo da negociação e evitar que uma oportunidade ativa perca força enquanto aguarda a atuação do promotor.", "op": "OPORTUNIDADE: não medir apenas quanto tempo levamos para receber o lead, mas quanto tempo o cliente fica esperando enquanto está negociando.", "nota": null}, {"key": "adesao", "short": "Adesão", "long": "Adesão", "title": "ADESÃO | DIAGNÓSTICO DOS 5 PRINCIPAIS OFENSORES", "pauta": null, "rows": [{"id": "729682301", "colab": "Thiago Abelo", "obj": false, "sla": false, "cot": false, "fup": true, "apr": false, "obs": "Após cotação e dúvidas sobre uso/carência/coparticipação, as retomadas não trabalharam de forma específica a última dúvida/necessidade do cliente."}, {"id": "730846912", "colab": "Giovanna Ragonezi", "obj": true, "sla": true, "cot": true, "fup": false, "apr": true, "obs": "Cliente informou preço alto, teto de R$ 550 e prioridade hospitalar/emergência; depois declarou não ter entendido a proposta. Faltou transformar essas informações em recomendação mais simples e direcionada."}, {"id": "731047690", "colab": "Thiago Abelo", "obj": true, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "Cliente encerrou dizendo que os planos eram muito caros. Houve questionamento da objeção, mas não foi construída alternativa concreta de produto/faixa de valor antes do encerramento."}, {"id": "729666006", "colab": "Bruno Ferreira", "obj": false, "sla": true, "cot": true, "fup": true, "apr": false, "obs": "Cliente pediu orçamento por CPF e CNPJ e recebeu opções. A condução ficou concentrada na apresentação das alternativas e não houve retomada comercial personalizada antes do encerramento."}, {"id": "732887203", "colab": "Thami Francisquelli", "obj": false, "sla": true, "cot": false, "fup": true, "apr": false, "obs": "Houve envio de proposta e tentativa de fechamento no dia seguinte; oportunidade de tornar a retomada mais conectada ao ponto em que a negociação havia parado."}, {"id": "730012590", "colab": "Giovanna Ragonezi", "obj": true, "sla": true, "cot": false, "fup": false, "apr": true, "obs": "Cliente disse 'Mt cara' e informou teto de R$ 400. O orçamento foi identificado, mas a jornada teve sucessivas violações de SLA e não chegou ao fechamento."}, {"id": "732095411", "colab": "Thami Francisquelli", "obj": false, "sla": true, "cot": false, "fup": false, "apr": true, "obs": "Cliente trouxe informações sobre coparticipação, desconto para duas pessoas e possibilidade de PJ; havia insumos para recomendação mais direcionada, mas a negociação terminou sem conversão."}, {"id": "730709910", "colab": "Bruno Ferreira", "obj": false, "sla": true, "cot": false, "fup": false, "apr": true, "obs": "Atendimento iniciou com informação sobre o plano atual, mas não evoluiu para investigação/cotação; informação disponível não foi convertida em avanço comercial."}, {"id": "733085232", "colab": "Thami Francisquelli", "obj": false, "sla": true, "cot": false, "fup": false, "apr": false, "obs": "CONTRAPONTO POSITIVO: negociação sustentada, dúvidas de carência/terapias/coparticipação tratadas, retomada no dia seguinte, boleto gerado e comprovante de pagamento recebido."}], "ev": [{"id": "730846912", "who": "Giovanna Ragonezi", "txt": "Cliente entrega três informações decisivas: considera o valor alto, define teto de R$ 550 e prioriza hospitalar/emergência. Depois ainda relata não ter entendido a proposta. A oportunidade era usar esses dados para simplificar a oferta e recomendar objetivamente a opção mais aderente ao orçamento e à cobertura desejada."}, {"id": "730012590", "who": "Giovanna Ragonezi", "txt": "Cliente reage com “Mt cara” e informa que consegue pagar no máximo R$ 400. O teto de investimento passa a ser conhecido, mas a negociação não chega ao fechamento. A informação financeira deveria funcionar como direcionador imediato para nova alternativa e recomendação."}, {"id": "732095411 + 730709910", "who": "Thami / Bruno", "txt": "Nos dois casos já existiam informações úteis para avançar: composição, coparticipação, desconto/PJ ou plano atual. A oportunidade é evitar reiniciar ou manter a conversa genérica e transformar o histórico disponível em próxima ação comercial."}], "lei": null, "op": null, "nota": null}, {"key": "repique", "short": "Repique", "long": "Repique", "title": "REPIQUE | DIAGNÓSTICO DOS 5 PRINCIPAIS OFENSORES", "pauta": null, "rows": [{"id": "740666428", "colab": "Viviane Gumbio", "obj": true, "sla": false, "cot": false, "fup": true, "apr": true, "obs": "Cliente informou que o plano estava muito caro e o chat foi resolvido. Não houve exploração da objeção, contraproposta ou retomada direcionada, apesar do histórico já disponível."}, {"id": "744425359", "colab": "Beatriz Giglio", "obj": true, "sla": true, "cot": true, "fup": true, "apr": true, "obs": "Objeção explícita de preço; SLA violado; repetição de cidade/idade; follow-up genérico/tardio; necessidade de consultas, exames, emergência e possível internação já estava disponível, mas não virou recomendação objetiva."}, {"id": "738006072", "colab": "Beatriz Giglio", "obj": false, "sla": false, "cot": true, "fup": true, "apr": true, "obs": "SLA inicial conforme, porém a monitoria apontou deficiência no uso do histórico, follow-up e produto. Havia oportunidade de partir do contexto existente e avançar para recomendação/fechamento."}], "ev": [{"id": "740666428", "who": "Viviane Gumbio", "txt": "OBJEÇÃO + HISTÓRICO + FOLLOW-UP: cliente informa que o plano está muito caro. A negociação é encerrada sem investigar teto de investimento, reposicionar produto ou retomar com base no histórico de preços já apresentado."}, {"id": "744425359", "who": "Beatriz Giglio", "txt": "CASO MAIS COMPLETO: cliente já havia informado necessidade de consultas, exames, emergência e possível internação e depois pede opção mais em conta. Há repetição de perguntas, SLA violado, follow-up genérico/tardio e ausência de recomendação construída sobre necessidade + preço."}, {"id": "738006072", "who": "Beatriz Giglio", "txt": "SLA inicial conforme, mas a monitoria apontou deficiência no uso do histórico e no follow-up. O caso mostra que, no Repique, velocidade sozinha não resolve quando a retomada não utiliza o contexto existente."}], "lei": "Na amostra recuperada de 3 atendimentos do Repique, a principal pauta é o aproveitamento das informações já disponíveis, identificado nos 3 casos (100%), e diretamente conectado à qualidade do follow-up, também presente como oportunidade nos 3 atendimentos.\n\nO Repique trabalha uma oportunidade que já teve contato anterior. Por isso, cidade, idade, necessidade, produto, preço apresentado e motivo da não conversão deveriam ser o ponto de partida. Quando o promotor repete perguntas, faz retomada genérica ou volta apenas a apresentar opções, perde-se a principal vantagem dessa fila: já conhecer parte da jornada.\n\nNos casos 740666428 e 744425359, a objeção de preço aparece explicitamente. A oportunidade era usar essa informação para negociar: entender o teto, readequar cobertura, comparar alternativa e construir uma recomendação. No caso 738006072, mesmo com SLA inicial conforme, houve deficiência em histórico e follow-up, mostrando que responder rápido não é suficiente quando a retomada não utiliza o contexto existente.\n\nO impacto comercial é recuperar o lead sem recuperar a negociação. A solução é iniciar o Repique pela última informação relevante do histórico, trabalhar a objeção real e apresentar uma recomendação nova e objetiva, em vez de reconstruir toda a jornada.", "op": "OPORTUNIDADE PRINCIPAL: no Repique, não recomeçar o atendimento. Antes da abordagem, identificar no histórico o que o cliente queria, qual valor/produto recebeu e por que não avançou. A retomada deve começar por essa barreira, trazer uma alternativa e conduzir novamente ao fechamento.", "nota": "Nota metodológica: dashboard construído somente com os 3 atendimentos de Repique recuperados com evidência suficiente: 740666428, 744425359 e 738006072. A classificação é conservadora; um mesmo atendimento pode conter mais de um ofensor, portanto os percentuais não somam 100%. O atendimento 743482436, relacionado à regularização de débito/SAC, não foi incluído como ofensor comercial do Repique."}];
+const OFF=[
+  {k:'apr',n:'Aproveitamento das informações'},
+  {k:'cot',n:'Cotando mais do que recomendando'},
+  {k:'fup',n:'Follow-up'},
+  {k:'obj',n:'Objeção'},
+  {k:'sla',n:'SLA'}
+];
+const SHORT={apr:'Aproveit. info.',cot:'Cotando > recom.',fup:'Follow-up',obj:'Objeção',sla:'SLA'};
+const PAUTA={eugenia:'apr',pme:'cot',carrinho:'cot',adesao:'apr',repique:'apr'};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct=(a,b)=>b?(a/b*100).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%':'—';
+const cnt=(R,k)=>R.filter(r=>r[k]).length;
+
+function tag(who){
+  const w=who.toUpperCase();
+  if(w.includes('CONTRAPONTO'))return '<span class="pill p-ok">Contraponto positivo</span>';
+  if(w.includes('CRÍTICO'))return '<span class="pill p-bad">Caso crítico</span>';
+  return '';
+}
+function evTag(txt){
+  if(/^CONTRAPONTO/i.test(txt))return '<span class="pill p-ok">Contraponto positivo</span>';
+  if(/^CASO MAIS/i.test(txt))return '<span class="pill p-info">Caso mais representativo</span>';
+  return '';
+}
+function evCards(t){
+  return `<div class="evs">${t.ev.map(e=>{
+    const who=e.who.replace(/\s+—\s+(CONTRAPONTO|CASO CRÍTICO)$/i,'');
+    const txt=e.txt.replace(/^(CONTRAPONTO|CASO MAIS (REPRESENTATIVO|COMPLETO)):\s*/i,'');
+    return `<article class="ev"><div class="top"><span class="who">${esc(who)}</span>${tag(e.who)}${evTag(e.txt)}</div><div class="mono note">ID ${esc(e.id)}</div><p>${esc(txt)}</p></article>`}).join('')}</div>`;
+}
+function reading(t){
+  if(!t.lei&&!t.op)return '';
+  let h='';
+  if(t.op){let o=t.op.replace(/^OPORTUNIDADE( PRINCIPAL)?:\s*/,'');o=o.charAt(0).toUpperCase()+o.slice(1);h+=`<section class="opp"><div class="lbl">Oportunidade principal</div><p>${esc(o)}</p></section>`}
+  if(t.lei){const ps=t.lei.split(/\n\s*\n/);h+=`<section class="card"><div class="chead"><h2>Leitura gerencial</h2></div><div class="read"><p>${esc(ps[0])}</p>${ps.length>1?`<details><summary>Ler leitura completa</summary><div class="read">${ps.slice(1).map(p=>`<p>${esc(p)}</p>`).join('')}</div></details>`:''}</div></section>`}
+  return h;
+}
+const lvl=r=>r<=0?'c0':r<=.25?'cl1':r<=.5?'cl2':r<=.75?'cl3':r<1?'cl4':'cl5';
+
+function ofensorPanel(t){
+  const R=t.rows,N=R.length,pk=PAUTA[t.key];
+  const promos=[...new Set(R.map(r=>r.colab))];
+  const sla=cnt(R,'sla'),pc=cnt(R,pk);
+  const list=OFF.map(o=>({...o,c:cnt(R,o.k)})).sort((a,b)=>b.c-a.c||(a.k==='sla')-(b.k==='sla'));
+  const perId=R.map(r=>OFF.filter(o=>r[o.k]).length);
+  const media=(perId.reduce((a,b)=>a+b,0)/N).toLocaleString('pt-BR',{maximumFractionDigits:1});
+  let h=`<div class="kpis">
+    <div class="kpi"><span class="lbl">Amostra analisada</span><b>${N}</b><span class="sub">atendimentos monitorados</span></div>
+    <div class="kpi hl"><span class="lbl">Pauta principal</span><b class="txt">${esc(OFF.find(o=>o.k===pk).n)}</b><span class="sub">${pc} de ${N} atendimentos · ${pct(pc,N)}</span></div>
+    <div class="kpi"><span class="lbl">SLA violado</span><b>${pct(sla,N)}</b><span class="sub">${sla} de ${N} · sinal operacional</span></div>
+    <div class="kpi"><span class="lbl">Promotores envolvidos</span><b>${promos.length}</b><span class="sub">média de ${media} ofensores por atendimento</span></div>
+  </div>`;
+  // bars
+  h+=`<section class="card"><div class="chead"><h2>Os 5 ofensores na amostra</h2><span class="note">% dos ${N} atendimentos</span></div><div class="bars">`+
+    list.map(o=>{const isP=o.k===pk,isS=o.k==='sla';const col=isP?'var(--accent)':isS?'var(--neutral-bar)':'var(--accent-2)';
+      return `<div class="brow hit" data-tip="${esc(o.n)}: ${o.c} de ${N} atendimentos (${pct(o.c,N)})"><div class="name">${isP?'<small>Pauta principal</small>':isS?'<small>Operacional</small>':''}${esc(o.n)}</div><div class="track"><div class="fill" style="width:${N?o.c/N*100:0}%;background:${col}"></div></div><div class="val">${o.c} <span>· ${pct(o.c,N)}</span></div></div>`}).join('')+
+    `</div><div class="legend"><span><i style="background:var(--accent)"></i>Pauta principal</span><span><i style="background:var(--accent-2)"></i>Outros ofensores comerciais</span><span><i style="background:var(--neutral-bar)"></i>SLA (operacional)</span></div><p class="note">Um atendimento pode ter mais de um ofensor; os percentuais não somam 100%.</p></section>`;
+  // matrix
+  const prow=promos.map(p=>{const S=R.filter(r=>r.colab===p);return {p,S,tot:OFF.reduce((a,o)=>a+cnt(S,o.k),0)}}).sort((a,b)=>b.tot-a.tot||b.S.length-a.S.length||a.p.localeCompare(b.p));
+  h+=`<section class="card"><div class="chead"><h2>Onde cada promotor(a) concentra os ofensores</h2><span class="scale">0%<i style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s3)"></i><i style="background:var(--s4)"></i><i style="background:var(--s5)"></i>100%</span></div><div class="tbl"><table class="mx"><thead><tr><th>Promotor(a)</th><th class="n">Atend.</th>${list.map(o=>`<th class="n">${SHORT[o.k]}</th>`).join('')}</tr></thead><tbody>`+
+    prow.map(({p,S})=>`<tr><td>${esc(p)}</td><td class="n">${S.length}</td>${list.map(o=>{const c=cnt(S,o.k);return `<td class="c"><span class="cell hit ${lvl(c/S.length)}" data-tip="${esc(p)} · ${esc(o.n)}: ${c} de ${S.length} atendimento(s)">${c?c+'/'+S.length:'—'}</span></td>`}).join('')}</tr>`).join('')+
+    `</tbody></table></div><p class="note">Cada célula mostra em quantos atendimentos do(a) promotor(a) o ofensor apareceu. Ordenado pelo total de ofensores.</p></section>`;
+  // fila breakdown (Eugênia)
+  if(R.some(r=>r.fila)){
+    const filas=[...new Set(R.map(r=>r.fila))];
+    h+=`<section class="card"><div class="chead"><h2>Ofensores por fila</h2><span class="note">quantidade e % dos atendimentos de cada fila</span></div><div class="tbl"><table class="mx"><thead><tr><th>Fila</th><th class="n">Atend.</th>${list.map(o=>`<th class="n">${SHORT[o.k]}</th>`).join('')}</tr></thead><tbody>`+
+      filas.map(f=>{const S=R.filter(r=>r.fila===f);return `<tr><td>${esc(f)}</td><td class="n">${S.length}</td>${list.map(o=>{const c=cnt(S,o.k);return `<td class="c"><span class="cell hit ${lvl(c/S.length)}" data-tip="${esc(f)} · ${esc(o.n)}: ${c} de ${S.length} (${pct(c,S.length)})">${c?pct(c,S.length):'—'}</span></td>`}).join('')}</tr>`}).join('')+
+      `</tbody></table></div></section>`;
+  }
+  h+=reading(t);
+  h+=`<section class="chead" style="margin-top:4px"><h2>Evidências fortes</h2></section>`+evCards(t);
+  // base
+  h+=`<section class="card"><details><summary>Ver base de monitorias (${N} atendimentos)</summary><div class="tbl"><table><thead><tr><th>ID</th>${R.some(r=>r.fila)?'<th>Fila</th>':''}<th>Promotor(a)</th>${OFF.map(o=>`<th class="n">${SHORT[o.k]}</th>`).join('')}<th>Evidência / observação</th></tr></thead><tbody>`+
+    R.map(r=>`<tr><td class="id">${esc(r.id)}</td>${r.fila!==undefined?`<td>${esc(r.fila)}</td>`:''}<td>${esc(r.colab)}</td>${OFF.map(o=>`<td class="n"><span class="dot${r[o.k]?'':' no'}" role="img" aria-label="${r[o.k]?'Sim':'Não'}"></span></td>`).join('')}<td class="obs">${esc(r.obs)}</td></tr>`).join('')+
+    `</tbody></table></div></details></section>`;
+  if(t.nota)h+=`<p class="note" style="max-width:90ch">${esc(t.nota)}</p>`;
+  return h;
+}
+
+function canceladosPanel(t){
+  const R=t.rows,N=R.length,v=cnt(R,'sla');
+  const promos=[...new Set(R.map(r=>r.colab))];
+  const pv=[...new Set(R.filter(r=>r.sla).map(r=>r.colab))];
+  const conv=R.filter(r=>/Venda/i.test(r.status||'')).length;
+  let h=`<div class="kpis">
+    <div class="kpi"><span class="lbl">Amostra analisada</span><b>${N}</b><span class="sub">atendimentos monitorados</span></div>
+    <div class="kpi hl"><span class="lbl">Com violação de SLA</span><b>${v}</b><span class="sub">${v} de ${N} atendimentos</span></div>
+    <div class="kpi"><span class="lbl">Incidência de SLA</span><b>${pct(v,N)}</b><span class="sub">da amostra</span></div>
+    <div class="kpi"><span class="lbl">Promotores com violação</span><b>${pv.length}</b><span class="sub">de ${promos.length} promotores na amostra</span></div>
+  </div>`;
+  // split bar
+  h+=`<div class="grid2"><section class="card"><div class="chead"><h2>SLA na amostra</h2><span class="note">${N} atendimentos</span></div>
+    <div style="display:flex;height:22px;border-radius:4px;overflow:hidden;gap:2px">
+      <div class="hit" style="width:${v/N*100}%;background:var(--bad)" data-tip="Com violação: ${v} (${pct(v,N)})"></div>
+      <div class="hit" style="width:${(N-v)/N*100}%;background:var(--ok)" data-tip="Sem violação: ${N-v} (${pct(N-v,N)})"></div>
+    </div>
+    <div class="legend"><span><i style="background:var(--bad)"></i>✕ Com violação · ${v} (${pct(v,N)})</span><span><i style="background:var(--ok)"></i>✓ Sem violação · ${N-v} (${pct(N-v,N)})</span></div>
+    ${conv?`<p class="note">${conv} dos atendimentos com violação ainda converteu em venda (negociação sustentada até o pagamento).</p>`:''}
+  </section>`;
+  const pr=promos.map(p=>{const S=R.filter(r=>r.colab===p);return {p,n:S.length,v:cnt(S,'sla')}}).sort((a,b)=>b.v-a.v||b.n-a.n||a.p.localeCompare(b.p));
+  const mx=Math.max(...pr.map(x=>x.n));
+  h+=`<section class="card"><div class="chead"><h2>Violações por promotor(a)</h2><span class="note">violações / atendimentos</span></div><div class="bars">`+
+    pr.map(x=>`<div class="brow hit" data-tip="${esc(x.p)}: ${x.v} violação(ões) em ${x.n} atendimento(s)"><div class="name">${esc(x.p)}</div><div class="track"><div class="fill" style="width:${x.n/mx*100}%;background:var(--accent-3);border-radius:4px"></div><div class="fill" style="width:${x.v/mx*100}%;background:var(--bad)"></div></div><div class="val">${x.v} <span>/ ${x.n}</span></div></div>`).join('')+
+    `</div><div class="legend"><span><i style="background:var(--bad)"></i>Atendimentos com violação</span><span><i style="background:var(--accent-3)"></i>Total de atendimentos</span></div></section></div>`;
+  h+=reading(t);
+  h+=`<section class="chead" style="margin-top:4px"><h2>Evidências fortes</h2></section>`+evCards(t);
+  const st=s=>/Venda/i.test(s)?'<span class="pill p-warn">Venda convertida + SLA</span>':/Sem/i.test(s)?'<span class="pill p-ok">✓ Sem violação</span>':'<span class="pill p-bad">✕ Violação SLA</span>';
+  h+=`<section class="card"><details><summary>Ver base de monitorias (${N} atendimentos)</summary><div class="tbl"><table><thead><tr><th>ID</th><th>Promotor(a)</th><th>Status</th><th>Evidência / observação</th></tr></thead><tbody>`+
+    R.map(r=>`<tr><td class="id">${esc(r.id)}</td><td>${esc(r.colab)}</td><td>${st(r.status||'')}</td><td class="obs">${esc(r.obs)}</td></tr>`).join('')+`</tbody></table></div></details></section>`;
+  return h;
+}
+
+const tabs=$('tabs');
+tabs.innerHTML=DATA.map((t,i)=>`<button class="tab" role="tab" id="tab-${t.key}" aria-selected="false" aria-controls="panel" data-k="${t.key}"><b>${esc(t.short)}</b><span>${t.rows.length} atendimentos</span></button>`).join('');
+function show(k,push){
+  const t=DATA.find(d=>d.key===k)||DATA[0];
+  tabs.querySelectorAll('.tab').forEach(b=>{const on=b.dataset.k===t.key;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1});
+  const head=`<div class="phead"><div><div class="eyebrow">${esc(t.long)}</div><h2 style="font-size:20px;margin-top:2px">${t.key==='cancelados'?'Diagnóstico de SLA nas monitorias':'Diagnóstico dos 5 principais ofensores'}</h2></div></div>`;
+  $('panel').innerHTML=head+(t.key==='cancelados'?canceladosPanel(t):ofensorPanel(t));
+  $('panel').setAttribute('aria-labelledby','tab-'+t.key);
+  if(push){try{history.replaceState(null,'','#'+t.key)}catch(e){}}
+  try{localStorage.setItem('mon-tab',t.key)}catch(e){}
+}
+tabs.addEventListener('click',e=>{const b=e.target.closest('.tab');if(b){show(b.dataset.k,true);b.scrollIntoView({block:'nearest',inline:'nearest'})}});
+tabs.addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft'].includes(e.key))return;const bs=[...tabs.querySelectorAll('.tab')];const i=bs.findIndex(b=>b.getAttribute('aria-selected')==='true');const n=bs[(i+(e.key==='ArrowRight'?1:-1)+bs.length)%bs.length];n.focus();show(n.dataset.k,true)});
+let start=(location.hash||'').slice(1);if(!DATA.some(d=>d.key===start)){try{start=localStorage.getItem('mon-tab')||''}catch(e){start=''}}
+show(start||DATA[0].key,false);
+// tooltip
+const tip=$('tip');
+document.addEventListener('mousemove',e=>{const h=e.target.closest('.hit');if(!h||!h.dataset.tip){tip.hidden=true;return}tip.textContent=h.dataset.tip;tip.hidden=false;const x=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8),y=Math.min(e.clientY+14,innerHeight-tip.offsetHeight-8);tip.style.left=x+'px';tip.style.top=y+'px'});
+document.addEventListener('mouseleave',()=>tip.hidden=true);
+</script>
+
 </body>
 </html>
