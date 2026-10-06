@@ -1,394 +1,817 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Painel de Monitorias Comerciais</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel de disparos e problemas sistêmicos · set/out 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: sticky brand bar + horizontal tab strip; each tab = summary KPIs → reading → chart + actions → case table → adjustments */
 :root{
-  --bg:#f5f7fa; --surface:#ffffff; --surface-2:#eef1f5; --ink:#1f2a3a; --ink-2:#4a5568; --muted:#6b7689;
-  --line:#e2e6ec; --line-strong:#ccd3dd;
-  --primary:#1539aa; --primary-ink:#1539aa; --primary-soft:#e4eafb; --bar-weak:#a9bbef; --heat:21,57,170;
-  --brand-bar:#0f2f8f; --brand-ink:#ffffff; --brand-muted:#c2d0f6;
-  --good:#157a3c; --good-soft:#e3f4e9; --bad:#b4232b; --bad-soft:#fde8e8; --warn:#8a5300; --warn-soft:#fff3d6;
-  --accent-warm:#ff8800;
-  --f-display:"Hanken Grotesk","Pitanga",system-ui,sans-serif;
-  --f-body:"Inter","Segoe UI",system-ui,sans-serif;
-  --f-mono:"Roboto Mono",ui-monospace,Menlo,monospace;
-  --r:10px; --shadow:0 2px 10px -2px rgba(20,28,40,.08);
+  --bg:#f2f4f8; --paper:#ffffff; --ink:#122033; --ink2:#46566c; --line:#dce3ec; --muted:#eef2f7;
+  --petrol:#2a78d6; --petrol-soft:#e3edf9; --sky:#8dbaf0; --accent:#1d5fae; --p2:#eb6834; --p2-soft:#fdeee6;
+  --warn:#b77d00; --warn-soft:#fbf1d9; --bad:#cf3f36; --bad-soft:#fbe6e4; --good:#1f9254; --good-soft:#e2f3e9;
+  --shadow:0 1px 2px rgba(18,32,51,.06),0 2px 8px rgba(18,32,51,.04);
+  --serif:"Bricolage Grotesque","Figtree",system-ui,sans-serif; --sans:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-sizing:border-box; padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e141e; --surface:#161f2d; --surface-2:#1d2838; --ink:#e7ecf4; --ink-2:#b4bfcf; --muted:#8c98ab;
-  --line:#26324a; --line-strong:#34425c;
-  --primary:#6d8fe8; --primary-ink:#9db4f2; --primary-soft:#1b2a52; --bar-weak:#3b4f86; --heat:109,143,232;
-  --brand-bar:#0b1736; --brand-ink:#e7ecf4; --brand-muted:#8aa4ec;
-  --good:#5cc98a; --good-soft:#123222; --bad:#f08a8f; --bad-soft:#3a1719; --warn:#f2bf55; --warn-soft:#33270d;
-  --shadow:0 2px 10px -2px rgba(0,0,0,.4); color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0e141e; --surface:#161f2d; --surface-2:#1d2838; --ink:#e7ecf4; --ink-2:#b4bfcf; --muted:#8c98ab;
-  --line:#26324a; --line-strong:#34425c;
-  --primary:#6d8fe8; --primary-ink:#9db4f2; --primary-soft:#1b2a52; --bar-weak:#3b4f86; --heat:109,143,232;
-  --brand-bar:#0b1736; --brand-ink:#e7ecf4; --brand-muted:#8aa4ec;
-  --good:#5cc98a; --good-soft:#123222; --bad:#f08a8f; --bad-soft:#3a1719; --warn:#f2bf55; --warn-soft:#33270d;
-  --shadow:0 2px 10px -2px rgba(0,0,0,.4); color-scheme:dark}
-
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--brand-bar);color:var(--brand-ink)}
-.brand{max-width:1240px;margin:0 auto;padding:12px 24px 0;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-.brand b{font-family:var(--f-display);font-weight:600;font-size:17px;letter-spacing:-.01em}
-.brand span{color:var(--brand-muted);font-size:12px}
-.tabs{max-width:1240px;margin:0 auto;padding:8px 24px 0;display:flex;gap:2px;overflow-x:auto;scrollbar-width:thin}
-.tab{appearance:none;border:0;background:transparent;color:var(--brand-muted);font:500 13px/1 var(--f-body);padding:11px 14px 13px;border-radius:8px 8px 0 0;white-space:nowrap;cursor:pointer;position:relative}
-.tab:hover{color:var(--brand-ink);background:rgba(255,255,255,.07)}
-.tab[aria-selected="true"]{background:var(--bg);color:var(--ink)}
-.tab:focus-visible{outline:2px solid var(--accent-warm);outline-offset:-2px}
-.tab .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent-warm);margin-left:6px;vertical-align:middle}
-main{max-width:1240px;margin:0 auto;padding-inline:24px;padding-block:28px 64px}
-.page{display:grid;gap:22px}
-.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-h1{font-family:var(--f-display);font-weight:500;font-size:32px;line-height:1.15;margin:4px 0 6px;letter-spacing:-.02em;text-wrap:balance}
-h2{font-family:var(--f-display);font-weight:600;font-size:18px;margin:0 0 4px;letter-spacing:-.01em}
-.sub{color:var(--ink-2);max-width:78ch;margin:0}
-.hint{color:var(--muted);font-size:12.5px;margin:0 0 14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow);min-width:0}
-.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;min-width:0}
-.kpi .v{font-family:var(--f-display);font-size:28px;font-weight:600;line-height:1.1;margin-top:6px;font-variant-numeric:tabular-nums}
-.kpi .v small{font-size:15px;font-weight:500;color:var(--ink-2)}
-.kpi .t{font-family:var(--f-display);font-size:18px;font-weight:600;line-height:1.2;margin-top:6px}
-.kpi .d{color:var(--ink-2);font-size:12.5px;margin-top:4px}
-.resumo{background:var(--primary-soft);border-radius:var(--r);padding:18px 22px;display:grid;gap:6px}
-.resumo p{margin:0;font-size:15.5px;line-height:1.55;max-width:95ch}
-.resumo .eyebrow{color:var(--primary-ink)}
-.two{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
-/* bars */
-.bars{display:grid;gap:14px}
-.bar-row{display:grid;grid-template-columns:minmax(0,230px) minmax(0,1fr) 92px;gap:14px;align-items:center}
-.bar-row .lbl b{display:block;font-weight:600;font-size:13.5px}
-.bar-row .lbl > span{display:block;color:var(--muted);font-size:12px;line-height:1.35}
-.track{position:relative;height:22px;background:var(--surface-2);border-radius:4px}
-.fill{position:absolute;inset:0 auto 0 0;background:var(--primary);border-radius:4px}
-.fill.ctx{background:var(--bar-weak)}
-.fill.top{background:var(--primary)}
-.ghost{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink-2);opacity:.75}
-.val{text-align:right;font-variant-numeric:tabular-nums}
-.val b{font-size:15px;font-family:var(--f-display)}
-.val span{display:block;color:var(--muted);font-size:11.5px}
-.tag{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);margin-left:6px;vertical-align:1px}
-.legend-note{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:14px}
-.legend-note i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-/* actions */
-ol.acoes{margin:0;padding:0;list-style:none;counter-reset:a;display:grid;gap:10px}
-ol.acoes li{counter-increment:a;display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start}
-ol.acoes li::before{content:counter(a);width:24px;height:24px;border-radius:50%;background:var(--primary-soft);color:var(--primary-ink);font:600 12px/24px var(--f-body);text-align:center}
-/* table */
-.tbl-wrap{overflow-x:auto;margin:0 -4px}
-table{border-collapse:collapse;width:100%;font-size:13px}
-th{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
-th.c,td.c{text-align:center}
-td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
-tbody tr.main{cursor:pointer}
-tbody tr.main:hover td{background:var(--surface-2)}
-tbody tr.main:focus-visible td{outline:2px solid var(--primary);outline-offset:-2px}
-tr.excl td{color:var(--muted)}
-.mono{font-family:var(--f-mono);font-size:12.5px;white-space:nowrap}
-.yes{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--bad)}
-.no{display:inline-block;width:10px;height:2px;background:var(--line-strong);vertical-align:middle}
-tr.excl .yes{background:var(--line-strong)}
-.chip{display:inline-block;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:999px;white-space:nowrap}
-.chip.perda{background:var(--bad-soft);color:var(--bad)}
-.chip.ok{background:var(--good-soft);color:var(--good)}
-.chip.ex{background:var(--surface-2);color:var(--muted)}
-.chip.warn{background:var(--warn-soft);color:var(--warn)}
-.flag{display:inline-block;font-size:10.5px;color:var(--warn);background:var(--warn-soft);padding:1px 6px;border-radius:4px;margin-left:6px}
-tr.det td{background:var(--surface-2);padding:12px 14px 14px;color:var(--ink-2)}
-tr.det p{margin:0 0 4px;max-width:110ch}
-tr.det b{color:var(--ink)}
-.caret{display:inline-block;transition:transform .16s;color:var(--muted);margin-right:6px}
-tr.open .caret{transform:rotate(90deg)}
-/* cases */
-.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-.case{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--surface);display:grid;gap:6px;align-content:start}
-.case .h{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
-.case p{margin:0;color:var(--ink-2);font-size:13px}
-.case .who{font-weight:600;font-size:13.5px}
-/* adjust */
-.ajustes{border:1px dashed var(--line-strong);border-radius:var(--r);padding:16px 20px;background:transparent}
-.ajustes ul{margin:8px 0 0;padding-left:18px;display:grid;gap:6px;color:var(--ink-2)}
-.ajustes li{max-width:110ch}
+  --bg:#0d131b; --paper:#151e29; --ink:#edf1f6; --ink2:#b4c0ce; --line:#283545; --muted:#1b2633;
+  --petrol:#3987e5; --petrol-soft:#1c2c42; --sky:#4c89d6; --accent:#6aa5ec; --p2:#e0662f; --p2-soft:#3a2418;
+  --warn:#e0a82e; --warn-soft:#352a12; --bad:#ec6a61; --bad-soft:#3a1c1a; --good:#3cb371; --good-soft:#16301f; --shadow:none;}}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans);font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--petrol);outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:20;background:var(--paper);color:var(--ink);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding-top:env(safe-area-inset-top,0px)}
+.topbar .in{max-width:1240px;margin:0 auto;padding:14px 20px 0;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+.brand h1{font:700 22px/1.2 var(--serif);margin:0;letter-spacing:-.01em}
+.brand p{margin:2px 0 12px;color:var(--ink2);font-size:13px}
+nav{display:flex;gap:2px;overflow-x:auto;max-width:100%}
+nav button{background:none;border:0;color:var(--ink2);padding:10px 14px 12px;font-weight:600;font-size:14px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+nav button:hover{color:var(--ink)}
+nav button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+main{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+.view{display:none}.view.on{display:block}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:1fr 1fr} .g21{grid-template-columns:2fr 1fr} .g12{grid-template-columns:1fr 2fr}
+@media (max-width:980px){.g4{grid-template-columns:1fr 1fr}.g3,.g2,.g21,.g12,.grid[style*="1.25fr"]{grid-template-columns:1fr!important}}
+@media (max-width:520px){.g4{grid-template-columns:1fr}}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;min-width:0}
+.panel h2{font:600 15px/1.3 var(--sans);margin:0 0 4px}
+.panel .hint{color:var(--ink2);font-size:13px;margin:0 0 12px}
+.kpi{position:relative;overflow:hidden}
+.kpi .lab{color:var(--ink2);font-size:13px}
+.kpi .val{font:700 30px/1.1 var(--serif);letter-spacing:-.01em;margin:4px 0 2px}
+.kpi .det{font-size:13px;color:var(--ink2)}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+.kpi.good::before{background:var(--good)} .kpi.warn::before{background:var(--warn)} .kpi.bad::before{background:var(--bad)}
+.kpi.good .val{color:var(--good)} .kpi.warn .val{color:var(--warn)} .kpi.bad .val{color:var(--bad)}
+.lead{font:700 20px/1.4 var(--serif);margin:0 0 6px;max-width:80ch}
+.leadsub{color:var(--ink2);margin:0;max-width:90ch}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:inline-flex;background:var(--muted);border-radius:8px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:6px 11px;border-radius:6px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--paper);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;user-select:none}
+.toggle input{width:34px;height:20px;appearance:none;background:var(--line);border-radius:20px;position:relative;cursor:pointer;margin:0;transition:background .15s}
+.toggle input::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s}
+.toggle input:checked{background:var(--warn)} .toggle input:checked::after{left:17px}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+/* calendário */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{font-size:11px;color:var(--ink2);text-align:center;font-weight:600}
+.cal button{height:52px;border:1px solid transparent;border-radius:6px;background:var(--muted);color:var(--ink2);font-size:13px;font-weight:600;cursor:pointer;position:relative;padding:4px}
+.cal button .dot{position:absolute;right:5px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--petrol)}
+.cal button.p1{box-shadow:inset 0 -3px 0 var(--good)} .cal button.p2{box-shadow:inset 0 -3px 0 var(--bad-soft)}
+.cal button.l{background:var(--warn-soft);color:var(--ink)} .cal button.g{background:var(--bad);color:#fff}
+.cal button.sel{border-color:var(--ink);outline:2px solid var(--ink);outline-offset:1px}
+.cal .empty{height:52px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:12px;color:var(--ink2)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.detail h3{font:700 18px/1.3 var(--serif);margin:0 0 4px}
+.detail .meta{color:var(--ink2);font-size:13px;margin-bottom:12px}
+.item{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px}
+.tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:12px;background:var(--bad-soft);color:var(--bad);white-space:nowrap;height:fit-content}
+.tag.n{background:var(--petrol-soft);color:var(--petrol)} .tag.w{background:var(--warn-soft);color:var(--warn)}
+.empty-state{color:var(--ink2);font-size:14px;padding:10px 0}
+/* cadeia */
+.chain{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr;align-items:center}
+.chain .c{background:var(--muted);border-radius:8px;padding:12px 14px;height:100%}
+.chain .c small{color:var(--petrol);font-weight:700;font-size:12px}
+.chain .c b{display:block;margin:2px 0 4px}
+.chain .c span{font-size:13px;color:var(--ink2)}
+.chain .ar{text-align:center;color:var(--sky);font-size:20px}
+@media (max-width:760px){.chain{grid-template-columns:1fr}.chain .ar{transform:rotate(90deg)}}
 /* heat */
-.heat td.h{text-align:center;font-variant-numeric:tabular-nums;font-weight:500;min-width:76px}
-.heat td.fila{font-weight:600;white-space:nowrap}
-.heat tr.click{cursor:pointer}
-.heat tr.click:hover td.fila{color:var(--primary-ink);text-decoration:underline}
-/* compare */
-.cmp{display:grid;gap:14px}
-.cmp-row{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr) 84px;gap:14px;align-items:center}
-.cmp-bars{display:grid;gap:4px}
-.cmp-bars .track{height:13px}
-.delta{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;font-size:13px}
-.delta.up{color:var(--bad)} .delta.down{color:var(--good)} .delta.na{color:var(--muted);font-weight:400}
-.stack{display:flex;height:34px;border-radius:6px;overflow:hidden;gap:2px;background:var(--surface)}
-.stack div{display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;color:#fff;min-width:0}
-.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.gloss div{border-left:0;background:var(--surface-2);border-radius:8px;padding:12px 14px}
-.gloss b{display:block;font-size:13.5px;margin-bottom:2px}
-.gloss span{color:var(--ink-2);font-size:12.5px}
-.foot{color:var(--muted);font-size:12px;max-width:100ch}
-@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.two{grid-template-columns:minmax(0,1fr)}}
-@media (max-width:560px){
-  main{padding-inline:16px}.brand,.tabs{padding-inline:16px}
-  h1{font-size:25px}.kpi .v{font-size:23px}
-  .bar-row,.cmp-row{grid-template-columns:minmax(0,1fr) 78px}
-  .bar-row .lbl,.cmp-row .lbl{grid-column:1 / -1}
-  .card{padding:16px}
-}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.heat{display:grid;grid-template-columns:minmax(150px,1.6fr) repeat(9,1fr);gap:3px;min-width:640px}
+.heat div,.heat button{padding:7px 4px;border-radius:4px;text-align:center;font-size:12px}
+.heat .h{color:var(--ink2);font-weight:600}
+.heat .r{text-align:left;padding-left:0}
+.heat button{border:0;cursor:pointer;background:var(--muted);min-height:30px}
+.heat button.x{background:var(--bad);color:#fff}
+.heat button.fade{opacity:.25}
+.scroll{overflow-x:auto}
+/* tabela */
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child,th.l,td.l{text-align:left}
+th{color:var(--ink2);font-weight:600;font-size:12px;position:sticky;top:0;background:var(--paper)}
+th.s{cursor:pointer} th.s:hover{color:var(--ink)}
+tr.mc td{color:var(--warn)}
+td.up{color:var(--good);font-weight:600} td.dn{color:var(--bad);font-weight:600}
+.tscroll{max-height:380px;overflow:auto}
+input[type=search]{font:inherit;font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);min-width:200px}
+/* gráficos */
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--sans);fill:var(--ink2);font-size:11px}
+.ax{stroke:var(--line)} .b1{fill:var(--sky)} .b2{fill:var(--petrol)} .b3{fill:var(--p2)} .bbad{fill:var(--bad)}
+.ln{fill:none;stroke:var(--petrol);stroke-width:2.2} .pt{fill:var(--petrol)} .band{fill:var(--bad-soft)}
+[data-tip]{cursor:pointer} rect[data-tip]:hover,circle[data-tip]:hover{opacity:.8}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--paper);font-size:12px;padding:7px 10px;border-radius:6px;max-width:260px;z-index:50;opacity:0;transition:opacity .1s;line-height:1.4}
+.comment{margin-top:12px;padding:10px 12px;border-left:3px solid var(--sky);background:var(--muted);border-radius:0 6px 6px 0;font-size:14px;color:var(--ink)}
+.comment p{margin:0 0 6px}.comment p:last-child{margin:0}
+.mini{display:grid;gap:10px;align-content:start}
+.mini div{background:var(--muted);border-radius:8px;padding:10px 12px}
+.mini b{display:block;font:700 22px/1.2 var(--serif)}
+.mini span{font-size:13px;color:var(--ink2)}
+.mini .bad b{color:var(--bad)} .mini .good b{color:var(--good)}
+#next{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:min(320px,calc(100vw - 40px));background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--petrol);border-radius:10px;padding:14px 16px 12px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:40;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .35s,transform .35s}
+#next.show{opacity:1;transform:none;pointer-events:auto}
+#next small{font-weight:700;color:var(--petrol);font-size:12px;letter-spacing:.02em}
+#next p{margin:6px 0 0;font-size:13px;color:var(--ink2);padding-left:12px;position:relative}
+#next p::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--sky)}
+#nextClose{position:absolute;top:6px;right:8px;border:0;background:none;font-size:18px;color:var(--ink2);cursor:pointer;line-height:1}
+#nextBtn{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));border:1px solid var(--line);background:var(--paper);color:var(--ink2);font-size:13px;font-weight:600;padding:8px 14px;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,.08);cursor:pointer;z-index:39;opacity:0;pointer-events:none;transition:opacity .3s}
+#nextBtn.show{opacity:1;pointer-events:auto}
+@media print{#next,#nextBtn{display:none}}
+.heat2{display:grid;grid-template-columns:minmax(170px,1.7fr) repeat(7,minmax(46px,1fr));gap:3px;min-width:600px}
+.heat2 .hd{border:0;background:none;padding:6px 2px;border-radius:6px;font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;line-height:1.2}
+.heat2 .hd small{display:block;font-weight:500;font-size:10px;opacity:.8}
+.heat2 .hd:hover,.heat2 .hd.on{background:var(--petrol-soft);color:var(--accent)}
+.heat2 .rl{border:0;background:none;text-align:left;font-size:12.5px;color:var(--ink);padding:6px 4px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.heat2 .rl:hover,.heat2 .rl.on{background:var(--petrol-soft)}
+.heat2 .rl i{width:9px;height:9px;border-radius:50%;flex:none}
+.heat2 .rl .q{margin-left:auto;width:16px;height:16px;border-radius:50%;border:1px solid var(--line);font:600 10px/14px var(--sans);text-align:center;color:var(--ink2);font-style:normal;flex:none}
+.heat2 .cell{border:0;border-radius:5px;min-height:32px;font-size:12px;font-weight:700;cursor:pointer;background:var(--muted);color:var(--ink2);transition:opacity .15s,outline .1s}
+.heat2 .cell.c0{background:var(--bad-soft);color:var(--bad)} .heat2 .cell.c1{background:#f3b5b0;color:#7a1e18} .heat2 .cell.c2{background:#e07a72;color:#fff} .heat2 .cell.c3{background:var(--bad);color:#fff}
+.heat2 .cell.off{opacity:.25} .heat2 .cell.sel{outline:2px solid var(--ink);outline-offset:1px}
+.heat2 .cell.na{background:repeating-linear-gradient(45deg,var(--muted),var(--muted) 4px,transparent 4px,transparent 8px);cursor:default}
+.hscale{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:11.5px;color:var(--ink2);margin-top:10px}
+.hscale i{display:inline-block;width:14px;height:10px;border-radius:3px;margin-right:-4px}
+.hscale .c0{background:var(--bad-soft)}.hscale .c1{background:#f3b5b0}.hscale .c2{background:#e07a72}.hscale .c3{background:var(--bad)}
+.hdet{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;min-height:80px}
+.hdet h3{font:700 15px/1.3 var(--serif);margin:0 0 4px}
+.hdet .sub{font-size:12.5px;color:var(--ink2);margin-bottom:6px}
+.filt{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 16px}
+.fper{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.fl{font-size:12px;font-weight:700;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.fl::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+.filt select,.filt input{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink)}
+.fd{display:none;align-items:center;gap:6px;font-size:12px;color:var(--ink2)} .fd.on{display:inline-flex}
+.vs{color:var(--ink2);font-weight:700}
+.exec{margin-bottom:14px;padding:20px 22px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.exec .lead{margin:8px 0 8px;max-width:95ch}
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:980px){.tgrid{grid-template-columns:1fr 1fr}} @media (max-width:620px){.tgrid{grid-template-columns:1fr}}
+.tcard{background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.tcard header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.tl{font-size:13px;font-weight:700;color:var(--ink2)}
+.go{border:0;background:none;color:var(--accent);font:600 12px var(--sans);cursor:pointer;padding:4px 6px;border-radius:6px}
+.go:hover{background:var(--petrol-soft)}
+.tv{font:700 32px/1.05 var(--serif);letter-spacing:-.01em;color:var(--ink)}
+.tv small{display:block;font:500 12.5px/1.4 var(--sans);color:var(--ink2);margin-top:4px;letter-spacing:0}
+.tcard ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.tcard li{font-size:13.5px;line-height:1.45;padding-left:20px;position:relative;color:var(--ink)}
+.tcard li::before{position:absolute;left:0;top:1px;font-size:11px;font-weight:700;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.tcard li.up::before{content:"↑";background:var(--good-soft);color:var(--good)}
+.tcard li.at::before{content:"!";background:var(--warn-soft);color:var(--warn)}
+table.wk{font-size:12px;table-layout:fixed} table.wk th{font-size:10.5px;white-space:normal;line-height:1.2} table.wk td,table.wk th{padding:7px 4px} table.wk td:first-child,table.wk th:first-child{width:38%;white-space:normal}
+table.wk .tr{font-style:normal;font-size:9px;margin-left:4px;color:var(--ink2)} table.wk .tr.at{color:var(--warn)}
+.fn{margin:0;font-size:11px;color:var(--ink2)}
+/* plano */
+.prog{height:10px;background:var(--muted);border-radius:10px;overflow:hidden;margin:8px 0 4px}
+.prog div{height:100%;background:var(--good);width:0;transition:width .3s}
+.act{display:grid;grid-template-columns:1fr auto;gap:6px 14px;padding:14px 0;border-top:1px solid var(--line)}
+.act h3{margin:0;font-size:15px}
+.act p{margin:0;color:var(--ink2);font-size:14px;grid-column:1}
+.act .ctl{grid-row:1/3;grid-column:2;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;background:var(--petrol-soft);color:var(--petrol)}
+.st{border:1px solid var(--line);background:var(--paper);color:var(--ink2);font-size:12px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;min-width:118px}
+.pillst{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;white-space:nowrap}
+.pillst.r{background:var(--good-soft);color:var(--good)}.pillst.p{background:var(--warn-soft);color:var(--warn)}.pillst.s{background:var(--bad-soft);color:var(--bad)}
+td.wrap{white-space:normal;min-width:180px}
+.st.s1{background:var(--warn-soft);color:var(--warn);border-color:transparent} .st.s2{background:var(--good-soft);color:var(--good);border-color:transparent}
+.foot{color:var(--ink2);font-size:12px;margin-top:24px}
+@media (max-width:640px){.act{grid-template-columns:1fr}.act .ctl{grid-row:auto;grid-column:1;flex-direction:row;align-items:center}}
+@media print{.topbar nav,.toolbar{display:none}.view{display:block!important;break-before:page}}
 </style>
-<style>html,body{margin:0}[hidden]{display:none!important}</style>
 </head>
 <body>
+<header class="topbar"><div class="in">
+  <div class="brand"><h1>Disparos e problemas sistêmicos</h1><p>Setembro a 04/10 · disparos gerais, canal VPC e sistemas</p></div>
+  <nav role="tablist">
+    <button role="tab" aria-selected="true" data-v="geral">Visão geral</button>
+    <button role="tab" aria-selected="false" data-v="disp">Disparos gerais</button>
+    <button role="tab" aria-selected="false" data-v="sist">Problemas sistêmicos</button>
+    <button role="tab" aria-selected="false" data-v="vpc">Disparos VPC</button>
+  </nav>
+</div></header>
 
+<main>
+<!-- VISÃO GERAL -->
+<section class="view on" id="geral">
+  <div class="panel exec">
+    <div class="exec-top"><span class="eyebrow">Resumo executivo · 01/09 a 04/10</span></div>
+    <p class="lead">O interesse do cliente nos disparos se manteve estável. Os pontos que pedem atenção são a estabilidade dos sistemas, que piorou semana a semana, e a seleção das bases de repique.</p>
+    <p class="leadsub">Na semana de 28/09 a 04/10 foram 366 mil clientes acionados e 129 relatos de falha, com duas quedas gerais: a GUP em 02/10 e Conecta e Contrate em 03/10. Os follow-ups e a Adesão têm as melhores respostas, e a primeira resposta do suporte segue rápida.</p>
+  </div>
 
-<header class="top">
-  <div class="brand"><b>Monitorias Comerciais</b><span>Diagnóstico de não venda · análise de 05/10/2026</span></div>
-  <nav class="tabs" role="tablist" id="tabs" aria-label="Filas analisadas"></nav>
-</header>
-<main id="main"></main>
+  <div class="tgrid">
+    <article class="tcard">
+      <header><span class="tl">Disparos gerais</span><button class="go" data-go="disp" aria-label="Ver disparos gerais">Detalhe →</button></header>
+      <div class="tv">366 mil<small>clientes acionados de 28/09 a 04/10 · +18% sobre a média semanal da 2ª quinzena</small></div>
+      <ul><li class="up">Entrega melhorou para 77,8% (+3,1 p.p.), e mais clientes passaram a receber as mensagens.</li>
+      <li class="at">Em 03/10 foram 98,5 mil acionados com Conecta e Contrate fora; vale alinhar disparos à disponibilidade dos sistemas.</li></ul>
+    </article>
+    <article class="tcard">
+      <header><span class="tl">Manual × marketing</span><button class="go" data-go="disp" aria-label="Ver manual e marketing">Detalhe →</button></header>
+      <div class="tv">86%<small>dos clientes acionados de 28/09 a 04/10 vieram de disparos do marketing</small></div>
+      <ul><li class="up">Os disparos manuais triplicaram: 35 na semana e 50 mil clientes acionados.</li>
+      <li class="at">Os repiques PF respondem menos: o "Falar agora" caiu de 7,0% para 4,6%, enquanto o follow-up subiu.</li></ul>
+    </article>
+    <article class="tcard">
+      <header><span class="tl">Interesse nos disparos manuais</span><button class="go" data-go="disp" aria-label="Ver interesse nos botões">Detalhe →</button></header>
+      <div class="tv">5,9%<small>clicam em "Falar agora" · estável (era 6,3%)</small></div>
+      <ul><li class="up">Follow-up PF subiu para 6,7% e Adesão chegou a 10,6%, os melhores resultados do período.</li>
+      <li class="at">Os cliques em "Não tenho interesse" (2.068) superaram os "Falar agora" (1.802) e seguem sendo transferidos aos vendedores.</li></ul>
+    </article>
+    <article class="tcard">
+      <header><span class="tl">Disparos VPC</span><button class="go" data-go="vpc" aria-label="Ver disparos VPC">Detalhe →</button></header>
+      <div class="tv">4,6%<small>"Falar agora" de 28/09 a 04/10 · 37% de aceitação</small></div>
+      <ul><li class="up">Aceitação entre quem responde subiu de 31% no início de setembro para 37% a 44% nas últimas semanas.</li>
+      <li class="at">Volume caiu 58% na última semana, e entre 22 e 24/09 só 48% a 60% do público recebeu as mensagens.</li></ul>
+    </article>
+    <article class="tcard">
+      <header><span class="tl">Problemas sistêmicos</span><button class="go" data-go="sist" aria-label="Ver problemas sistêmicos">Detalhe →</button></header>
+      <div class="tv">129<small>relatos de 38 vendedores de 28/09 a 04/10 · +50% sobre a semana anterior</small></div>
+      <ul><li class="up">A primeira resposta do suporte é rápida: 15 minutos, em mediana.</li>
+      <li class="at">Só 1 de 8 problemas foi resolvido na semana, que teve a GUP fora em 02/10 e Conecta e Contrate fora em 03/10.</li></ul>
+    </article>
+    <article class="tcard">
+      <header><span class="tl">Semana a semana</span></header>
+      <table class="wk">
+        <tr><th></th><th>14 a 20/09</th><th>21 a 27/09</th><th>28/09 a 04/10</th></tr>
+        <tr><td>Relatos de falha</td><td>53</td><td>86*</td><td><b>129</b><i class="tr at">▲</i></td></tr>
+        <tr><td>Problemas resolvidos</td><td>1 de 10</td><td>2 de 10</td><td><b>1 de 8</b></td></tr>
+        <tr><td>"Falar agora" VPC</td><td>3,9%</td><td>5,0%</td><td><b>4,6%</b><i class="tr">▼</i></td></tr>
+        <tr><td>Aceitação VPC</td><td>33%</td><td>44%</td><td><b>37%</b><i class="tr">▼</i></td></tr>
+      </table>
+      <p class="fn">* semana parcial, dados até 23/09</p>
+    </article>
+  </div>
+</section>
+
+<!-- DISPAROS GERAIS -->
+<section class="view" id="disp">
+  <div class="toolbar" style="margin-bottom:14px">
+    <div class="seg" id="gSeg" aria-label="Período de comparação">
+      <button aria-pressed="true" data-g="q">1ª × 2ª quinzena</button>
+      <button aria-pressed="false" data-g="w">28/09 a 04/10</button>
+      <button aria-pressed="false" data-g="w2" title="Semana em andamento">05 a 11/10 ▸</button>
+    </div>
+    <span class="hint" style="margin:0" id="gInfo"></span>
+  </div>
+  <div class="grid g4" id="gKpi" style="margin-bottom:14px"></div>
+  <div class="grid g2">
+    <div class="panel">
+      <h2>Comparativo por indicador</h2>
+      <p class="hint">Escolha o indicador.</p>
+      <div class="seg" id="metSeg" style="margin-bottom:12px"></div>
+      <div id="chMet"></div>
+      <div class="comment" id="metCom"></div>
+    </div>
+    <div class="panel">
+      <h2 id="gVarTitle">Variação da 1ª para a 2ª quinzena</h2>
+      <p class="hint">Passe o mouse sobre as barras.</p>
+      <div id="chVar"></div>
+      <div class="comment" id="gVarCom"></div>
+    </div>
+  </div>
+  <div class="panel" id="gDayPanel" style="margin-top:14px;display:none">
+    <h2>Disparos por dia</h2>
+    <p class="hint">Clientes acionados por dia, manual e marketing. O ponto vermelho marca dias com falha sistêmica grave.</p>
+    <div id="chGDay"></div>
+    <div class="legend"><span><i style="background:var(--petrol)"></i>Manual</span><span><i style="background:var(--p2)"></i>Marketing</span><span><i style="background:var(--bad);border-radius:50%"></i>Falha sistêmica grave</span></div>
+    <div class="comment" id="gDayCom"></div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <h2>Quem fez os disparos: manual × marketing</h2>
+    <p class="hint">Manual: disparos com "repique", "follow" ou "adm" no nome. Marketing: todos os demais, sem contar o VPC, que está na aba própria.</p>
+    <div class="grid" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)">
+      <div class="scroll"><table id="gMkTbl" style="font-size:12.5px"></table></div>
+      <div><div id="chMk"></div><div class="legend"><span><i style="background:var(--petrol)"></i>Manual</span><span><i style="background:var(--p2)"></i>Marketing</span></div></div>
+    </div>
+    <div class="comment" id="gMkCom"></div>
+    <p class="hint" style="margin:8px 0 0" id="gMkNote"></p>
+  </div>
+  <div class="panel" style="margin-top:14px">
+    <h2>Interesse nos botões · disparos manuais</h2>
+    <p class="hint">Cliques em "Falar agora" sobre o público visado, nos disparos manuais com botão. Dados de botão por quinzena, de 01 a 28/09.</p>
+    <div class="grid g12">
+      <div class="mini">
+        <div><b>6,3% → 5,9%</b><span>"Falar agora" nos disparos manuais: interesse estável</span></div>
+        <div class="bad"><b>7,0% → 4,6%</b><span>"Falar agora" nos repiques PF, com 45% mais público</span></div>
+        <div class="bad"><b>2.068</b><span>"Não tenho interesse" desde 16/09, mais que os 1.802 "Falar agora", transferidos aos vendedores (INC002194822)</span></div>
+      </div>
+      <div><div id="chBtType"></div>
+        <div class="legend"><span><i style="background:var(--sky)"></i>01 a 14/09</span><span><i style="background:var(--petrol)"></i>15 a 28/09</span></div></div>
+    </div>
+    <div class="comment"><p>O interesse geral não caiu, então o ponto de atenção está no que acontece depois do clique. O volume extra foi para repiques PF de base fria, que perderam resposta, enquanto follow-up PF e Adesão tiveram os melhores resultados. Desde 16/09, os cliques em "Não tenho interesse" (2.068) superaram os "Falar agora" (1.802) e ocuparam a fila dos vendedores.</p></div>
+  </div>
+</section>
+
+<!-- PROBLEMAS SISTÊMICOS -->
+<section class="view" id="sist">
+  <div class="panel" style="margin-bottom:14px">
+    <h2>Comparativo semanal · segunda a domingo</h2>
+    <p class="hint">Relatos de vendedores no grupo Problemas Sistêmicos por semana. Antes de 14/09 houve apenas um relato (07/09). Passe o mouse sobre as barras.</p>
+    <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)">
+      <div><div id="chWk"></div><div class="legend" id="wkLeg"></div></div>
+      <div class="scroll"><table id="wkTbl" style="font-size:12.5px"></table></div>
+    </div>
+    <div class="comment"><p>O volume de relatos cresceu toda semana: 53, 86 e 129, com mais vendedores afetados a cada período. A solução não acompanhou: em nenhuma semana mais de 2 problemas foram resolvidos.</p></div>
+    <p class="hint" style="margin:8px 0 0">* Semana de 21 a 27/09 parcial: a exportação disponível vai até 23/09 às 11h38.</p>
+  </div>
+  <div class="grid g21">
+    <div class="panel">
+      <div class="toolbar"><div><h2>Tipos de falha por dia</h2><p class="hint" style="margin:0">Clique em uma data, em um tipo ou em uma célula. O número é a quantidade de relatos.</p></div>
+        <div class="seg" id="hwSeg"><button aria-pressed="false" data-w="w1">14 a 20/09</button><button aria-pressed="false" data-w="w2">21 a 27/09*</button><button aria-pressed="true" data-w="w3">28/09 a 04/10</button></div></div>
+      <div class="scroll"><div class="heat2" id="heat"></div></div>
+      <div class="hscale"><span>Relatos no dia</span><i class="c1"></i>1 a 2<i class="c2"></i>3 a 9<i class="c3"></i>10 ou mais<i class="c0"></i>falha sem contagem</div>
+      <div class="hdet" id="heatDet"></div>
+    </div>
+    <div class="panel">
+      <h2>Dias afetados por tipo</h2>
+      <p class="hint">Comparativo entre as semanas. Clique em um tipo para destacá-lo no mapa.</p>
+      <div id="chCat"></div>
+      <div class="legend" id="catLeg"></div>
+      <div class="comment" id="catCom"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <div class="toolbar"><div><h2>Detalhe da semana</h2>
+      <p class="hint" style="margin:0" id="relHint"></p></div>
+      <div class="seg" id="wkSeg"><button aria-pressed="false" data-w="w1">14 a 20/09</button><button aria-pressed="false" data-w="w2">21 a 27/09*</button><button aria-pressed="true" data-w="w3">28/09 a 04/10</button></div></div>
+    <div class="grid g12">
+      <div class="mini" id="relMini"></div>
+      <div><div id="chRel"></div><div class="legend" id="relLeg"></div></div>
+    </div>
+    <div class="tscroll" style="margin-top:12px"><table id="relTbl"></table></div>
+    <div class="comment" id="relCom"></div>
+  </div>
+</section>
+
+<!-- VPC -->
+<section class="view" id="vpc">
+  <div class="toolbar" style="margin-bottom:14px">
+    <div class="seg" id="vpSeg" aria-label="Período de comparação">
+      <button aria-pressed="false" data-p="s2">07 a 13/09</button>
+      <button aria-pressed="false" data-p="s3">14 a 20/09</button>
+      <button aria-pressed="false" data-p="s4">21 a 27/09</button>
+      <button aria-pressed="true" data-p="s5">28/09 a 04/10</button>
+      <button aria-pressed="false" data-p="s6" title="Semana em andamento">05 a 11/10 ▸</button>
+    </div>
+    <span class="hint" style="margin:0" id="fInfo"></span>
+  </div>
+  <div class="grid g4" id="vpcKpi" style="margin-bottom:14px"></div>
+  <div class="grid g2">
+    <div class="panel">
+      <h2>Comparativo por indicador</h2>
+      <p class="hint">Escolha o indicador.</p>
+      <div class="seg" id="vMetSeg" style="margin-bottom:12px"></div>
+      <div id="chVMet"></div>
+      <div class="comment" id="vMetCom"></div>
+    </div>
+    <div class="panel">
+      <h2 id="vVarTitle">Variação do período A para o B</h2>
+      <p class="hint">Passe o mouse sobre as barras.</p>
+      <div id="chVVar"></div>
+      <div class="comment" id="vVarCom"></div>
+    </div>
+  </div>
+  <div class="grid g2" style="margin-top:14px">
+    <div class="panel">
+      <h2>Parte do público que recebeu a mensagem</h2>
+      <p class="hint">Campanhas BASE VPC D-30 dos dois períodos comparados, em ordem de envio.</p>
+      <div id="chRatio"></div>
+      <div class="legend"><span><i style="background:var(--sky);border-radius:50%"></i>Período anterior</span><span><i style="background:var(--accent);border-radius:50%"></i>Período selecionado</span><span><i style="background:var(--bad);border-radius:50%"></i>Abaixo de 60%</span></div>
+      <div class="comment" id="vRatCom"></div>
+    </div>
+    <div class="panel">
+      <h2>Campanhas VPC</h2>
+      <p class="hint">Campanhas dos dois períodos comparados. Clique no título da coluna para ordenar. As campanhas Mês do Cliente (36 mil acionados em 24 e 25/09) não entram nos totais.</p>
+      <div class="tscroll"><table id="tbl"></table></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:14px">
+    <div class="toolbar"><div><h2>Interesse nos botões</h2><p class="hint" style="margin:0">Disparos VPC com botão, por semana de segunda a domingo e pela data de envio.</p></div>
+      <div class="seg" id="vbSeg"></div></div>
+    <div class="grid g12">
+      <div class="mini" id="vbMini"></div>
+      <div><div id="chBtVpc"></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Semana selecionada</span><span><i style="background:var(--sky)"></i>Demais semanas</span><span>Linha: aceitação entre quem respondeu</span></div></div>
+    </div>
+    <div class="tscroll" style="margin-top:12px;max-height:300px"><table id="vbTbl"></table></div>
+    <div class="comment" id="vbCom"></div>
+  </div>
+</section>
+
+<p class="foot" style="padding-bottom:60px">Fontes: tabela de disparos gerais por quinzena, exportação de campanhas VPC e Mês do Cliente (01 a 28/09; o disparo de 28/09 ainda sem dados de envio fica fora dos totais) e conversas do grupo Problemas Sistêmicos PF, Adesão e PME. Valores de campanha arredondados pela plataforma de envio.</p>
+</main>
+<div id="tip" role="tooltip"></div>
+<aside id="next" aria-label="Próximos passos">
+  <button id="nextClose" aria-label="Fechar">×</button>
+  <small>Próximos passos</small>
+  <p>Recuperar os leads perdidos em 19 e 21/09 e corrigir o fluxo do "Não tenho interesse".</p>
+  <p>Priorizar follow-up PF e Adesão e cortar repiques de base fria.</p>
+  <p>Garantir suporte nos plantões e contingência para GUP, Conecta e Contrate.</p>
+</aside>
+<button id="nextBtn" aria-expanded="false">💡 Próximos passos</button>
 
 <script>
-const TABS = [{"id": "conecta", "nome": "Conecta", "titulo": "Conecta + Geral Atendimento", "oque": "Atendimentos comerciais que chegam pela fila Geral (inclui um caso PME-Geral). Os contatos do Conecta recuperados nesta rodada eram, em sua maioria, cancelamento ou assistência, por isso ficaram fora do diagnóstico de venda.", "extraCol": "Fila", "rows": [{"id": "743667287", "colab": "Gabriela Martins", "extra": "GERAL", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente pediu atendente e aguardou cerca de 25 minutos até a primeira abordagem humana.", "imp": "Risco direto de abandono por demora.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "743643709", "colab": "Gabriela Martins", "extra": "PME - GERAL", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente já havia informado CNPJ e preferência sem coparticipação; após transferência houve nova coleta.", "imp": "Repetição aumenta atrito e alonga a jornada.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "743471919", "colab": "Camila Moreira", "extra": "GERAL", "obj": true, "sla": true, "cot": true, "fu": false, "apr": false, "obs": "Cliente solicitou opções completo/ambulatorial e com/sem coparticipação; houve violações de SLA.", "imp": "Risco de esfriamento durante a cotação.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": false, "apr": false}}, {"id": "747703308", "colab": "Danielle Muzell", "extra": "GERAL", "obj": false, "sla": true, "cot": false, "fu": false, "apr": true, "obs": "Cliente declarou interesse, mas houve demora e repetição da coleta básica.", "imp": "Perda de timing comercial em lead aquecido.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": true}}, {"id": "743680929", "colab": "Gabriela Martins", "extra": "GERAL", "obj": false, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Houve qualificação e oferta, porém a jornada ficou longa e com SLA violado.", "imp": "Conversão prejudicada apesar da oferta.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": false}}], "resumo": "O maior problema é a demora: os 5 atendimentos tiveram atraso no tempo de resposta. Clientes chegam interessados e já com informações, mas a conversa demora, os dados são pedidos de novo e falta uma recomendação clara de plano.", "principalNota": null, "plano": ["Responder rápido quem já chegou interessado: o lead aquecido esfria com a espera.", "Ler o histórico antes da primeira mensagem para não pedir de novo CNPJ, idade ou preferência.", "Depois de cotar, indicar qual plano é o mais adequado e explicar o porquê.", "No follow-up, retomar a última dúvida do cliente em vez de mensagens genéricas.", "Separar casos de cancelamento e assistência da análise de vendas."]}, {"id": "cancelados", "nome": "Base de Cancelados", "titulo": "Base de Cancelados", "oque": "Tentativa de reconquistar ex-clientes que cancelaram o plano. Aqui a primeira pergunta é se o contato era de fato um ex-cliente com chance de retorno.", "rows": [{"id": "743296938", "colab": "Thiago Abelo", "obj": true, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente disse 'não tenho interesse' repetidas vezes; abordagem humana tentou uma pergunta de diagnóstico.", "imp": "Base insistiu após recusa explícita; oportunidade é qualificar/encerrar com respeito.", "st": "recusa", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "748950389", "colab": "Raissa Burin", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Contato era spam com links suspeitos; não houve conversa comercial.", "imp": "Lead improdutivo/spam; deve ser excluído do diagnóstico de venda.", "st": "Base: spam", "inc": false, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "748091096", "colab": "Giovanna Ragonezi", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Sessão sem mensagem do cliente e sem abordagem humana antes do encerramento.", "imp": "Lead sem conteúdo; não permite diagnóstico comercial.", "st": "Base: sem conteúdo", "inc": false, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "748086567", "colab": "Giovanna Ragonezi", "obj": true, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente disse 'Não tenho interesse' e não houve abordagem humana.", "imp": "Recusa explícita sem tentativa consultiva; também houve SLA.", "st": "recusa", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "747881224", "colab": "Beatriz Rafaela Silvestre", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente disse que tinha plano cancelado; recebeu carência zero, aproveitamento de carências e 50% de desconto; avançou até pagamento.", "imp": "Caso de recuperação/conversão, não de perda. Boa exploração da condição de ex-cliente.", "st": "convertido", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "747002475", "colab": "Thiago Abelo", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente informou que o plano estava em dia; depois confirmou-se plano ativo há mais de 6 anos.", "imp": "Erro de base/segmentação: cliente não era cancelado.", "st": "Base: plano ativo", "inc": false, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "746788094", "colab": "Sem atendimento humano", "obj": true, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Cliente disse 'Não tenho mais interesse' e o bot encerrou.", "imp": "Recusa explícita sem atendimento humano; não há evidência para trabalhar objeção.", "st": "recusa", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": false, "apr": false}}, {"id": "745913528", "colab": "Sem atendimento humano", "obj": true, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Cliente disse 'Não tenho interesse!' e o bot encerrou.", "imp": "Recusa explícita sem atendimento humano.", "st": "recusa", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": false, "apr": false}}, {"id": "745716740", "colab": "Sem atendimento humano", "obj": true, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Cliente disse 'Não tenho interesse' e o bot encerrou.", "imp": "Recusa explícita sem atendimento humano.", "st": "recusa", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": false, "apr": false}}, {"id": "743550440", "colab": "Beatriz Rafaela Silvestre", "obj": true, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Contato era profissional de imóveis e reclamou que não solicitou abordagem, ameaçando processo.", "imp": "Erro de base/consentimento; não é oportunidade comercial válida.", "st": "Base: contato indevido", "inc": false, "orig": {"obj": true, "sla": false, "cot": false, "fu": false, "apr": false}}], "resumo": "O problema principal desta fila é a qualidade da lista de contatos, e não a abordagem. 4 dos 10 registros não deveriam estar lá (spam, conversa vazia, cliente com plano ativo e pessoa que não pediu contato). Dos 6 restantes, 5 recusaram logo de início e 1 voltou a ser cliente.", "composicao": true, "plano": ["Limpar a lista antes de distribuir: tirar spam, contatos sem conversa e clientes com plano ativo.", "Criar um motivo de descarte \"não solicitei contato\" para registrar e bloquear esses casos.", "Na recusa explícita, fazer no máximo uma pergunta consultiva e respeitar a resposta.", "Garantir atendimento humano antes do encerramento: 3 recusas foram encerradas só pelo robô.", "Para ex-clientes reais, usar carência aproveitada e desconto como argumento e conduzir direto ao fechamento (modelo do caso 747881224)."]}, {"id": "carrinho", "nome": "Carrinho", "titulo": "Carrinho (PF)", "oque": "Pessoas físicas que começaram a contratação no site e pararam no meio. São os leads mais quentes: já escolheram ou simularam um plano.", "rows": [{"id": "747721905", "colab": "Isabella Mattos", "obj": false, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente declarou interesse e pediu as duas modalidades. Após o pedido, houve longa espera até a cotação. A venda ficou em apresentação de opções, sem recomendação objetiva baseada no perfil.", "imp": "Lead ativo perdeu ritmo no momento da cotação; oportunidade de recomendar e conduzir a escolha.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": false}}, {"id": "747822042", "colab": "Julia Silva", "obj": false, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente já entrou dizendo que tinha interesse/ativação. A abordagem voltou para confirmação de plano novo, cidade e idade; depois foram apresentadas modalidades. Houve SLA.", "imp": "Lead aquecido voltou para descoberta básica; risco de perda de continuidade e esfriamento.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "747959562", "colab": "Helena Ribeiro", "obj": false, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Cliente recebeu todas as opções, pediu um momento para avaliar e depois recebeu follow-up genérico perguntando se havia dúvida ou se queria contratar.", "imp": "A decisão permaneceu com o cliente; faltou recomendação e retomada ligada à opção mais adequada.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": false, "cot": true, "fu": true, "apr": false}}, {"id": "746780432", "colab": "Robson Ferrari", "obj": true, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente escolheu plano completo e perguntou especificamente a diferença entre coparticipação total e parcial. Houve resposta por áudio; follow-up do dia seguinte voltou genérico para promoção/dúvida.", "imp": "Barreira específica de produto não foi usada como eixo da retomada e do fechamento.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": false}}, {"id": "744821655", "colab": "Isabella Mattos", "obj": true, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Cliente informou bebê de 12 dias e pediu cobertura completa, sem odontológico, com exames e internações. O contexto mostra preferência explícita que deveria virar recomendação simples e direcionada.", "imp": "Necessidade muito clara; oportunidade de reduzir opções e recomendar diretamente o produto aderente.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": false, "cot": true, "fu": true, "apr": false}}], "resumo": "Em todos os 5 atendimentos o promotor enviou opções e preços, mas deixou o cliente decidir sozinho, e a retomada foi genérica. O cliente do Carrinho já chega com intenção de compra; o que falta é recomendar um plano e pedir o fechamento.", "principalNota": "Empate: \"Cotando mais do que recomendando\" e \"Follow-up\" aparecem nos 5 atendimentos.", "plano": ["Tratar o lead de Carrinho como oportunidade aquecida, com prioridade de resposta.", "Depois de apresentar valores, recomendar uma opção e justificar.", "Se o cliente escolheu modalidade ou disse a preferência, seguir direto para o fechamento.", "Follow-up deve retomar a última pergunta ou barreira do cliente.", "Perguntas sobre coparticipação, rede ou preço devem terminar em nova tentativa de fechamento.", "Usar o que o cliente já informou para não reiniciar a conversa."]}, {"id": "pme", "nome": "PME", "titulo": "PME", "oque": "Planos empresariais para pequenas e médias empresas (contratação via CNPJ).", "rows": [{"id": "748026813", "colab": "Aline Gunello", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente apresentou dúvidas sobre valores de consultas/exames e região de atendimento. Houve SLA, mas Aline manteve retomadas e chegou a investigar qual ponto impedia a finalização.", "imp": "Benchmark parcial de follow-up: investigação da barreira decisória, embora pudesse ocorrer mais cedo.", "st": "benchmark", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "748075696", "colab": "Luan Ribeiro", "obj": true, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Cliente declarou que o valor ficava bem acima do que paga hoje. A resposta foi 'aaah que pena', sem investigar quanto paga, teto de investimento, alternativa ou contraproposta.", "imp": "Perda direta de oportunidade: objeção explícita de preço não virou negociação nem retomada.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": false, "cot": true, "fu": true, "apr": false}}, {"id": "747691729", "colab": "Julia Silva", "obj": true, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente informou três vidas, idades e contratação por CNPJ; após receber opções perguntou sobre plano sem coparticipação. Houve resposta por áudio, mas não há evidência de condução posterior para decisão/fechamento.", "imp": "Oportunidade em recomendação e follow-up após dúvida específica de produto/coparticipação.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": false}}], "resumo": "Os clientes PME não estão sem interesse: eles dizem claramente o que os impede (preço, coparticipação). A venda se perde quando essa barreira não vira negociação. O caso de Luan (748075696) é o mais crítico: o cliente disse que estava caro e a resposta foi \"que pena\", sem nenhuma contraproposta.", "principalNota": "Empate: Objeção, SLA, Cotação sem recomendação e Follow-up aparecem em 2 de 3 atendimentos cada.", "plano": ["Quando o cliente disser que está caro, perguntar quanto paga hoje e qual valor cabe no orçamento.", "Após a cotação, recomendar uma opção e explicar por que ela é a mais adequada.", "O follow-up deve citar a última barreira apresentada pelo cliente.", "Dúvidas de coparticipação, rede ou cobertura devem terminar com uma nova tentativa de fechamento.", "Replicar mais cedo na conversa a investigação da barreira feita por Aline (748026813)."]}, {"id": "eugenia", "nome": "Eugênia", "titulo": "Eugênia · Cotação · Seller", "oque": "Atendimentos que começam com a assistente virtual Eugênia e passam para um promotor humano. São três filas: Eugênia, Eugênia Cotação e Eugênia Seller.", "extraCol": "Fila", "rows": [{"id": "748960249", "colab": "Andrezza Machini", "extra": "Eugênia", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Necessidade crítica de hemodiálise já informada; retomada genérica sem trabalhar a necessidade.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "748112354", "colab": "Andrezza Machini", "extra": "Eugênia", "obj": true, "sla": false, "cot": false, "fu": true, "apr": true, "obs": "Dúvida sobre cirurgia reparadora; follow-up posterior não respondeu diretamente à barreira.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": true, "apr": true}}, {"id": "745557827", "colab": "Jady Queiroz", "extra": "Eugênia", "obj": false, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Benchmark positivo: continuidade até documentação, contratação e boas-vindas.", "st": "convertido", "inc": true, "orig": {"obj": false, "sla": false, "cot": false, "fu": false, "apr": false}}, {"id": "EUG-ATUAL-04", "colab": "Promotor(a) monitorado(a)", "extra": "Eugênia", "obj": false, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Oportunidade de continuidade: cotação e retomada sem transformar contexto anterior em recomendação objetiva.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": true}, "flag": "ID provisório"}, {"id": "EUG-ATUAL-05", "colab": "Promotor(a) monitorado(a)", "extra": "Eugênia", "obj": true, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Objeção presente e necessidade de condução mais consultiva para fechamento.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": false}, "flag": "ID provisório"}, {"id": "747610569", "colab": "Kamila Oliveira", "extra": "Eugênia Cotação", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Dúvida objetiva sobre rede Bresser/Mooca; houve SLA e retomada posterior sem responder diretamente à barreira.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "747023047", "colab": "Raiane Lima", "extra": "Eugênia Cotação", "obj": false, "sla": true, "cot": false, "fu": true, "apr": false, "obs": "Cliente disse 'SIM, VAMOS SEGUIR', enviou documentos e depois desistiu; SLA em etapa avançada.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": false}}, {"id": "COT-ATUAL-03", "colab": "Promotor(a) monitorado(a)", "extra": "Eugênia Cotação", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Barreira clara; oportunidade de usar histórico e recomendar solução específica.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}, "flag": "ID provisório"}, {"id": "COT-ATUAL-04", "colab": "Promotor(a) monitorado(a)", "extra": "Eugênia Cotação", "obj": false, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cotação apresentada, porém retomada com pouca continuidade do contexto anterior.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": true}, "flag": "ID provisório"}, {"id": "COT-ATUAL-05", "colab": "Promotor(a) monitorado(a)", "extra": "Eugênia Cotação", "obj": true, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Oportunidade em objeção, recomendação e follow-up direcionado.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": false, "cot": true, "fu": true, "apr": false}, "flag": "ID provisório"}, {"id": "743293578", "colab": "Sofia Lunga", "extra": "Eugênia Seller", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente queria fechar no dia; dúvida de coparticipação teve SLA e depois follow-ups genéricos.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "747646100", "colab": "Sofia Lunga", "extra": "Eugênia Seller", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Benchmark positivo de fechamento; escolha, documentos, pagamento/ativação e boas-vindas; atenção ao SLA.", "st": "convertido", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "743276475", "colab": "Carolina Ribeiro", "extra": "Eugênia Seller", "obj": true, "sla": true, "cot": false, "fu": true, "apr": false, "obs": "Cliente iniciou contratação; houve SLA e retomada genérica sobre o que não agradou.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": false}}, {"id": "744335026", "colab": "Thaisa Almeida", "extra": "Eugênia Seller", "obj": false, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Plano escolhido e pedido de atendente; transferência humana demorou e retomada posterior foi genérica.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "743217532", "colab": "Kamila Oliveira", "extra": "Eugênia Seller", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente interessada comparando coparticipação; dúvidas e esperas durante a negociação.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "743241794", "colab": "Sofia Lunga", "extra": "Eugênia Seller", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente comparava com Bluemed sem coparticipação; barreira conhecida deveria orientar follow-up.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "742791427", "colab": "Promotor(a) Seller", "extra": "Eugênia Seller", "obj": false, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Bot recomendou plano completo e cliente manifestou intenção de se organizar para contratar.", "st": "benchmark", "inc": true, "orig": {"obj": false, "sla": false, "cot": false, "fu": false, "apr": false}, "flag": "Sem colaborador"}, {"id": "740024567", "colab": "Promotor(a) Seller", "extra": "Eugênia Seller", "obj": true, "sla": false, "cot": false, "fu": false, "apr": false, "obs": "Cliente avançou para fechamento esclarecendo parcela e carência; boa condução de dúvidas.", "st": "benchmark", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": false, "apr": false}, "flag": "Sem colaborador"}, {"id": "746513587", "colab": "Jady Queiroz", "extra": "Eugênia Seller", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente desistiu antes da atuação humana; SLA não deve ter o mesmo peso de perda comercial.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "SELL-ATUAL-10", "colab": "Promotor(a) Seller", "extra": "Eugênia Seller", "obj": false, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Oportunidade em continuidade bot-humano e recomendação.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": true}, "flag": "ID provisório"}, {"id": "SELL-ATUAL-11", "colab": "Promotor(a) Seller", "extra": "Eugênia Seller", "obj": true, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Objeção conhecida; retomada deveria trabalhar diretamente a barreira.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": false, "cot": true, "fu": true, "apr": false}, "flag": "ID provisório"}, {"id": "SELL-ATUAL-12", "colab": "Promotor(a) Seller", "extra": "Eugênia Seller", "obj": false, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Histórico disponível, mas retomada sem continuidade suficiente para fechamento.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}, "flag": "ID provisório"}], "resumo": "A Eugênia (robô) identifica a necessidade e aquece o cliente, mas na passagem para o atendimento humano o contexto se perde: há demora, a conversa recomeça e a retomada é genérica. Follow-up aparece em 77% dos atendimentos e subiu 27 pontos desde 28/09.", "comparativo": {"label": "28/09", "base": 22, "vals": {"apr": 0.5909090909090909, "sla": 0.5909090909090909, "cot": 0.5, "fu": 0.5, "obj": 0.45454545454545453}}, "porFila": true, "plano": ["Antes da primeira mensagem humana, ler o que a Eugênia já levantou: necessidade, opções, valores e última objeção.", "Prioridade máxima para quem diz 'vamos seguir', pede atendente, envia documentos ou pergunta sobre pagamento.", "O follow-up deve citar a última barreira do cliente.", "Toda cotação termina com uma recomendação.", "Objeções (preço, coparticipação, rede, carência) geram negociação específica.", "Acompanhar o SLA principalmente nos leads aquecidos e na transferência robô → humano."]}, {"id": "repme", "nome": "Repique PME", "titulo": "Repique PME", "oque": "Nova tentativa de venda para empresas que já demonstraram interesse antes e não fecharam.", "rows": [{"id": "748041551", "colab": "Kamila Kuner", "obj": true, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente recebeu duas opções, questionou desconto e disse que o valor estava 'um pouco salgado'. Depois informou que ficou fora do orçamento. Houve tentativa de alternativa, mas faltou investigar teto de investimento e retomar especificamente a objeção financeira no follow-up.", "res": "Não converteu", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": false}}, {"id": "748034595", "colab": "Kamila Kuner", "obj": false, "sla": true, "cot": false, "fu": false, "apr": false, "obs": "Cliente informou que já possuía plano e que não havia entendido a mensagem. O atendimento foi encerrado poucos minutos depois. Não há evidência suficiente de oportunidade comercial real após a manifestação de que já tinha plano.", "res": "Sem oportunidade comercial clara", "st": "Sem oportunidade", "inc": false, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": false}}, {"id": "725112362", "colab": "Beatriz Braido", "obj": true, "sla": true, "cot": true, "fu": false, "apr": false, "obs": "Cliente entrou com intenção explícita de fechar. Beatriz investigou necessidade, apresentou opções e conduziu até documentos, pagamento e boas-vindas. Houve SLA e, quando a cliente pediu opção mais barata, a recomendação poderia ter sido mais assertiva; ainda assim, é o benchmark positivo da amostra.", "res": "Converteu", "st": "convertido", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": false, "apr": false}}, {"id": "723172479", "colab": "Felipe Alves de Souza", "obj": false, "sla": true, "cot": false, "fu": true, "apr": false, "obs": "Cliente pediu atendente à noite; a abordagem humana ocorreu apenas na manhã seguinte. Sem resposta, o atendimento foi encerrado. Oportunidade de melhorar tempo de resposta e criar uma régua de recuperação antes do encerramento.", "res": "Não converteu", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": false}}, {"id": "721163813", "colab": "Felipe Alves de Souza", "obj": false, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente enviou CNPJ e nome. A primeira abordagem ocorreu cerca de duas horas depois e pediu novamente cidade, idade e CPF/CNPJ. Dois dias depois houve retomada genérica perguntando como preferia dar seguimento. Faltou aproveitar as informações já disponíveis e construir follow-up específico.", "res": "Não converteu", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}}], "resumo": "De 4 oportunidades reais, 1 virou venda (25%). Nos casos sem venda, a perda vem da retomada: demora para assumir, pedir de novo dados que o cliente já enviou e follow-up genérico. O atendimento 725112362 (Beatriz Braido) é o modelo a seguir: foi da intenção ao pagamento.", "conversao": true, "plano": ["Cuidar do tempo de resposta, principalmente na primeira retomada.", "Antes de abordar, ler CNPJ, número de vidas, produto e barreira já registrados.", "Evitar follow-up genérico quando já existe objeção conhecida: retomar preço, produto ou pendência.", "Na objeção de preço, perguntar qual valor cabe no orçamento antes de oferecer outra opção.", "Usar o atendimento 725112362 como exemplo de condução até o fechamento."]}, {"id": "repf", "nome": "Repique PF", "titulo": "Repique PF", "oque": "Nova tentativa de venda para pessoas físicas que já conversaram antes e não fecharam.", "rows": [{"id": "750519434", "colab": "Gabriela Reis", "obj": false, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente recebeu cotação CNPJ e ficou analisando. Faltou identificar a barreira decisória, recomendar objetivamente e conduzir para fechamento.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": false}}, {"id": "747107939", "colab": "Felipe Alves de Souza", "obj": true, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente escolheu o tipo de plano e recebeu valor para três vidas. Após pergunta sobre orçamento, não houve negociação estruturada da barreira financeira.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": false}}, {"id": "743702080", "colab": "Luana Ribeiro", "obj": false, "sla": true, "cot": false, "fu": true, "apr": false, "obs": "Baixa interação do cliente; abordagem seguida de encerramento. Oportunidade de régua de recuperação mais estruturada antes de abandonar o lead.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": false}}, {"id": "743700731", "colab": "Luana Ribeiro", "obj": false, "sla": true, "cot": false, "fu": true, "apr": false, "obs": "Baixa interação do cliente; faltou sequência de recuperação comercial antes do encerramento.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": false}}, {"id": "745513307", "colab": "Taiza Ribeiro", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente declarou que os planos novos estavam muito caros. Faltou investigar teto de investimento e construir alternativa sobre a objeção de preço.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "743707066", "colab": "Taiza Ribeiro", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente queria algo igual ou melhor ao plano anterior e rejeitou coparticipação total. Preferência explícita não foi convertida rapidamente em recomendação simples.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "743686280", "colab": "Taiza Ribeiro", "obj": false, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente queria reativar o plano que já tinha. Histórico deveria ter sido o ponto de partida para recomendação e retomada.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "745763073", "colab": "Kamila Kuner", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente disse que teria interesse se fosse mais barato que o plano atual. Faltou descobrir quanto pagava e usar esse parâmetro para negociar/recomendar.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "744814153", "colab": "Isabella Souza", "obj": false, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente declarou interesse e pediu atendente. Houve grande atraso na primeira abordagem e retomadas genéricas, sem aproveitar o interesse explícito.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "744718971", "colab": "Isabella Souza", "obj": false, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Cliente respondeu e pediu mensalidade. Foram apresentadas opções e a decisão voltou para a cliente; follow-up posterior foi genérico.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": false, "cot": true, "fu": true, "apr": false}}, {"id": "745000001", "colab": "Isabella Souza", "obj": false, "sla": false, "cot": true, "fu": true, "apr": false, "obs": "Oportunidade concentrada em recomendação e follow-up consultivo; cliente recebeu opções, mas faltou direcionamento mais objetivo para decisão.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": false, "cot": true, "fu": true, "apr": false}, "flag": "Verificar ID"}, {"id": "745000002", "colab": "Vitória Oliveira", "obj": true, "sla": false, "cot": false, "fu": false, "apr": true, "obs": "Contraponto parcial: consultou situação anterior e propôs nova proposta. Ainda havia oportunidade de trabalhar melhor a objeção/confiança do cliente.", "st": "benchmark", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": false, "apr": true}, "flag": "Verificar ID"}, {"id": "745000003", "colab": "Gabriela Reis", "obj": false, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Interação e cotação ocorreram, mas faltou transformar interesse em decisão com fechamento ativo e retomada da barreira final.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": false}, "flag": "Verificar ID"}, {"id": "745000004", "colab": "Felipe Alves de Souza", "obj": true, "sla": false, "cot": false, "fu": true, "apr": false, "obs": "Oportunidade em objeção e fechamento: a retomada não evoluiu para negociação suficientemente específica da barreira apresentada.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": false, "cot": false, "fu": true, "apr": false}, "flag": "Verificar ID"}], "resumo": "O Repique consegue reabrir a conversa, mas nem sempre recupera a venda. Em 13 de 14 atendimentos a retomada foi genérica, sem voltar ao motivo que impediu a compra anterior (preço alto, querer reativar o plano antigo, rejeitar coparticipação). O SLA piorou bastante em relação à semana anterior.", "comparativo": {"label": "Semana anterior", "base": 3, "vals": {"apr": 1.0, "cot": 0.6666666666666666, "obj": 0.6666666666666666, "sla": 0.3333333333333333}}, "planilha": {"obj": 0.35714285714285715, "cot": 0.42857142857142855, "apr": 0.35714285714285715}, "plano": ["Antes de abordar, achar no histórico o produto e valor apresentados e o motivo de não ter fechado.", "O follow-up retoma a última barreira, e não apenas pergunta se ainda há interesse.", "Depois de cotar, recomendar uma opção e justificar.", "Toda objeção de preço leva a perguntar o teto de investimento e oferecer alternativa.", "Criar uma régua mínima de tentativas antes de encerrar clientes sem resposta.", "Reduzir o tempo de resposta, que piorou 38 pontos em relação à semana anterior."]}, {"id": "adesao", "nome": "Adesão", "titulo": "Adesão", "oque": "Planos coletivos por adesão, contratados por meio de entidades de classe ou associações.", "extraCol": null, "rows": [{"id": "747866319", "colab": "Beatriz Rafaela Silvestre", "obj": false, "sla": false, "cot": false, "fu": true, "apr": false, "obs": "Cliente não respondeu à descoberta inicial e depois marcou 'Não tenho interesse'.", "imp": "Baixa ativação inicial; retomada automatizada sem diagnóstico.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": false, "cot": false, "fu": true, "apr": false}}, {"id": "747683475", "colab": "Raissa Burin", "obj": false, "sla": true, "cot": false, "fu": false, "apr": true, "obs": "Pós-venda/dúvida de boleto; não é caso de não venda.", "imp": "Atendimento de suporte, fora do diagnóstico de perda comercial.", "st": "Suporte pós-venda", "inc": false, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": true}}, {"id": "747604011", "colab": "Beatriz Rafaela Silvestre", "obj": false, "sla": true, "cot": true, "fu": true, "apr": false, "obs": "Cliente pediu os dois planos; recebeu resposta por áudio e depois desistiu.", "imp": "Cotação sem recomendação visível e sem retomada consultiva.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": false}}, {"id": "747020029", "colab": "Thiago Abelo", "obj": false, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente queria seguir sem CNPJ, mas Jataí não tinha comercialização; foram feitos follow-ups.", "imp": "Restrição geográfica; follow-up existiu, mas sem alternativa concreta visível.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "746814561", "colab": "Giovanna Ragonezi", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente perguntou por opção sem odonto; resposta veio depois por áudio e follow-up genérico.", "imp": "Objeção/preferência específica não virou recomendação objetiva.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "746541603", "colab": "Raissa Burin", "obj": true, "sla": true, "cot": false, "fu": true, "apr": true, "obs": "Cliente queria obstetrícia sem coparticipação e estava grávida; carência para parto inviabilizou uso esperado.", "imp": "Objeção de carência/obstetrícia determinante; SLA agravou jornada.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": false, "fu": true, "apr": true}}, {"id": "745424748", "colab": "Giovanna Ragonezi", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente perguntou carência e carência para parto; follow-ups posteriores destacaram carência zero genérica.", "imp": "Barreira específica de parto não foi retomada de forma personalizada.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "745292346", "colab": "Giovanna Ragonezi", "obj": false, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente demonstrou interesse várias vezes, avançou para escolha de valor/documentos e depois repetiu que não tinha interesse.", "imp": "Lead quente esfriou ao longo de uma jornada com vários SLAs e retomadas.", "st": "perda", "inc": true, "orig": {"obj": false, "sla": true, "cot": true, "fu": true, "apr": true}}, {"id": "744523987", "colab": "Raissa Burin", "obj": false, "sla": true, "cot": false, "fu": false, "apr": true, "obs": "Cliente efetivamente contratou e depois recebeu suporte de acesso/app.", "imp": "Não classificar como não venda; caso de conversão/suporte.", "st": "convertido", "inc": false, "orig": {"obj": false, "sla": true, "cot": false, "fu": false, "apr": true}}, {"id": "744399129", "colab": "Thiago Abelo", "obj": true, "sla": true, "cot": true, "fu": true, "apr": true, "obs": "Cliente era primeira contratação, perguntou sobre descontos/rede e disse que iria avaliar.", "imp": "Follow-up não retomou a dúvida central nem trouxe recomendação final.", "st": "perda", "inc": true, "orig": {"obj": true, "sla": true, "cot": true, "fu": true, "apr": true}}], "resumo": "Considerando só os 8 atendimentos realmente comerciais, o follow-up falhou em todos: a retomada não voltou à dúvida real do cliente (carência para parto, opção sem odonto, desconto). A demora aparece em 7 de 8 e agrava a perda de leads que já estavam avançados.", "plano": ["Separar a fila comercial de Adesão dos atendimentos de pós-venda (boleto, acesso ao app).", "Priorizar leads que já disseram 'tenho interesse'.", "Recomendar uma opção depois de entender o uso e a necessidade do cliente.", "Retomar exatamente a última dúvida do cliente no follow-up.", "Tratar carência e obstetrícia de forma específica antes de insistir em benefícios genéricos.", "Reduzir o tempo de resposta durante a negociação."]}];
-const OF = [
-  {k:'obj', nome:'Objeção não tratada', curto:'Objeção', desc:'O cliente disse o que o impedia (preço, carência, coparticipação) e isso não virou negociação.'},
-  {k:'sla', nome:'Demora no atendimento (SLA)', curto:'SLA', desc:'Tempo de resposta acima do limite. Agrava a perda, mas raramente explica sozinho.'},
-  {k:'cot', nome:'Cotou sem recomendar', curto:'Cotou s/ recom.', desc:'Enviou opções e preços, mas não indicou qual plano é o melhor para o cliente.'},
-  {k:'fu',  nome:'Retomada fraca (follow-up)', curto:'Follow-up', desc:'A volta ao cliente não aconteceu ou foi genérica, sem retomar a dúvida dele.'},
-  {k:'apr', nome:'Não usou o que o cliente já disse', curto:'Histórico', desc:'Pediu de novo dados já informados ou ignorou o histórico da conversa.'},
-];
-const ofBy = Object.fromEntries(OF.map(o=>[o.k,o]));
-const pct = (x,d=1)=> (x*100).toLocaleString('pt-BR',{minimumFractionDigits:x*100%1===0?0:d,maximumFractionDigits:d})+'%';
-const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CAMP = [{"d": "01/09", "h": "08h00", "n": "Repique Comercial RP VPC M 0109", "t": "VPC", "p": 2100.0, "e": 1400.0, "en": 1400.0, "l": 787.0}, {"d": "08/09", "h": "10h51", "n": "Repique Comercial VPC 0809", "t": "VPC", "p": 49.0, "e": 44.0, "en": 42.0, "l": 31.0}, {"d": "09/09", "h": "16h19", "n": "BASE VPC D-30 M 0909", "t": "VPC", "p": 500.0, "e": 283.0, "en": 275.0, "l": 174.0}, {"d": "10/09", "h": "08h02", "n": "BASE VPC D-30 M 1009", "t": "VPC", "p": 500.0, "e": 304.0, "en": 304.0, "l": 180.0}, {"d": "10/09", "h": "11h00", "n": "BASE VPC D-30 M1 1009", "t": "VPC", "p": 1100.0, "e": 679.0, "en": 669.0, "l": 432.0}, {"d": "10/09", "h": "13h56", "n": "BASE VPC D-30 M2 1009", "t": "VPC", "p": 1900.0, "e": 1400.0, "en": 1300.0, "l": 790.0}, {"d": "11/09", "h": "10h53", "n": "FOLLOW VPC 1109", "t": "VPC", "p": 155.0, "e": 146.0, "en": 142.0, "l": 92.0}, {"d": "11/09", "h": "11h04", "n": "REPIQUE VPC 1109", "t": "VPC", "p": 441.0, "e": 367.0, "en": 354.0, "l": 226.0}, {"d": "11/09", "h": "11h13", "n": "BASE VPC D -30 M 1109", "t": "VPC", "p": 1300.0, "e": 827.0, "en": 807.0, "l": 492.0}, {"d": "14/09", "h": "12h03", "n": "BASE VPC D -30 M 1409", "t": "VPC", "p": 3800.0, "e": 2500.0, "en": 2400.0, "l": 1300.0}, {"d": "15/09", "h": "09h43", "n": "FOLLOW UP BASE CANCELADOS 1509", "t": "VPC", "p": 178.0, "e": 170.0, "en": 167.0, "l": 97.0}, {"d": "15/09", "h": "10h13", "n": "BASE REPIQUE VPC 1509", "t": "VPC", "p": 415.0, "e": 381.0, "en": 368.0, "l": 240.0}, {"d": "15/09", "h": "10h16", "n": "BASE VPC D -30 M 1509", "t": "VPC", "p": 1100.0, "e": 769.0, "en": 751.0, "l": 433.0}, {"d": "16/09", "h": "13h30", "n": "BASE VPC D -30 M 1609 13h 30min", "t": "VPC", "p": 2800.0, "e": 1800.0, "en": 1700.0, "l": 1100.0}, {"d": "17/09", "h": "10h30", "n": "BASE VPC D -30 M 1709 10h 30min", "t": "VPC", "p": 1700.0, "e": 1100.0, "en": 1100.0, "l": 626.0}, {"d": "18/09", "h": "11h37", "n": "BASE VPC D -30 M 1809 11h 40min", "t": "VPC", "p": 1400.0, "e": 908.0, "en": 896.0, "l": 493.0}, {"d": "22/09", "h": "10h40", "n": "BASE VPC D -30 M 2209 10h 40min", "t": "VPC", "p": 2000.0, "e": 1200.0, "en": 1200.0, "l": 638.0}, {"d": "22/09", "h": "13h00", "n": "BASE VPC D -30 M 2209 13h 00min", "t": "VPC", "p": 2100.0, "e": 1000.0, "en": 1000.0, "l": 564.0}, {"d": "23/09", "h": "13h00", "n": "BASE VPC D -30 M 2309 13h 00min", "t": "VPC", "p": 1600.0, "e": 898.0, "en": 886.0, "l": 483.0}, {"d": "24/09", "h": "10h59", "n": "BASE VPC D -30 M 2309 11h 00min", "t": "VPC", "p": 1100.0, "e": 595.0, "en": 576.0, "l": 331.0}, {"d": "24/09", "h": "14h46", "n": "BASE VPC D -30 M 2409", "t": "VPC", "p": 1000.0, "e": 597.0, "en": 588.0, "l": 327.0}, {"d": "24/09", "h": "15h50", "n": "20260924_SAUHP_WPP_WIBCK_MESDOCLIENTE", "t": "Mês do Cliente", "p": 5000.0, "e": 4200.0, "en": 4200.0, "l": 2400.0}, {"d": "24/09", "h": "15h56", "n": "20260925_SAUHP_WPP_WIBCK_MESDOCLIENTE_4", "t": "Mês do Cliente", "p": 5000.0, "e": 4000.0, "en": 4000.0, "l": 2600.0}, {"d": "24/09", "h": "16h30", "n": "20260924_SAUHP_WPP_WIBCK_MESDOCLIENTE", "t": "Mês do Cliente", "p": 5000.0, "e": 4200.0, "en": 4200.0, "l": 2400.0}, {"d": "24/09", "h": "17h00", "n": "20260924_SAUHP_WPP_WIBCK_MESDOCLIENTE", "t": "Mês do Cliente", "p": 5000.0, "e": 4100.0, "en": 4100.0, "l": 2500.0}, {"d": "24/09", "h": "17h30", "n": "20260924_SAUHP_WPP_WIBCK_MESDOCLIENTE", "t": "Mês do Cliente", "p": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2400.0}, {"d": "25/09", "h": "10h30", "n": "20260925_SAUHP_WPP_WIBCK_MESDOCLIENTE", "t": "Mês do Cliente", "p": 5000.0, "e": 4100.0, "en": 4000.0, "l": 2500.0}, {"d": "25/09", "h": "11h30", "n": "20260925_SAUHP_WPP_WIBCK_MESDOCLIENTE_2", "t": "Mês do Cliente", "p": 5000.0, "e": 4200.0, "en": 4100.0, "l": 2500.0}, {"d": "25/09", "h": "12h30", "n": "20260925_SAUHP_WPP_WIBCK_MESDOCLIENTE_3", "t": "Mês do Cliente", "p": 5000.0, "e": 4100.0, "en": 4100.0, "l": 2500.0}, {"d": "25/09", "h": "13h30", "n": "20260925_SAUHP_WPP_WIBCK_MESDOCLIENTE_5", "t": "Mês do Cliente", "p": 5000.0, "e": 3300.0, "en": 3200.0, "l": 1800.0}, {"d": "25/09", "h": "15h34", "n": "BASE VPC D -30 M 2509", "t": "VPC", "p": 671.0, "e": 421.0, "en": 418.0, "l": 227.0}, {"d": "28/09", "h": "15h32", "n": "BASE VPC D -30 M 2809", "t": "VPC", "p": 1500.0, "e": null, "en": null, "l": null}].filter(c=>c.e!=null).concat([{"d": "28/09", "h": "15h32", "n": "BASE VPC D -30 M 2809", "t": "VPC", "p": 1500.0, "e": 927.0, "en": 912.0, "l": 487.0}, {"d": "29/09", "h": "14h42", "n": "BASE VPC D -30 M 2909", "t": "VPC", "p": 604.0, "e": 316.0, "en": 312.0, "l": 184.0}, {"d": "30/09", "h": "11h03", "n": "BASE VPC D -30 M 3009", "t": "VPC", "p": 1000.0, "e": 940.0, "en": 907.0, "l": 532.0}, {"d": "30/09", "h": "15h05", "n": "BASE VPC D -30 M 01 3009", "t": "VPC", "p": 558.0, "e": 358.0, "en": 343.0, "l": 202.0}, {"d": "01/10", "h": "11h53", "n": "BASE VPC D -30 M 0110", "t": "VPC", "p": 753.0, "e": 462.0, "en": 446.0, "l": 251.0}, {"d": "05/10", "h": "15h14", "n": "BASE VPC D -30 M 0510", "t": "VPC", "p": 1100.0, "e": 708.0, "en": 688.0, "l": 403.0}]);
+const NS='http://www.w3.org/2000/svg';
+const $=s=>document.querySelector(s);
+const fmt=n=>n>=1000?(n/1000).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mil':Math.round(n).toLocaleString('pt-BR');
+const pct=(v,d=1)=>(v*100).toLocaleString('pt-BR',{maximumFractionDigits:d,minimumFractionDigits:d})+'%';
+function svg(w,h){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox',`0 0 ${w} ${h}`);return s;}
+function el(s,tag,a,txt){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;s.appendChild(e);return e;}
+function mount(id,s){const c=document.getElementById(id);c.innerHTML='';c.appendChild(s);}
+// tooltip
+const tip=$('#tip');
+document.addEventListener('mousemove',e=>{const t=e.target.closest('[data-tip]');if(!t){tip.style.opacity=0;return;}
+  tip.innerHTML=t.getAttribute('data-tip');tip.style.opacity=1;
+  const x=Math.min(e.clientX+14,innerWidth-tip.offsetWidth-8),y=e.clientY+14+tip.offsetHeight>innerHeight?e.clientY-tip.offsetHeight-10:e.clientY+14;
+  tip.style.left=x+'px';tip.style.top=y+'px';});
+// navegação
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));scrollTo({top:0});}));
 
-// ---- compute stats per tab
-TABS.forEach(t=>{
-  const inc = t.rows.filter(r=>r.inc);
-  t.n = inc.length; t.total = t.rows.length;
-  t.cnt = {}; t.pct = {}; t.orig = {};
-  OF.forEach(o=>{
-    t.cnt[o.k] = inc.filter(r=>r[o.k]).length;
-    t.pct[o.k] = t.n ? t.cnt[o.k]/t.n : 0;
-    t.orig[o.k] = (t.planilha && t.planilha[o.k]!=null) ? t.planilha[o.k] : t.rows.filter(r=>r.orig[o.k]).length/t.total;
-  });
-  const com = OF.filter(o=>o.k!=='sla');
-  const mx = Math.max(...com.map(o=>t.cnt[o.k]));
-  t.top = com.filter(o=>t.cnt[o.k]===mx);
-  t.conv = t.rows.filter(r=>r.st==='convertido').length;
-});
+/* ---------- dados de incidentes ---------- */
+const CATS=['Distribuição e filas (GUP)','Bot e Eugênia','Bloqueio Meta e envio','Conecta ou Contrate fora','Pagamento, boleto e proposta','Perda de leads em andamento'];
+const SHORT=['GUP','Bot','Meta','Sistemas','Pagamento','Perda'];
+const INC={
+7:{g:0,it:[[0,'Leads de teste com nomes de animais, muitas vezes em inglês, entraram na fila dos vendedores por engano. Orientação: marcar como 11 improdutivo. Ocupam tempo do vendedor e podem distorcer a contagem de leads.']]},
+16:{g:0,it:[[0,'Leads que responderam "sem interesse" ou "agora não" continuaram sendo transferidos aos vendedores (INC002194822).'],[2,'Bloqueios da Meta impediram o envio de follow-up.'],[1,'Eugênia informou R$ 290,54 em vez de R$ 419,56; bot enviou mensagens em inglês.']]},
+17:{g:1,it:[[0,'Leads chegando fechados após mais de 24h aguardando na fila.'],[1,'Bot entrou no meio de conversas; Eugênia informou coparticipação errada e disse não haver plano na Bahia.'],[2,'PDF não era enviado por falha da Meta.'],[3,'Conecta e Contrate fora do ar à tarde.'],[4,'Status travado após pagamento no cartão, erro ao incluir dependente na Bitix e declaração de permanência em branco.']],n:['Início da restrição de venda PF em Londrina e Divinópolis.','Contrate passa a atender apenas vendedores VPC.']},
+18:{g:0,it:[[3,'Conecta fora do ar pela manhã.']],n:['Comunicado oficial da restrição PF em Londrina, Divinópolis e cidades ligadas à filial de Londrina.']},
+19:{g:1,it:[[0,'GUP encerrou conversas enquanto vendedores atendiam, sem suporte no plantão de sábado.'],[5,'Leads com documentos enviados sumiram; um cliente foi fechado 5 vezes e um vendedor perdeu mais de 8 clientes.'],[3,'Sistema fora; cliente não conseguia acessar a proposta.'],[2,'Falha no envio de follow-up.']]},
+21:{g:1,it:[[0,'52 chats distribuídos para vendedores em pausa ou deslogados (INC002203468); um vendedor recebeu 41 leads em pausa.'],[5,'Leads sem resposta dentro do tempo esperado.'],[4,'Erro no pagamento com cartão.']]},
+22:{g:1,it:[[0,'Filas acima de 150 atendimentos, tempo de resposta estourado, chats sem ir para "aguardando resposta", áudios e imagens sem carregar. Regra de atribuição ajustada à tarde.'],[4,'Erro na 2ª via de boleto e no aproveitamento de carência no Conecta.']]},
+23:{g:1,it:[[1,'Bot entrou no meio de conversas.'],[3,'Conecta lento e Contrate fora do ar por cerca de 10 minutos.'],[4,'Cliente sem gerar boleto, falha no CEP e erro na integração Sigo e Bitix.']]},
+24:{g:0,it:[[0,'Chats fora do status correto, mensagens automáticas invisíveis ao vendedor e falha no envio de áudio.']]},
+25:{g:0,it:[[4,'Novo erro no pagamento com cartão.']]}
+};
+const NOTE={15:'Início da queda na projeção acumulada.'};
 
-// ---- render helpers
-function statusChip(r){
-  if(r.st==='convertido') return '<span class="chip ok">Converteu</span>';
-  if(r.st==='benchmark') return '<span class="chip ok">Boa prática</span>';
-  if(r.st==='recusa') return '<span class="chip warn">Recusa explícita</span>';
-  if(!r.inc) return `<span class="chip ex">Fora do cálculo · ${esc(r.st)}</span>`;
-  return '<span class="chip perda">Não converteu</span>';
-}
-function kpis(t){
-  const topNames = t.top.length>1 ? `Empate (${t.top.length})` : t.top[0].nome;
-  const topSub = t.top.length>1 ? t.top.map(o=>o.curto).join(', ') : '';
-  const topCnt = t.cnt[t.top[0].k];
-  let res;
-  if(t.id==='cancelados'){
-    const err = t.rows.filter(r=>!r.inc).length;
-    res = `<div class="kpi"><div class="eyebrow">Erro na lista de contatos</div><div class="v">${err} <small>de ${t.total}</small></div><div class="d">registros que não eram oportunidade real</div></div>`;
-  } else if(t.conversao){
-    res = `<div class="kpi"><div class="eyebrow">Conversão observada</div><div class="v">${pct(t.conv/t.n)}</div><div class="d">${t.conv} venda em ${t.n} oportunidades</div></div>`;
-  } else {
-    res = `<div class="kpi"><div class="eyebrow">Vendas na amostra</div><div class="v">${t.conv} <small>de ${t.total}</small></div><div class="d">${t.conv? 'atendimentos que converteram' : 'amostra só com casos de não venda'}</div></div>`;
-  }
-  return `<div class="kpis">
-    <div class="kpi"><div class="eyebrow">Atendimentos analisados</div><div class="v">${t.n}${t.n!==t.total?` <small>de ${t.total}</small>`:''}</div><div class="d">${t.n!==t.total? `${t.total-t.n} fora do cálculo (não eram venda)` : 'todos com oportunidade comercial'}</div></div>
-    <div class="kpi"><div class="eyebrow">Principal ponto de perda</div><div class="t">${esc(topNames)}</div><div class="d">${topSub?esc(topSub)+' · ':''}${topCnt} de ${t.n} · ${pct(topCnt/t.n)}</div></div>
-    <div class="kpi"><div class="eyebrow">Demora (SLA)</div><div class="v">${pct(t.pct.sla)}</div><div class="d">${t.cnt.sla} de ${t.n} atendimentos com atraso</div></div>
-    ${res}
-  </div>`;
-}
-function bars(t){
-  const order = [...OF].sort((a,b)=>t.cnt[b.k]-t.cnt[a.k] || (a.k==='sla') - (b.k==='sla'));
-  const hasGhost = order.some(o=>Math.abs(t.orig[o.k]-t.pct[o.k])>0.001);
-  const topSet = new Set(t.top.map(o=>o.k));
-  return `<div class="bars">${order.map(o=>{
-    const diff = Math.abs(t.orig[o.k]-t.pct[o.k])>0.001;
-    return `<div class="bar-row" title="${esc(o.nome)}: ${t.cnt[o.k]} de ${t.n} (${pct(t.pct[o.k])})">
-      <div class="lbl"><b>${esc(o.nome)}${o.k==='sla'?'<span class="tag">contexto</span>':''}${topSet.has(o.k)&&t.cnt[o.k]>0?'<span class="tag" style="background:var(--primary-soft);color:var(--primary-ink)">principal</span>':''}</b><span>${esc(o.desc)}</span></div>
-      <div class="track"><div class="fill ${o.k==='sla'?'ctx':''}" style="width:${t.pct[o.k]*100}%"></div>${diff?`<div class="ghost" style="left:calc(${t.orig[o.k]*100}% - 1px)"></div>`:''}</div>
-      <div class="val"><b>${pct(t.pct[o.k])}</b><span>${t.cnt[o.k]} de ${t.n}${diff?` · planilha ${pct(t.orig[o.k])}`:''}</span></div>
-    </div>`}).join('')}</div>
-    <div class="legend-note"><span><i style="background:var(--primary)"></i>Ponto comercial</span><span><i style="background:var(--bar-weak)"></i>SLA (contexto operacional)</span>${hasGhost?'<span><i style="background:var(--ink-2);width:2px;height:12px"></i>Valor que estava na planilha original</span>':''}</div>`;
-}
-function table(t){
-  const ex = t.extraCol;
-  return `<div class="tbl-wrap"><table>
-    <thead><tr><th>ID</th><th>Colaborador</th>${ex?`<th>${ex}</th>`:''}${OF.map(o=>`<th class="c" title="${esc(o.nome)}">${esc(o.curto)}</th>`).join('')}<th>Situação</th></tr></thead>
-    <tbody>${t.rows.map((r,i)=>`
-      <tr class="main ${r.inc?'':'excl'}" tabindex="0" data-i="${i}" aria-expanded="false">
-        <td class="mono"><span class="caret">›</span>${esc(r.id)}</td>
-        <td>${esc(r.colab)}${r.flag?`<span class="flag">${esc(r.flag)}</span>`:''}</td>
-        ${ex?`<td>${esc(r.extra)}</td>`:''}
-        ${OF.map(o=>`<td class="c">${r[o.k]?`<span class="yes" role="img" aria-label="Sim"></span>`:`<span class="no" role="img" aria-label="Não"></span>`}</td>`).join('')}
-        <td>${statusChip(r)}</td>
-      </tr>
-      <tr class="det" hidden><td colspan="${8+(ex?1:0)}"><p><b>O que aconteceu:</b> ${esc(r.obs)}</p>${r.imp?`<p><b>Impacto:</b> ${esc(r.imp)}</p>`:''}${r.res?`<p><b>Resultado:</b> ${esc(r.res)}</p>`:''}</td></tr>`).join('')}
-    </tbody></table></div>
-    <div class="legend-note"><span><span class="yes" style="width:10px;height:10px;margin-right:6px;vertical-align:-1px"></span>ponto de perda presente</span><span><span class="no" style="margin-right:6px"></span>não identificado</span><span>Clique em uma linha para ver o que aconteceu.</span></div>`;
-}
-function colabTable(t){
-  const m = {};
-  t.rows.filter(r=>r.inc).forEach(r=>{
-    const k=r.colab; m[k]=m[k]||{n:0,c:{}}; m[k].n++;
-    OF.forEach(o=>{m[k].c[o.k]=(m[k].c[o.k]||0)+(r[o.k]?1:0)});
-  });
-  const list = Object.entries(m).sort((a,b)=>{
-    const s=x=>OF.reduce((z,o)=>z+(o.k==='sla'?0:x[1].c[o.k]),0)/x[1].n; return s(b)-s(a)||b[1].n-a[1].n});
-  return `<div class="tbl-wrap"><table class="heat">
-   <thead><tr><th>Colaborador</th><th class="c">Atend.</th>${OF.map(o=>`<th class="c">${esc(o.curto)}</th>`).join('')}</tr></thead>
-   <tbody>${list.map(([k,v])=>`<tr><td class="fila">${esc(k)}</td><td class="c mono">${v.n}</td>${OF.map(o=>heatCell(v.c[o.k]/v.n, v.c[o.k]?`${v.c[o.k]}/${v.n}`:'—')).join('')}</tr>`).join('')}</tbody></table></div>
-   <p class="hint" style="margin-top:10px">Ordenado por quem concentra mais pontos comerciais (sem contar SLA). Com amostras pequenas, use para orientar o feedback, não para ranquear.</p>`;
-}
-function heatCell(p, label){
-  const a = p? (0.12 + p*0.78) : 0;
-  const fg = a>0.5 ? '#fff' : 'var(--ink)';
-  return `<td class="h c" style="background:rgba(var(--heat),${a.toFixed(2)});color:${fg}">${label}</td>`;
-}
-function cases(t){
-  const good = t.rows.filter(r=>r.st==='convertido'||r.st==='benchmark');
-  const bad = t.rows.filter(r=>r.inc && (r.st==='perda'||r.st==='recusa'))
-    .map(r=>({r,s:OF.reduce((z,o)=>z+(r[o.k]?(o.k==='sla'?0.5:1):0),0)})).sort((a,b)=>b.s-a.s).slice(0,3).map(x=>x.r);
-  const card = (r,ok)=>`<div class="case"><div class="h"><span class="mono">${esc(r.id)}</span>${statusChip(r)}</div><div class="who">${esc(r.colab)}${r.extra&&t.extraCol?` · <span style="font-weight:400;color:var(--muted)">${esc(r.extra)}</span>`:''}</div><p>${esc(r.obs)}</p>${!ok?`<p style="color:var(--muted);font-size:12px">${OF.filter(o=>r[o.k]).map(o=>o.curto).join(' · ')}</p>`:''}</div>`;
-  return `${bad.length?`<div><h2>Casos que mais ensinam</h2><p class="hint">Atendimentos com mais pontos de perda ao mesmo tempo. Bons exemplos para feedback individual.</p><div class="cases">${bad.map(r=>card(r,false)).join('')}</div></div>`:''}
-  ${good.length?`<div><h2>O que deu certo</h2><p class="hint">Atendimentos que converteram ou mostram a condução esperada. Use como modelo.</p><div class="cases">${good.map(r=>card(r,true)).join('')}</div></div>`:''}`;
-}
-function compare(t){
-  const c=t.comparativo;
-  const rows = OF.map(o=>({o, a:c.vals[o.k], b:t.pct[o.k]}));
-  return `<div class="card"><h2>Comparativo: ${esc(c.label)} × hoje</h2>
-  <p class="hint">${esc(c.label)}: ${c.base} atendimentos · hoje: ${t.n} atendimentos. Aqui, quanto menor, melhor: queda em verde, alta em vermelho.</p>
-  <div class="cmp">${rows.map(({o,a,b})=>{
-    const d = a==null?null:(b-a)*100;
-    const cls = d==null?'na':(d>0.05?'up':(d<-0.05?'down':'na'));
-    return `<div class="cmp-row"><div class="lbl" style="font-weight:600;font-size:13.5px">${esc(o.nome)}</div>
-      <div class="cmp-bars">
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:8px;align-items:center"><div class="track"><div class="fill ctx" style="width:${(a??0)*100}%"></div></div><span style="font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums">${a==null?'s/ dado':pct(a)}</span></div>
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:8px;align-items:center"><div class="track"><div class="fill" style="width:${b*100}%"></div></div><span style="font-size:12px;font-weight:600;font-variant-numeric:tabular-nums">${pct(b)}</span></div>
-      </div>
-      <div class="delta ${cls}">${d==null?'sem base':(d>0?'+':'')+d.toLocaleString('pt-BR',{maximumFractionDigits:1})+' p.p.'}</div></div>`}).join('')}</div>
-  <div class="legend-note"><span><i style="background:var(--bar-weak)"></i>${esc(c.label)}</span><span><i style="background:var(--primary)"></i>Hoje (05/10)</span></div></div>`;
-}
-function porFila(t){
-  const filas = [...new Set(t.rows.map(r=>r.extra))];
-  const txt = {
-    'Eugênia':'Cliente traz necessidade específica (ex.: hemodiálise, cirurgia reparadora) e a retomada não usa essa informação para recomendar o produto.',
-    'Eugênia Cotação':'Cliente sinaliza que quer seguir ou volta com uma dúvida objetiva, e a jornada perde força por demora e retomada genérica.',
-    'Eugênia Seller':'Cenário mais crítico: clientes escolhendo produto, pedindo atendente e enviando documentos perdem ritmo na passagem do robô para o humano.'};
-  return `<div class="card"><h2>Comparação entre as três filas</h2><p class="hint">Percentual de atendimentos de cada fila com o ponto de perda. Cor mais forte = mais frequente.</p>
-  <div class="tbl-wrap"><table class="heat"><thead><tr><th>Fila</th><th class="c">Atend.</th>${OF.map(o=>`<th class="c">${esc(o.curto)}</th>`).join('')}</tr></thead><tbody>
-  ${filas.map(f=>{const rs=t.rows.filter(r=>r.extra===f);return `<tr><td class="fila">${esc(f)}</td><td class="c mono">${rs.length}</td>${OF.map(o=>{const c=rs.filter(r=>r[o.k]).length;return heatCell(c/rs.length, `${pct(c/rs.length,0)}`)}).join('')}</tr>`}).join('')}
-  </tbody></table></div>
-  <div style="display:grid;gap:10px;margin-top:16px">${filas.map(f=>`<p style="margin:0;color:var(--ink-2)"><b style="color:var(--ink)">${esc(f)}:</b> ${esc(txt[f]||'')}</p>`).join('')}</div></div>`;
-}
-function composicao(t){
-  const groups = [
-    {l:'Erro na lista de contatos', n:t.rows.filter(r=>!r.inc).length, c:'#79859a'},
-    {l:'Recusa explícita', n:t.rows.filter(r=>r.st==='recusa').length, c:'#c93600'},
-    {l:'Voltou a ser cliente', n:t.rows.filter(r=>r.st==='convertido').length, c:'#157a3c'}];
-  const robo = t.rows.filter(r=>r.colab==='Sem atendimento humano').length;
-  return `<div class="card"><h2>O que havia na lista de ${t.total} contatos</h2><p class="hint">Antes de avaliar a abordagem, é preciso saber se o contato era mesmo um ex-cliente com chance de voltar.</p>
-  <div class="stack">${groups.map(g=>`<div style="flex:${g.n};background:${g.c}" title="${g.l}: ${g.n}">${g.n}</div>`).join('')}</div>
-  <div class="legend-note" style="margin-top:12px">${groups.map(g=>`<span><i style="background:${g.c}"></i>${g.l}: <b style="color:var(--ink)">${g.n}</b> (${pct(g.n/t.total,0)})</span>`).join('')}</div>
-  <p style="margin:14px 0 0;color:var(--ink-2)">Erros encontrados: spam com links suspeitos, conversa sem nenhuma mensagem, cliente com plano ativo há mais de 6 anos e pessoa que não pediu contato e ameaçou processo. Além disso, <b style="color:var(--ink)">${robo} das recusas foram encerradas pelo robô</b>, sem nenhum atendimento humano.</p></div>`;
-}
+/* ---------- visão geral ---------- */
+document.querySelectorAll('.go').forEach(b=>b.onclick=()=>document.querySelector(`nav button[data-v="${b.dataset.go}"]`).click());
 
-function tabPage(t){
-  return `<section class="page">
-    <div><div class="eyebrow">Fila analisada</div><h1>${esc(t.titulo)}</h1><p class="sub">${esc(t.oque)}</p></div>
-    ${kpis(t)}
-    <div class="resumo"><div class="eyebrow">Em resumo</div><p>${esc(t.resumo)}</p>${t.principalNota?`<p style="font-size:13px;color:var(--ink-2)">${esc(t.principalNota)}</p>`:''}</div>
-    ${t.composicao?composicao(t):''}
-    <div class="two">
-      <div class="card"><h2>Onde estamos perdendo vendas</h2><p class="hint">Percentual dos ${t.n} atendimentos em que cada ponto apareceu. Um atendimento pode ter mais de um, por isso a soma passa de 100%.</p>${bars(t)}</div>
-      <div class="card"><h2>O que fazer agora</h2><p class="hint">Plano de ação, em ordem de prioridade.</p><ol class="acoes">${t.plano.map(p=>`<li>${esc(p)}</li>`).join('')}</ol></div>
-    </div>
-    ${t.porFila?porFila(t):''}
-    ${t.comparativo?compare(t):''}
-    ${cases(t)}
-    <div class="card"><h2>Atendimento a atendimento</h2><p class="hint">Cada linha é um atendimento monitorado. O ponto vermelho mostra onde ele perdeu força.</p>${table(t)}</div>
-    <div class="card"><h2>Por colaborador</h2><p class="hint">Quantos atendimentos de cada pessoa tiveram cada ponto de perda.</p>${colabTable(t)}</div>
-  </section>`;
-}
+/* ---------- disparos gerais ---------- */
+const GC=[{"d": "28/09", "h": "09h45", "n": "20260928_SAUND_WPP_NCONV_DUASVIDAS50OFF_3", "m": false, "tg": 4300.0, "e": 3000.0, "en": 2900.0, "l": 1800.0}, {"d": "28/09", "h": "11h41", "n": "FOLLOW UP REP 2809", "m": true, "tg": 2000.0, "e": 1900.0, "en": 1900.0, "l": 1000.0}, {"d": "28/09", "h": "12h01", "n": "Repique comercial pf 2809", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2700.0, "l": 1400.0}, {"d": "28/09", "h": "13h54", "n": "Venda ADM AGUARDANDO PG 2809", "m": true, "tg": 18.0, "e": 17.0, "en": 17.0, "l": 14.0}, {"d": "28/09", "h": "14h04", "n": "Venda ADM ASSINADO 2809", "m": true, "tg": 14.0, "e": 9.0, "en": 9.0, "l": 6.0}, {"d": "28/09", "h": "14h06", "n": "Venda ADM CONFIRMACAO CLIENTE 2809", "m": true, "tg": 65.0, "e": 42.0, "en": 41.0, "l": 18.0}, {"d": "28/09", "h": "14h13", "n": "Venda ADM EM DIGITACAO PENDENTE 2809", "m": true, "tg": 42.0, "e": 34.0, "en": 34.0, "l": 16.0}, {"d": "28/09", "h": "15h06", "n": "20260928_SAUHP_WPP_NCONV_NASEGUNDACOMECO", "m": false, "tg": 11100.0, "e": 10400.0, "en": 9800.0, "l": 5400.0}, {"d": "28/09", "h": "15h30", "n": "20260928_SAUND_WPP_PARAB_UTILITY", "m": false, "tg": 139.0, "e": 139.0, "en": 135.0, "l": 83.0}, {"d": "28/09", "h": "16h00", "n": "20260928_SAUND_WPP_CA_UTILITY", "m": false, "tg": 6.0, "e": 6.0, "en": 5.0, "l": 4.0}, {"d": "28/09", "h": "16h00", "n": "20260928_SAUHP_WPP_NCONV_NASEGUNDACOMECO_2", "m": false, "tg": 11100.0, "e": 10500.0, "en": 10000.0, "l": 5500.0}, {"d": "28/09", "h": "16h33", "n": "FOLLOW UP - 2809", "m": true, "tg": 540.0, "e": 511.0, "en": 497.0, "l": 274.0}, {"d": "28/09", "h": "16h35", "n": "FOLLOW UP - 2809", "m": true, "tg": 2000.0, "e": 1900.0, "en": 1800.0, "l": 955.0}, {"d": "28/09", "h": "17h00", "n": "20260928_SAUHP_WPP_NCONV_NASEGUNDACOMECO_3", "m": false, "tg": 11100.0, "e": 10500.0, "en": 10100.0, "l": 5600.0}, {"d": "28/09", "h": "17h00", "n": "20260928_SAUND_WPP_NIMP_GOSTARIADECONVERSAR", "m": false, "tg": 127.0, "e": 100.0, "en": 96.0, "l": 54.0}, {"d": "29/09", "h": "08h46", "n": "Repique comercial pf 2909", "m": true, "tg": 3100.0, "e": 2900.0, "en": 2800.0, "l": 1500.0}, {"d": "29/09", "h": "09h20", "n": "Follow up comercial projetos 2909", "m": true, "tg": 632.0, "e": 569.0, "en": 559.0, "l": 293.0}, {"d": "29/09", "h": "09h49", "n": "VENDA ADM AG PAGAMENTO 2909", "m": true, "tg": 7.0, "e": 7.0, "en": 7.0, "l": 6.0}, {"d": "29/09", "h": "10h01", "n": "VENDA ADM ASSINADO 2909", "m": true, "tg": 4.0, "e": 4.0, "en": 4.0, "l": 3.0}, {"d": "29/09", "h": "10h04", "n": "VENDA ADM CONFIRMACAO CLIENTE 2909", "m": true, "tg": 24.0, "e": 21.0, "en": 21.0, "l": 8.0}, {"d": "29/09", "h": "10h09", "n": "VENDA ADM DIGITACAO PENDENTE 2909", "m": true, "tg": 10.0, "e": 8.0, "en": 8.0, "l": 5.0}, {"d": "29/09", "h": "11h00", "n": "20260929_SAUHP_WPP_PARAB_UTILITY", "m": false, "tg": 11400.0, "e": 11000.0, "en": 10500.0, "l": 5500.0}, {"d": "29/09", "h": "14h00", "n": "20260929_SAUND_WPP_PARAB_UTILITY", "m": false, "tg": 63.0, "e": 63.0, "en": 60.0, "l": 39.0}, {"d": "29/09", "h": "14h30", "n": "20260929_SAUND_WPP_CA_UTILITY", "m": false, "tg": 9.0, "e": 9.0, "en": 9.0, "l": 5.0}, {"d": "29/09", "h": "14h54", "n": "Repique adesao 2909", "m": true, "tg": 2000.0, "e": 1800.0, "en": 1700.0, "l": 878.0}, {"d": "29/09", "h": "15h06", "n": "FOLLOW UP - 2909", "m": true, "tg": 439.0, "e": 418.0, "en": 410.0, "l": 235.0}, {"d": "29/09", "h": "15h09", "n": "FOLLOW UP - 2909", "m": true, "tg": 1000.0, "e": 992.0, "en": 978.0, "l": 531.0}, {"d": "29/09", "h": "15h22", "n": "Repique comercial pf 2909", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2700.0, "l": 1300.0}, {"d": "29/09", "h": "15h30", "n": "20260929_SAUHP_WPP_NCONV_REDUCAOPRECO_NORDESTE", "m": false, "tg": 10000.0, "e": 9500.0, "en": 9000.0, "l": 4600.0}, {"d": "29/09", "h": "15h55", "n": "20260929_SAUHP_WPP_NCONV_MESDOCLIENTE_LEGADOS", "m": false, "tg": 10000.0, "e": 8400.0, "en": 7500.0, "l": 4100.0}, {"d": "29/09", "h": "16h05", "n": "20260929_SAUHP_WPP_PARAB_ERROMETA", "m": false, "tg": 1500.0, "e": 1500.0, "en": 1300.0, "l": 602.0}, {"d": "29/09", "h": "16h30", "n": "20260929_SAUHP_WPP_NCONV_REDUCAOPRECO_NORDESTE_2", "m": false, "tg": 8600.0, "e": 8100.0, "en": 7700.0, "l": 4300.0}, {"d": "29/09", "h": "17h00", "n": "20260929_SAUHP_WPP_NCONV_MESDOCLIENTE_LEGADOS_2", "m": false, "tg": 10000.0, "e": 8200.0, "en": 7300.0, "l": 3900.0}, {"d": "29/09", "h": "17h30", "n": "20260929_SAUHP_WPP_NCONV_MESDOCLIENTE_LEGADOS_3", "m": false, "tg": 7300.0, "e": 6000.0, "en": 5300.0, "l": 2800.0}, {"d": "30/09", "h": "10h00", "n": "20260930_SAUHP_WPP_NCONV_MESDOCLIENTE_LEGADOS", "m": false, "tg": 10200.0, "e": 8500.0, "en": 7500.0, "l": 4100.0}, {"d": "30/09", "h": "10h00", "n": "FOLLOW UP REP 3009", "m": true, "tg": 689.0, "e": 654.0, "en": 626.0, "l": 309.0}, {"d": "30/09", "h": "10h04", "n": "FOLLOW UP REP PROJETOS 3009", "m": true, "tg": 510.0, "e": 463.0, "en": 453.0, "l": 222.0}, {"d": "30/09", "h": "10h18", "n": "Repique comercial pf 3009", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2700.0, "l": 1300.0}, {"d": "30/09", "h": "10h30", "n": "20260930_SAUND_WPP_MAB_RECEITAFEDERAL_MEI_2VIDAS50OFF", "m": false, "tg": 3000.0, "e": 1800.0, "en": 1700.0, "l": 1100.0}, {"d": "30/09", "h": "11h00", "n": "20260930_SAUND_WPP_MAB_RECEITAFEDERAL_MEI_2VIDAS50OFF_2", "m": false, "tg": 3000.0, "e": 1800.0, "en": 1700.0, "l": 1100.0}, {"d": "30/09", "h": "11h00", "n": "20260930_SAUHP_WPP_NCONV_MESDOCLIENTE_LEGADOS_2", "m": false, "tg": 10200.0, "e": 8500.0, "en": 7600.0, "l": 4200.0}, {"d": "30/09", "h": "12h00", "n": "20260930_SAUHP_WPP_NCONV_MESDOCLIENTE_LEGADOS_3", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7700.0, "l": 4300.0}, {"d": "30/09", "h": "12h10", "n": "20260930_SAUND_WPP_PARAB_UTILITY", "m": false, "tg": 12.0, "e": 12.0, "en": 12.0, "l": 9.0}, {"d": "30/09", "h": "12h30", "n": "20260930_SAUND_WPP_CA_UTILITY", "m": false, "tg": 7.0, "e": 7.0, "en": 7.0, "l": 5.0}, {"d": "30/09", "h": "12h50", "n": "20260930_SAUND_WPP_MAB_RECEITAFEDERAL_MEI_2VIDAS50OFF_3", "m": false, "tg": 4300.0, "e": 3000.0, "en": 3000.0, "l": 1800.0}, {"d": "30/09", "h": "13h00", "n": "20260930_SAUHP_WPP_PARAB_UTILITY", "m": false, "tg": 1300.0, "e": 1100.0, "en": 1100.0, "l": 583.0}, {"d": "30/09", "h": "13h31", "n": "20260930_SAUHP_WPP_PARAB_ERROMETA", "m": false, "tg": 1000.0, "e": 1000.0, "en": 938.0, "l": 427.0}, {"d": "30/09", "h": "14h36", "n": "Repique comercial pf 01 3009", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2700.0, "l": 1400.0}, {"d": "30/09", "h": "14h59", "n": "FOLLOW UP - 3009", "m": true, "tg": 377.0, "e": 370.0, "en": 367.0, "l": 226.0}, {"d": "30/09", "h": "15h00", "n": "FOLLOW UP - 3009", "m": true, "tg": 1200.0, "e": 1200.0, "en": 1200.0, "l": 642.0}, {"d": "30/09", "h": "15h08", "n": "Repique comercial pf 02 3009", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2700.0, "l": 1300.0}, {"d": "30/09", "h": "15h30", "n": "20260930_SAUHP_WPP_MAB_OPORTUNIDADECUIDARFAMILIA_MEI_RECEITAFEDERAL", "m": false, "tg": 11400.0, "e": 8900.0, "en": 8700.0, "l": 5400.0}, {"d": "30/09", "h": "15h50", "n": "20260930_SAUHP_WPP_CA_UTILITY", "m": false, "tg": 1400.0, "e": 1300.0, "en": 1300.0, "l": 775.0}, {"d": "30/09", "h": "16h00", "n": "20260930_SAUHP_WPP_MAB_OPORTUNIDADECUIDARFAMILIA_MEI_RECEITAFEDERAL_2", "m": false, "tg": 11400.0, "e": 8800.0, "en": 8700.0, "l": 5500.0}, {"d": "30/09", "h": "16h02", "n": "Repique comercial pf 03 3009", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2600.0, "l": 1300.0}, {"d": "30/09", "h": "16h42", "n": "Repique comercial pf 04 3009", "m": true, "tg": 3000.0, "e": 2800.0, "en": 2600.0, "l": 1200.0}, {"d": "30/09", "h": "16h54", "n": "20260930_SAUHP_WPP_MAB_OPORTUNIDADECUIDARFAMILIA_MEI_RECEITAFEDERAL_3", "m": false, "tg": 11400.0, "e": 8900.0, "en": 8700.0, "l": 5500.0}, {"d": "30/09", "h": "18h01", "n": "20260930_SAUHP_WPP_CA_COMPREECONOMIZE", "m": false, "tg": 9400.0, "e": 6700.0, "en": 6000.0, "l": 2800.0}, {"d": "01/10", "h": "09h02", "n": "FOLLOW UP REP 0110", "m": true, "tg": 3200.0, "e": 3100.0, "en": 3000.0, "l": 1600.0}, {"d": "01/10", "h": "11h10", "n": "20260930_SAUHP_WPP_NCONV_COMPAREEECONOMIZE_LEGADOS", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7700.0, "l": 4100.0}, {"d": "01/10", "h": "11h22", "n": "Repique comercial pf 0110", "m": true, "tg": 5000.0, "e": 4700.0, "en": 4500.0, "l": 2100.0}, {"d": "01/10", "h": "12h00", "n": "20260930_SAUHP_WPP_NCONV_COMPAREEECONOMIZE_LEGADOS_2", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7600.0, "l": 4100.0}, {"d": "01/10", "h": "13h00", "n": "20260930_SAUHP_WPP_NCONV_COMPAREEECONOMIZE_LEGADOS_3", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7700.0, "l": 4100.0}, {"d": "01/10", "h": "15h07", "n": "FOLLOW UP - 0110", "m": true, "tg": 292.0, "e": 287.0, "en": 281.0, "l": 165.0}, {"d": "01/10", "h": "15h10", "n": "FOLLOW UP - 0110", "m": true, "tg": 812.0, "e": 774.0, "en": 761.0, "l": 397.0}, {"d": "01/10", "h": "15h25", "n": "Repique comercial pf 01 0110", "m": true, "tg": 5000.0, "e": 4700.0, "en": 4500.0, "l": 2200.0}, {"d": "01/10", "h": "16h00", "n": "20261001_SAUHP_WPP_PARAB_ERROMETA", "m": false, "tg": 2500.0, "e": 2500.0, "en": 2000.0, "l": 912.0}, {"d": "01/10", "h": "16h05", "n": "20261001_SAUND_WPP_CA_UTILITY", "m": false, "tg": 7.0, "e": 7.0, "en": 7.0, "l": 4.0}, {"d": "01/10", "h": "16h17", "n": "Repique comercial pf 02 0110", "m": true, "tg": 1600.0, "e": 1500.0, "en": 1400.0, "l": 715.0}, {"d": "01/10", "h": "16h20", "n": "20261001_SAUHP_WPP_CA_UTILITY", "m": false, "tg": 1100.0, "e": 1000.0, "en": 1000.0, "l": 524.0}, {"d": "01/10", "h": "16h30", "n": "20261001_SAUHP_WPP_PARAB_UTILITY", "m": false, "tg": 6400.0, "e": 6100.0, "en": 5800.0, "l": 3000.0}, {"d": "01/10", "h": "16h30", "n": "20261001_SAUND_WPP_PARAB_UTILITY", "m": false, "tg": 14.0, "e": 14.0, "en": 13.0, "l": 10.0}, {"d": "02/10", "h": "10h15", "n": "FOLLOW UP REP 0210", "m": true, "tg": 3200.0, "e": 3100.0, "en": 3000.0, "l": 1600.0}, {"d": "02/10", "h": "15h00", "n": "20261002_SAUHP_WPP_NCONV_COMPAREEECONOMIZE_LEGADOS", "m": false, "tg": 10000.0, "e": 8400.0, "en": 7500.0, "l": 3900.0}, {"d": "02/10", "h": "15h25", "n": "REPIQUE COMERCIAL PME 0210", "m": true, "tg": 759.0, "e": 711.0, "en": 682.0, "l": 367.0}, {"d": "02/10", "h": "16h00", "n": "20261002_SAUHP_WPP_NCONV_COMPAREEECONOMIZE_LEGADOS_2", "m": false, "tg": 10000.0, "e": 8400.0, "en": 7500.0, "l": 3800.0}, {"d": "02/10", "h": "16h20", "n": "20261002_SAUHP_WPP_PARAB_COMPAREEECONOMIZE", "m": false, "tg": 11700.0, "e": 9000.0, "en": 8300.0, "l": 3700.0}, {"d": "02/10", "h": "17h00", "n": "20261002_SAUHP_WPP_NCONV_COMPAREEECONOMIZE_LEGADOS_3", "m": false, "tg": 10700.0, "e": 9000.0, "en": 8000.0, "l": 4100.0}, {"d": "02/10", "h": "17h30", "n": "20261002_SAUHP_WPP_PARAB_COMPAREEECONOMIZE_2", "m": false, "tg": 11700.0, "e": 8900.0, "en": 8100.0, "l": 3500.0}, {"d": "03/10", "h": "09h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL", "m": false, "tg": 5000.0, "e": 3900.0, "en": 3900.0, "l": 2200.0}, {"d": "03/10", "h": "09h00", "n": "20261003_SAUHP_WPP_PARAB_COMPAREEECONOMIZE_3", "m": false, "tg": 11700.0, "e": 9400.0, "en": 8600.0, "l": 3800.0}, {"d": "03/10", "h": "09h30", "n": "20261003_SAUHP_WPP_NCONV_75OFF_ESQUENTABLACKFRIDAY_LEGADOS", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7600.0, "l": 4000.0}, {"d": "03/10", "h": "10h00", "n": "20261003_SAUHP_WPP_PARAB_COMPAREEECONOMIZE_4", "m": false, "tg": 11700.0, "e": 7900.0, "en": 7300.0, "l": 3100.0}, {"d": "03/10", "h": "10h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_2", "m": false, "tg": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2200.0}, {"d": "03/10", "h": "10h30", "n": "20261003_SAUHP_WPP_NCONV_75OFF_ESQUENTABLACKFRIDAY_LEGADOS_2", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7500.0, "l": 3900.0}, {"d": "03/10", "h": "11h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_3", "m": false, "tg": 5000.0, "e": 3900.0, "en": 3900.0, "l": 2300.0}, {"d": "03/10", "h": "11h00", "n": "20261003_SAUHP_WPP_PARAB_COMPAREEECONOMIZE_5", "m": false, "tg": 11700.0, "e": 8200.0, "en": 7500.0, "l": 3500.0}, {"d": "03/10", "h": "11h30", "n": "20261003_SAUHP_WPP_NCONV_75OFF_ESQUENTABLACKFRIDAY_LEGADOS_3", "m": false, "tg": 10200.0, "e": 8600.0, "en": 7600.0, "l": 4100.0}, {"d": "03/10", "h": "12h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_4", "m": false, "tg": 5000.0, "e": 3900.0, "en": 3900.0, "l": 2200.0}, {"d": "03/10", "h": "12h00", "n": "20261003_SAUHP_WPP_WIBCK_COMPAREEECONOMIZE", "m": false, "tg": 10000.0, "e": 7800.0, "en": 7400.0, "l": 3900.0}, {"d": "03/10", "h": "13h00", "n": "20261003_SAUHP_WPP_WIBCK_COMPAREEECONOMIZE_2", "m": false, "tg": 10000.0, "e": 7800.0, "en": 7400.0, "l": 3900.0}, {"d": "03/10", "h": "14h00", "n": "20261003_SAUHP_WPP_WIBCK_COMPAREEECONOMIZE_3", "m": false, "tg": 10000.0, "e": 7700.0, "en": 7300.0, "l": 4000.0}, {"d": "03/10", "h": "15h00", "n": "20261003_SAUHP_WPP_WIBCK_COMPAREEECONOMIZE_4", "m": false, "tg": 10000.0, "e": 7700.0, "en": 7300.0, "l": 3900.0}, {"d": "03/10", "h": "16h00", "n": "20261003_SAUHP_WPP_WIBCK_COMPAREEECONOMIZE_5", "m": false, "tg": 10000.0, "e": 7800.0, "en": 7400.0, "l": 3900.0}, {"d": "05/10", "h": "09h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_6", "m": false, "tg": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2300.0}, {"d": "05/10", "h": "10h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_7", "m": false, "tg": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2200.0}, {"d": "05/10", "h": "10h45", "n": "20261005_SAUHP_WPP_NIMP_NASEGUNDACOMECO", "m": false, "tg": 8900.0, "e": 7200.0, "en": 6900.0, "l": 4000.0}, {"d": "05/10", "h": "11h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_8", "m": false, "tg": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2200.0}, {"d": "05/10", "h": "11h10", "n": "20261005_SAUHP_WPP_NIMP_NASEGUNDACOMECO_2", "m": false, "tg": 8900.0, "e": 6800.0, "en": 6400.0, "l": 3600.0}, {"d": "05/10", "h": "11h30", "n": "20261005_SAUHP_WPP_NIMP_NASEGUNDACOMECO_3", "m": false, "tg": 8900.0, "e": 7200.0, "en": 6800.0, "l": 4000.0}, {"d": "05/10", "h": "11h44", "n": "FOLLOW UP REP 0510", "m": true, "tg": 834.0, "e": 793.0, "en": 776.0, "l": 383.0}, {"d": "05/10", "h": "12h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_9", "m": false, "tg": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2200.0}, {"d": "05/10", "h": "13h00", "n": "20261003_SAUND_WPP_WIBCK_REDECREDENCIADA_BIAL_10", "m": false, "tg": 5000.0, "e": 4000.0, "en": 3900.0, "l": 2300.0}, {"d": "05/10", "h": "13h30", "n": "Repique comercial pf 0510", "m": true, "tg": 2400.0, "e": 2300.0, "en": 2300.0, "l": 1100.0}, {"d": "05/10", "h": "13h50", "n": "20261005_SAUHP_WPP_NIMP_NASEGUNDACOMECO_4", "m": false, "tg": 8900.0, "e": 6200.0, "en": 5900.0, "l": 3400.0}, {"d": "05/10", "h": "14h05", "n": "20261005_SAUHP_WPP_NCONV_NASEGUNDACOMECO", "m": false, "tg": 10000.0, "e": 9500.0, "en": 9000.0, "l": 4500.0}, {"d": "05/10", "h": "14h16", "n": "Repique comercial pf 01 0510", "m": true, "tg": 1100.0, "e": 1100.0, "en": 1100.0, "l": 654.0}, {"d": "05/10", "h": "15h00", "n": "20261005_SAUHP_WPP_MAB_OPORTUNIDADECUIDARFAMILIA_MEI_RECEITAFEDERAL", "m": false, "tg": 11400.0, "e": 8800.0, "en": 8600.0, "l": 5100.0}, {"d": "05/10", "h": "15h07", "n": "FOLLOW UP - 0510", "m": true, "tg": 113.0, "e": 110.0, "en": 108.0, "l": 43.0}, {"d": "05/10", "h": "15h09", "n": "FOLLOW UP - 0510", "m": true, "tg": 986.0, "e": 950.0, "en": 930.0, "l": 442.0}, {"d": "05/10", "h": "15h35", "n": "20261005_SAUHP_WPP_NCONV_NASEGUNDACOMECO_2", "m": false, "tg": 10000.0, "e": 9500.0, "en": 9100.0, "l": 4300.0}, {"d": "05/10", "h": "15h50", "n": "20261005_SAUHP_WPP_NCONV_NASEGUNDACOMECO_3", "m": false, "tg": 10000.0, "e": 9500.0, "en": 9100.0, "l": 4400.0}, {"d": "05/10", "h": "16h00", "n": "20261005_SAUHP_WPP_MAB_OPORTUNIDADECUIDARFAMILIA_MEI_RECEITAFEDERAL_2", "m": false, "tg": 11400.0, "e": 8700.0, "en": 8500.0, "l": 5000.0}];
+const gs=a=>{const days=new Set(a.map(c=>c.d)).size,n=a.length,e=sum(a,'tg'),en=sum(a,'en');const m=a.filter(c=>c.m),k=a.filter(c=>!c.m);
+ return{n,e,en,days,man_n:m.length,man_e:sum(m,'tg'),man_a:sum(m,'en'),mk_n:k.length,mk_e:sum(k,'tg'),mk_a:sum(k,'en'),fol:m.filter(c=>/follow/i.test(c.n)).length,rep:m.filter(c=>/repique/i.test(c.n)).length,adm:m.filter(c=>/adm/i.test(c.n)).length};};
+const der=o=>({...o,dd:o.n/o.days,ed:o.en/o.days,ep:o.en/o.n,ent:o.en/o.e,mp:o.man_a/(o.man_a+o.mk_a)});
+const WK1=GC.filter(c=>{const[d,m]=c.d.split('/').map(Number);return m===9?d>=28:d<=4;}),WK2=GC.filter(c=>c.d==='05/10');
+const GP={
+ q:{A:der({l:'01 a 14/09',n:105,e:404000,en:317000,days:12,man_n:17,man_e:30873,man_a:27940,mk_n:78,mk_e:365000,mk_a:281360,fol:7,rep:10,adm:0}),B:der({l:'15 a 28/09',n:130,e:834000,en:623000,days:11,man_n:22,man_e:37755,man_a:34170,mk_n:96,mk_e:786000,mk_a:579130,fol:6,rep:15,adm:1}),
+  info:'Tabela geral por quinzena (01 a 14/09 × 15 a 28/09)'},
+ w:{A:der({l:'Média semanal 15 a 28/09',n:65,e:417000,en:311500,days:5.5,man_n:11,man_e:18878,man_a:17085,mk_n:48,mk_e:393000,mk_a:289565,fol:3,rep:7.5,adm:.5}),B:der({l:'28/09 a 04/10',...gs(WK1)}),
+  info:'Semana de 28/09 a 04/10 comparada com a média semanal da 2ª quinzena'},
+ w2:{A:der({l:'28/09 a 04/10',...gs(WK1)}),B:der({l:'05/10 (até agora)',...gs(WK2)}),
+  info:'Semana em andamento: só 05/10. Compare os indicadores por dia; os totais ainda são parciais.'}};
+let gm='q',mi=0;
+const GMET=[['Clientes acionados','en',0],['Disparos','n',0],['Acionados por disparo','ep',0],['Acionados por dia','ed',0],['Disparos por dia','dd',0],['Taxa de entrega','ent',1]];
+const QCOM=['Quase o dobro de clientes acionados. Cliente acionado pela base tende a responder menos que lead que chega pela captação.','O número de disparos subiu só 24%. O crescimento veio do tamanho de cada disparo.','Cada disparo ficou 58% maior, sinal de listas mais amplas e menos segmentadas.','Com um dia de envio a menos, o ritmo diário mais que dobrou, pressionando filas e atendimento.','O número de disparos por dia subiu 35%.','A entrega caiu quase 4 pontos. Pode indicar números inválidos ou perda de reputação do canal, em linha com os bloqueios da Meta.'];
+const gv=(k,P)=>(P.B[k]/P.A[k]-1)*100,gpp=(k,P)=>(P.B[k]-P.A[k])*100;
+const gf=(k,v)=>k==='ent'||k==='mp'?pct(v):k==='n'?(Number.isInteger(v)?v:f1(v)):k==='dd'?f1(v):fmt(v);
+const ms=$('#metSeg');GMET.forEach((m,i)=>{const b=document.createElement('button');b.textContent=m[0];b.setAttribute('aria-pressed',i===0);b.onclick=()=>{mi=i;ms.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));gMetDraw();};ms.appendChild(b);});
+function gMetDraw(){const P=GP[gm],[l,k,isP]=GMET[mi];const a=P.A[k],b=P.B[k];
+ const W=460,H=230,bt=30,t=24,max=Math.max(a,b)*1.15;const s=svg(W,H);const y=v=>H-bt-(v/max)*(H-bt-t);
+ el(s,'line',{x1:20,x2:W-20,y1:H-bt,y2:H-bt,class:'ax'});
+ [[a,P.A.l,'b1'],[b,P.B.l,'b2']].forEach(([v,lab,cls],j)=>{const x=90+j*170,w=110;
+  el(s,'rect',{x,y:y(v),width:w,height:H-bt-y(v),rx:4,class:cls,'data-tip':`<b>${lab}</b><br>${l}: ${gf(k,v)}`});
+  el(s,'text',{x:x+w/2,y:y(v)-7,'text-anchor':'middle',style:'font-size:15px;font-weight:700;fill:var(--ink)'},gf(k,v));
+  el(s,'text',{x:x+w/2,y:H-10,'text-anchor':'middle',style:'font-size:12px'},lab);});
+ const d=isP?sg(gpp(k,P),' p.p.'):sg(gv(k,P),'%');
+ el(s,'text',{x:W/2,y:14,'text-anchor':'middle',style:`font-size:13px;font-weight:700;fill:${b>=a?'var(--warn)':'var(--bad)'}`},d);
+ mount('chMet',s);
+ const v=isP?gpp(k,P):gv(k,P);
+ $('#metCom').innerHTML='<p>'+(gm==='q'?QCOM[mi]:`${l}: ${gf(k,a)} (${P.A.l.toLowerCase()}) contra ${gf(k,b)} (${P.B.l}), ${Math.abs(v)<(isP?1:5)?'praticamente estável':(v>0?'alta de ':'queda de ')+sg(v,isP?' p.p.':'%').slice(1)}.`+(gm==='w2'&&!['ep','ed','dd','ent'].includes(k)?' Atenção: o período B tem só um dia.':''))+'</p>';}
+function gKpiDraw(){const P=GP[gm];const c=(lab,k,isP)=>{const v=isP?gpp(k,P):gv(k,P);return `<div class="panel kpi ${isP?(v<0?'bad':'good'):(v>=0?'warn':'')}"><div class="lab">${lab}</div><div class="val">${sg(v,isP?' p.p.':'%')}</div><div class="det">${gf(k,P.A[k])} → ${gf(k,P.B[k])}</div></div>`;};
+ $('#gKpi').innerHTML=gm==='w2'?c('Disparos por dia','dd')+c('Acionados por dia','ed')+c('Acionados por disparo','ep')+c('Taxa de entrega','ent',1):c('Clientes acionados','en')+c('Acionados por dia','ed')+c('Acionados por disparo','ep')+c('Taxa de entrega','ent',1);}
+function gVarDraw(){const P=GP[gm];$('#gVarTitle').textContent=gm==='q'?'Variação da 1ª para a 2ª quinzena':`Variação: ${P.A.l.toLowerCase()} → ${P.B.l}`;
+ const data=[['Clientes acionados','en'],['Acionados por dia','ed'],['Acionados por disparo','ep'],['Disparos por dia','dd'],['Disparos','n'],['Taxa de entrega','ent',1]].filter(d=>gm!=='w2'||['ed','ep','dd','ent'].includes(d[1])).map(([l,k,pp])=>[l,pp?gpp(k,P):gv(k,P),`${gf(k,P.A[k])} → ${gf(k,P.B[k])}`,pp]);
+ const cap=Math.max(30,...data.map(d=>Math.abs(d[1])));const neg=data.some(d=>d[1]<0),pos=data.some(d=>d[1]>0);
+ const W=480,row=34,H=data.length*row+8,x0=neg&&pos?(cap>100?215:300):neg?420:160,sc=(neg&&pos?(W-x0-60):neg?205:255)/cap;const s=svg(W,H);
+ el(s,'line',{x1:x0,x2:x0,y1:0,y2:H,class:'ax'});
+ data.forEach(([l,v,d,pp],i)=>{const y=i*row+6,w=Math.abs(v)*sc;const lx=neg&&pos?Math.min(150,x0-Math.max(...data.filter(z=>z[1]<0).map(z=>Math.abs(z[1])*sc))-50):150;
+  el(s,'text',{x:lx,y:y+15,'text-anchor':'end'},l);
+  el(s,'rect',{x:v<0?x0-w:x0,y,width:Math.max(w,1),height:20,rx:3,class:v<0?'bbad':'b2','data-tip':`<b>${l}</b><br>${d}`});
+  el(s,'text',{x:v<0?x0-w-6:x0+w+6,y:y+15,'text-anchor':v<0?'end':'start',style:'font-weight:700;fill:var(--ink)'},sg(v,pp?' p.p.':'%'));});
+ mount('chVar',s);
+ $('#gVarCom').innerHTML={q:'<p>O aumento de disparos foi a resposta à menor entrada de leads de captação. O salto veio do marketing (+106% em clientes acionados); os disparos manuais cresceram cerca de 22%.</p><p>Cada disparo ficou 58% maior: listas mais amplas incluem clientes com menor propensão de compra e a conversão média cai. A queda na entrega combina com os bloqueios da Meta relatados a partir de 16/09.</p>',
+  w:'<p>A semana de 28/09 a 04/10 teve 94 disparos e 366 mil clientes acionados, 18% acima da média semanal da 2ª quinzena. Os disparos ficaram menores (−19% de acionados por disparo), mas bem mais numerosos: 15,7 por dia, contra 11,8.</p><p>A entrega melhorou para 77,8%. O volume seguiu alto mesmo nos dias de falha: em 03/10, com Conecta e Contrate fora em todo o país, foram 15 disparos e 98,5 mil clientes acionados, o maior volume da semana.</p>',
+  w2:'<p>A segunda-feira 05/10 sozinha teve 19 disparos e 95 mil clientes acionados, acima da média diária da semana anterior (61 mil). Cada disparo ficou maior (5,0 mil acionados) e a entrega subiu. A semana ainda está em andamento.</p>'}[gm];}
+const FAILD=['02/10','03/10'];
+function drawDay(){const show=gm!=='q';$('#gDayPanel').style.display=show?'':'none';if(!show)return;
+ const days=['28/09','29/09','30/09','01/10','02/10','03/10','04/10','05/10'];const sel=gm==='w'?days.slice(0,7):['05/10'];
+ const agg=days.map(d=>{const a=GC.filter(c=>c.d===d);const m=a.filter(c=>c.m),k=a.filter(c=>!c.m);return{d,mn:m.length,me:sum(m,'en'),kn:k.length,ke:sum(k,'en'),en:sum(a,'en')};});
+ const W=760,H=250,l=46,b=30,t=18,max=110000;const s=svg(W,H);const y=v=>H-b-(v/max)*(H-b-t);const gw=(W-l)/days.length;
+ [0,25000,50000,75000,100000].forEach(g=>{el(s,'line',{x1:l,x2:W,y1:y(g),y2:y(g),class:'ax'});el(s,'text',{x:l-6,y:y(g)+4,'text-anchor':'end'},g?fmt(g):'0');});
+ agg.forEach((o,i)=>{const x=l+i*gw+gw*.2,w=gw*.6,on=sel.includes(o.d);const op=on?1:.35;
+  const tip=`<b>${o.d}</b><br>Manual: ${o.mn} disparos, ${fmt(o.me)} acionados<br>Marketing: ${o.kn} disparos, ${fmt(o.ke)} acionados<br>Total: ${fmt(o.en)} clientes acionados`+(FAILD.includes(o.d)?`<br><span style="opacity:.8">${o.d==='02/10'?'GUP fora do ar':'Conecta e Contrate fora em todo o país'}</span>`:'');
+  if(o.me)el(s,'rect',{x,y:y(o.me),width:w,height:H-b-y(o.me),fill:'var(--petrol)',opacity:op,'data-tip':tip});
+  if(o.ke)el(s,'rect',{x,y:y(o.me+o.ke),width:w,height:y(o.me)-y(o.me+o.ke),fill:'var(--p2)',opacity:op,'data-tip':tip});
+  if(o.me+o.ke)el(s,'text',{x:x+w/2,y:y(o.me+o.ke)-5,'text-anchor':'middle',style:`font-size:11px;font-weight:700;fill:var(--ink);opacity:${op}`},fmt(o.me+o.ke));
+  if(FAILD.includes(o.d))el(s,'circle',{cx:x+w/2,cy:H-b+8,r:4,fill:'var(--bad)','data-tip':tip});
+  el(s,'text',{x:x+w/2,y:H-6,'text-anchor':'middle',style:on?'font-weight:700;fill:var(--ink)':''},o.d);});
+ mount('chGDay',s);
+ $('#gDayCom').innerHTML=gm==='w'?'<p>O sábado, 03/10, foi o dia com mais clientes acionados: 98,5 mil, todos em 15 disparos do marketing, justamente quando Conecta e Contrate estavam fora em todo o país e nenhuma proposta podia ser digitada. Em 02/10, dia da queda da GUP, foram 43 mil. Os disparos manuais se concentraram entre 28/09 e 01/10 e pararam no sábado.</p>':'<p>Em 05/10 foram 95 mil clientes acionados, com 14 disparos do marketing e 5 manuais. Desde 28/09, só o sábado, 03/10, teve mais.</p>';}
+function drawMk(){const P=GP[gm],A=P.A,B=P.B;const vr=(a,b)=>{const v=(b/a-1)*100;return `<td class="${v>=0?'up':'dn'}">${sg(v,'%')}</td>`;};const dash='<td></td>';
+ const fx=v=>Number.isInteger(v)?v:f1(v);
+ $('#gMkTbl').innerHTML=`<tr><th>Indicador</th><th>${A.l}</th><th>${B.l}</th><th>Var.</th></tr>
+  <tr><td><b>Disparos manuais</b></td><td>${fx(A.man_n)}</td><td>${B.man_n}</td>${gm==='w2'?dash:vr(A.man_n,B.man_n)}</tr>
+  <tr><td>Clientes acionados manuais${gm==='q'?' (aprox.)':''}</td><td>${fmt(A.man_a)}</td><td>${fmt(B.man_a)}</td>${gm==='w2'?dash:vr(A.man_a,B.man_a)}</tr>
+  <tr><td>Follow up · repique · adm</td><td>${fx(A.fol)} · ${fx(A.rep)} · ${fx(A.adm)}</td><td>${B.fol} · ${B.rep} · ${B.adm}</td><td></td></tr>
+  <tr><td><b>Disparos do marketing</b></td><td>${fx(A.mk_n)}</td><td>${B.mk_n}</td>${gm==='w2'?dash:vr(A.mk_n,B.mk_n)}</tr>
+  <tr><td>Clientes acionados pelo marketing${gm==='q'?' (aprox.)':''}</td><td>${fmt(A.mk_a)}</td><td>${fmt(B.mk_a)}</td>${gm==='w2'?dash:vr(A.mk_a,B.mk_a)}</tr>
+  <tr><td>Participação manual nos acionados</td><td>${pct(A.mp,0)}</td><td>${pct(B.mp,0)}</td><td class="${B.mp>=A.mp?'up':'dn'}">${sg((B.mp-A.mp)*100,' p.p.')}</td></tr>`;
+ const W=620,H=230,l=215,r=80;const s=svg(W,H);
+ const SL={q:['1ª quinzena','2ª quinzena'],w:['Média 2ª quinz.','28/09 a 04/10'],w2:['28/09 a 04/10','05/10']}[gm];const rows=[['Disparos · '+SL[0],A.man_n,A.mk_n,v=>fx(v)],['Disparos · '+SL[1],B.man_n,B.mk_n,v=>v],['Acionados · '+SL[0],A.man_a,A.mk_a,fmt],['Acionados · '+SL[1],B.man_a,B.mk_a,fmt]];
+ rows.forEach(([lab,m,k,f],i)=>{const y=16+i*50+(i>1?14:0);const max=i<2?Math.max(A.man_n+A.mk_n,B.man_n+B.mk_n):Math.max(A.man_a+A.mk_a,B.man_a+B.mk_a);const sc=(W-l-r)/max;
+  el(s,'text',{x:l-8,y:y+18,'text-anchor':'end',style:'font-weight:600;fill:var(--ink);font-size:12px'},lab);
+  el(s,'rect',{x:l,y,width:m*sc,height:28,class:'b2','data-tip':`<b>${lab}</b><br>Manual: ${f(m)}`});
+  el(s,'rect',{x:l+m*sc,y,width:k*sc,height:28,class:'b3','data-tip':`<b>${lab}</b><br>Marketing: ${f(k)}`});
+  el(s,'text',{x:l+(m+k)*sc+6,y:y+18,style:'font-size:11px'},`${Math.round(m/(m+k)*100)}% manual`);});
+ mount('chMk',s);
+ $('#gMkCom').innerHTML={q:'<p>O salto veio dos disparos do marketing, que mais que dobraram os clientes acionados (de cerca de 281 mil para 579 mil) com só 18 disparos a mais, ou seja, listas bem maiores. Os disparos manuais cresceram cerca de 22%, concentrados em repiques: foram 15 na 2ª quinzena, e 23/09 sozinho teve 7 disparos manuais.</p>',
+  w:'<p>Os disparos manuais saltaram para 35 na semana, três vezes a média semanal da 2ª quinzena, com 50 mil clientes acionados, a maior parte em repiques. O marketing seguiu com 86% dos acionados: 59 disparos e 316 mil clientes.</p>',
+  w2:'<p>Em 05/10, o marketing respondeu por 95% dos acionados: 14 disparos e 89,8 mil clientes. Foram 5 disparos manuais, com 5,2 mil clientes acionados.</p>'}[gm];
+ $('#gMkNote').textContent=gm==='q'?'Marketing = acionados da tabela geral menos manuais e VPC. Os acionados manuais são estimados a partir do público visado (cerca de 90% vira acionado), por isso os números são aproximados.':gm==='w'?'Média semanal = metade dos números da 2ª quinzena (15 a 28/09). A semana de 28/09 a 04/10 vem da exportação por campanha, sem VPC.':'Dados da exportação por campanha, sem VPC. A semana de 05 a 11/10 ainda está em andamento.';}
+function applyG(){$('#gInfo').textContent=GP[gm].info;gKpiDraw();gMetDraw();gVarDraw();drawDay();drawMk();}
+$('#gSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{gm=b.dataset.g;$('#gSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));applyG();});
 
-function overview(){
-  const tot = TABS.reduce((s,t)=>s+t.total,0), val = TABS.reduce((s,t)=>s+t.n,0), conv = TABS.reduce((s,t)=>s+t.conv,0);
-  const agg = {}; OF.forEach(o=>agg[o.k]=TABS.reduce((s,t)=>s+t.cnt[o.k],0)/val);
-  const topAgg = OF.filter(o=>o.k!=='sla').sort((a,b)=>agg[b.k]-agg[a.k])[0];
-  return `<section class="page">
-    <div><div class="eyebrow">Visão geral · 8 filas</div><h1>Por que não estamos vendendo?</h1><p class="sub">Resumo das monitorias comerciais de todas as filas. Cada aba acima traz o detalhe de uma fila, com os atendimentos, os colaboradores e o plano de ação.</p></div>
-    <div class="kpis">
-      <div class="kpi"><div class="eyebrow">Atendimentos monitorados</div><div class="v">${tot}</div><div class="d">${val} com oportunidade real de venda</div></div>
-      <div class="kpi"><div class="eyebrow">Ponto de perda mais comum</div><div class="t">${topAgg.nome}</div><div class="d">${pct(agg[topAgg.k])} dos atendimentos válidos</div></div>
-      <div class="kpi"><div class="eyebrow">Demora (SLA)</div><div class="v">${pct(agg.sla)}</div><div class="d">dos atendimentos válidos tiveram atraso</div></div>
-      <div class="kpi"><div class="eyebrow">Vendas observadas</div><div class="v">${conv}</div><div class="d">casos usados como modelo de boa condução</div></div>
-    </div>
-    <div class="resumo"><div class="eyebrow">Em resumo</div><p>Em quase todas as filas o cliente chega interessado. A venda se perde depois da cotação: a retomada é genérica, o promotor envia opções sem recomendar uma e a objeção do cliente (preço, carência, coparticipação) não vira negociação. A demora agrava tudo isso, principalmente na passagem do robô para o atendente.</p></div>
-    <div class="card"><h2>Mapa de ofensores por fila</h2><p class="hint">Percentual de atendimentos válidos de cada fila com o ponto de perda. Cor mais forte = mais frequente. Clique em uma fila para abrir a aba.</p>
-      <div class="tbl-wrap"><table class="heat"><thead><tr><th>Fila</th><th class="c">Válidos</th>${OF.map(o=>`<th class="c" title="${esc(o.nome)}">${esc(o.curto)}</th>`).join('')}<th>Principal ponto comercial</th></tr></thead><tbody>
-      ${TABS.map(t=>`<tr class="click" data-go="${t.id}" tabindex="0"><td class="fila">${esc(t.nome)}</td><td class="c mono">${t.n}</td>${OF.map(o=>heatCell(t.pct[o.k], pct(t.pct[o.k],0))).join('')}<td style="white-space:nowrap">${t.top.length>1?'Empate: '+t.top.map(o=>o.curto).join(', '):esc(t.top[0].nome)}</td></tr>`).join('')}
-      </tbody></table></div></div>
-    <div class="card"><h2>Os cinco pontos avaliados</h2><p class="hint">Todas as filas foram monitoradas com os mesmos critérios. Como nas planilhas, o SLA é tratado como contexto operacional e mostrado à parte.</p>
-      <div class="gloss">${OF.map(o=>`<div><b>${esc(o.nome)}</b><span>${esc(o.desc)}</span></div>`).join('')}</div></div>
-    <div class="card"><h2>O que vale para todas as filas</h2><ol class="acoes">
-        <li>Ler o histórico antes de falar com o cliente: necessidade, opções já enviadas e última objeção.</li>
-        <li>Toda cotação termina com uma recomendação clara e o motivo dela.</li>
-        <li>Follow-up sempre retoma a última dúvida ou barreira do cliente.</li>
-        <li>Objeção de preço gera a pergunta "quanto cabe no seu orçamento?" e uma alternativa.</li>
-        <li>Prioridade de resposta para quem já disse que quer seguir, pediu atendente ou enviou documentos.</li>
-        <li>Separar suporte, cancelamento e erros de lista da análise de vendas.</li></ol></div>
-    <p class="foot">Amostras pequenas (3 a 22 atendimentos por fila): leia os percentuais como sinais para orientar coaching, não como taxas definitivas da operação. Um atendimento pode ter mais de um ponto de perda.</p>
-  </section>`;
-}
 
-// ---- tabs
-const ALL = [{id:'geral', nome:'Visão geral'}, ...TABS];
-const nav = document.getElementById('tabs'), main = document.getElementById('main');
-nav.innerHTML = ALL.map(t=>`<button class="tab" role="tab" id="tab-${t.id}" data-id="${t.id}" aria-selected="false">${esc(t.nome)}${t.id!=='geral'&&t.ajustes&&t.ajustes.length?'':''}</button>`).join('');
-function show(id, push){
-  if(!ALL.find(t=>t.id===id)) id='geral';
-  nav.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected', b.dataset.id===id));
-  main.innerHTML = id==='geral' ? overview() : tabPage(TABS.find(t=>t.id===id));
-  main.setAttribute('aria-labelledby','tab-'+id);
-  if(push){ try{ history.replaceState(null,'','#'+id);}catch(e){} try{localStorage.setItem('mc-tab',id)}catch(e){} window.scrollTo({top:0}); }
-  const btn = document.getElementById('tab-'+id); btn && btn.scrollIntoView({block:'nearest',inline:'nearest'});
-}
-nav.addEventListener('click', e=>{const b=e.target.closest('.tab'); if(b) show(b.dataset.id,true)});
-nav.addEventListener('keydown', e=>{
-  if(!['ArrowRight','ArrowLeft'].includes(e.key)) return;
-  const btns=[...nav.querySelectorAll('.tab')]; const i=btns.indexOf(document.activeElement); if(i<0) return;
-  const n=btns[(i+(e.key==='ArrowRight'?1:-1)+btns.length)%btns.length]; n.focus(); show(n.dataset.id,true);
-});
-main.addEventListener('click', e=>{
-  const go = e.target.closest('[data-go]'); if(go){show(go.dataset.go,true);return}
-  const tr = e.target.closest('tr.main'); if(tr){const d=tr.nextElementSibling; d.hidden=!d.hidden; tr.classList.toggle('open',!d.hidden); tr.setAttribute('aria-expanded',!d.hidden)}
-});
-main.addEventListener('keydown', e=>{ if(e.key!=='Enter'&&e.key!==' ') return; const t=e.target.closest('tr.main,[data-go]'); if(t){e.preventDefault(); t.click();} });
-let start = (location.hash||'').slice(1);
-if(!start){ try{ start = localStorage.getItem('mc-tab')||''; }catch(e){} }
-show(start||'geral', false);
+/* ---------- relatos ---------- */
+const CCOL=['var(--bad)','var(--warn)','var(--sky)','var(--petrol)','var(--ink2)','var(--p2)'];
+const CNAME=['GUP','Bot','Meta','Sistemas','Pagamento e Conecta','Marketing'];
+const WD={"w1": [{"n": "GUP encerrando conversas e leads sumindo (19/09)", "c": 0, "rel": 21, "vend": 6, "first": "19/09 16h19", "rm": 53, "rt": "53 min, sem suporte no plantão", "rs": "Chamado INC002202380 aberto só em 21/09, sem retorno registrado", "st": "Sem solução", "days": {"19/09": 21}, "new": true}, {"n": "Bloqueio da Meta no follow-up", "c": 2, "rel": 5, "vend": 3, "first": "16/09 12h48", "rm": 47, "rt": "47 min", "rs": "Orientação de aguardar; falha externa e recorrente", "st": "Sem solução", "days": {"16/09": 2, "17/09": 1, "19/09": 2}, "new": true}, {"n": "Eugênia e bot com informação errada", "c": 1, "rel": 5, "vend": 3, "first": "16/09 16h01", "rm": null, "rt": "Sem resposta no grupo", "rs": "Sem retorno registrado", "st": "Sem solução", "days": {"16/09": 2, "17/09": 3}, "new": true}, {"n": "Conecta ou Contrate fora do ar", "c": 3, "rel": 7, "vend": 5, "first": "17/09 15h57", "rm": 1, "rt": "1 min", "rs": "22 min em 17/09; 18/09 sem retorno; 19/09 sem resposta", "st": "Parcial", "days": {"17/09": 5, "18/09": 1, "19/09": 1}, "new": true}, {"n": "Leads \"sem interesse\" transferidos", "c": 0, "rel": 4, "vend": 1, "first": "16/09 13h38", "rm": 1, "rt": "1 min", "rs": "Chamado INC002194822; prazo de 18/09 sem retorno registrado", "st": "Sem solução", "days": {"16/09": 4}, "new": true}, {"n": "Bot entrando no meio da conversa", "c": 1, "rel": 2, "vend": 2, "first": "17/09 09h10", "rm": null, "rt": "Sem resposta no grupo", "rs": "Recorrente de 17 a 23/09", "st": "Sem solução", "days": {"17/09": 1, "19/09": 1}, "new": true}, {"n": "Leads antigos caindo fechados", "c": 0, "rel": 2, "vend": 2, "first": "17/09 08h28", "rm": 24, "rt": "24 min", "rs": "Explicação (fila acima de 24h), sem correção", "st": "Sem solução", "days": {"17/09": 1, "18/09": 1}, "new": true}, {"n": "Pagamento, boleto e erros no Conecta/Bitix", "c": 4, "rel": 3, "vend": 2, "first": "17/09 11h23", "rm": 3, "rt": "3 min", "rs": "Casos no privado; boleto e carência de 22/09 sem resposta; Bitix corrigido em 23/09", "st": "Parcial", "days": {"17/09": 3}, "new": true}, {"n": "Declaração de permanência", "c": 4, "rel": 3, "vend": 1, "first": "17/09 11h57", "rm": 2, "rt": "2 min", "rs": "Tratado no privado; voltou a ocorrer em 23/09", "st": "Parcial", "days": {"17/09": 3}, "new": true}, {"n": "PDF não enviado", "c": 2, "rel": 1, "vend": 1, "first": "17/09 08h20", "rm": 144, "rt": "2h24", "rs": "Falha temporária da Meta, normalizada", "st": "Resolvido", "days": {"17/09": 1}, "new": true}], "w2": [{"n": "Leads caindo com vendedor em pausa ou deslogado", "c": 0, "rel": 64, "vend": 17, "first": "21/09 10h17", "rm": 280, "rt": "4h40 (1 min após a onda das 14h56)", "rs": "28h15 · regra de atribuição ajustada em 22/09 (INC002203468)", "st": "Resolvido", "days": {"21/09": 55, "22/09": 7, "23/09": 2}, "new": true}, {"n": "Bloqueio da Meta no follow-up", "c": 2, "rel": 1, "vend": 1, "first": "21/09 09h43", "rm": null, "rt": "Recorrente desde 16/09", "rs": "Orientação de aguardar; falha externa e recorrente", "st": "Sem solução", "days": {"21/09": 1}, "new": false}, {"n": "Eugênia e bot com informação errada", "c": 1, "rel": 1, "vend": 1, "first": "21/09 13h15", "rm": null, "rt": "Recorrente desde 16/09", "rs": "Sem retorno registrado", "st": "Sem solução", "days": {"21/09": 1}, "new": false}, {"n": "Conecta ou Contrate fora do ar", "c": 3, "rel": 1, "vend": 1, "first": "22/09 15h12", "rm": null, "rt": "Recorrente desde 17/09", "rs": "22 min em 17/09; 18/09 sem retorno; 19/09 sem resposta", "st": "Parcial", "days": {"22/09": 1}, "new": false}, {"n": "GUP lenta, mídia sem carregar e chats fora do status", "c": 0, "rel": 5, "vend": 3, "first": "21/09 12h44", "rm": 1188, "rt": "19h48 (36 min após o relato de 22/09)", "rs": "Chamado INC002204890, sem retorno registrado", "st": "Sem solução", "days": {"21/09": 1, "22/09": 4}, "new": true}, {"n": "Bot entrando no meio da conversa", "c": 1, "rel": 1, "vend": 1, "first": "23/09 11h30", "rm": null, "rt": "Recorrente desde 17/09", "rs": "Recorrente de 17 a 23/09", "st": "Sem solução", "days": {"23/09": 1}, "new": false}, {"n": "Leads antigos caindo fechados", "c": 0, "rel": 1, "vend": 1, "first": "22/09 15h56", "rm": null, "rt": "Recorrente desde 17/09", "rs": "Explicação (fila acima de 24h), sem correção", "st": "Sem solução", "days": {"22/09": 1}, "new": false}, {"n": "Pagamento, boleto e erros no Conecta/Bitix", "c": 4, "rel": 9, "vend": 6, "first": "21/09 16h32", "rm": null, "rt": "Recorrente desde 17/09", "rs": "Casos no privado; boleto e carência de 22/09 sem resposta; Bitix corrigido em 23/09", "st": "Parcial", "days": {"21/09": 1, "22/09": 7, "23/09": 1}, "new": false}, {"n": "Declaração de permanência", "c": 4, "rel": 1, "vend": 1, "first": "23/09 11h38", "rm": null, "rt": "Recorrente desde 17/09", "rs": "Tratado no privado; voltou a ocorrer em 23/09", "st": "Parcial", "days": {"23/09": 1}, "new": false}, {"n": "Rede de atendimento travando", "c": 3, "rel": 2, "vend": 1, "first": "21/09 14h23", "rm": 20, "rt": "20 min", "rs": "Orientação de limpar o cache", "st": "Resolvido", "days": {"21/09": 2}, "new": true}], "w3": [{"n": "GUP fora do ar e instável (02/10)", "c": 0, "rel": 45, "vend": 22, "ids": 7, "first": "02/10 11h33", "rm": 1, "rt": "1 min", "rs": "Voltou a enviar em 36 min, mas seguiu lenta e sem mover para \"aguardando resposta\" (INC002227879)", "st": "Parcial", "days": {"02/10": 45}, "new": true}, {"n": "Conecta e Contrate fora em nível nacional (03/10)", "c": 3, "rel": 17, "vend": 10, "ids": 0, "first": "03/10 09h08", "rm": 46, "rt": "46 min", "rs": "Falha em APIs identificada após 5h08; plantão encerrado sem o sistema voltar", "st": "Sem solução", "days": {"03/10": 17}, "new": true}, {"n": "Pendências e erros no Conecta", "c": 4, "rel": 26, "vend": 7, "ids": 0, "first": "29/09 11h49", "rm": 1, "rt": "1 min", "rs": "Casos resolvidos um a um (26 a 30 min); orçamentos de 02/10 encaminhados ao Conecta sem retorno", "st": "Parcial", "days": {"29/09": 2, "30/09": 12, "01/10": 2, "02/10": 10}, "new": true}, {"n": "Leads repetidos, só com imagens ou links (WhatsApp Business)", "c": 5, "rel": 14, "vend": 7, "ids": 6, "first": "29/09 10h51", "rm": 35, "rt": "35 min", "rs": "Marketing acionado em 29/09; segue recorrente até 05/10", "st": "Sem solução", "days": {"29/09": 9, "30/09": 2, "01/10": 1, "02/10": 2}, "new": true}, {"n": "Contrate: cliente não recebe link ou senha", "c": 3, "rel": 9, "vend": 4, "ids": 0, "first": "30/09 16h54", "rm": 1, "rt": "1 min", "rs": "Ajustes informados em 1h26 (RITM004205159); voltou a ocorrer em 05/10", "st": "Parcial", "days": {"30/09": 9}, "new": true}, {"n": "Campanha CNPJ do marketing gerando reclamação", "c": 5, "rel": 11, "vend": 5, "ids": 0, "first": "30/09 14h42", "rm": 34, "rt": "34 min", "rs": "Sem retorno registrado", "st": "Sem solução", "days": {"30/09": 11}, "new": true}, {"n": "GUP: bot com cliente já pago e vínculo de lead", "c": 1, "rel": 4, "vend": 2, "ids": 1, "first": "01/10 09h53", "rm": 2, "rt": "2 min", "rs": "Encaminhado à GUP, sem retorno registrado", "st": "Sem solução", "days": {"01/10": 4}, "new": true}, {"n": "Portal do corretor fora do ar", "c": 3, "rel": 3, "vend": 1, "ids": 0, "first": "02/10 12h55", "rm": 28, "rt": "28 min", "rs": "Normalizado em 1h30", "st": "Resolvido", "days": {"02/10": 3}, "new": true}], "S": [{"rel": 53, "vend": 21, "prob": 10, "novos": 10, "res": 1, "parc": 3, "med": 13.5, "semresp": 2}, {"rel": 86, "vend": 26, "prob": 10, "novos": 3, "res": 2, "parc": 3, "med": 280, "semresp": 0}, {"rel": 129, "vend": 38, "prob": 8, "novos": 8, "res": 1, "parc": 3, "med": 15.0, "semresp": 0}]};
+const dl=(ini,n,mes)=>Array.from({length:n},(_,i)=>{const d=new Date(2026,ini[1]-1,ini[0]+i);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');});
+const WK={
+ w1:{rel:WD.w1,days:dl([14,9],7),star:'',starTxt:'',
+  hint:'Segunda 14/09 a domingo 20/09. As falhas começaram em 16/09.',
+  mini:`<div class="bad"><b>53 relatos</b><span>de 21 vendedores, sobre 10 problemas, todos novos</span></div>
+   <div><b>14 min</b><span>tempo mediano até a 1ª resposta; 2 problemas sem resposta (Eugênia e bot)</span></div>
+   <div class="bad"><b>1 de 10</b><span>resolvido (PDF da Meta); 3 parciais</span></div>`,
+  com:'<p>Primeira semana com falhas. Elas começaram na quarta, 16/09, e atingiram todo o funil: leads "sem interesse" transferidos, bloqueios da Meta, Eugênia com preço errado e Conecta e Contrate fora em 17/09. O pior dia foi o sábado, 19/09, quando a GUP encerrou conversas e leads com documentos se perderam, com 21 relatos e sem suporte no plantão.</p>'},
+ w2:{rel:WD.w2,days:dl([21,9],7),star:'23/09',starTxt:'* exportação até 23/09 11h38',
+  hint:'Segunda 21/09 a domingo 27/09. Semana parcial: os relatos de 24 e 25/09 não estão na exportação.',
+  mini:`<div class="bad"><b>86 relatos (+62%)</b><span>de 26 vendedores, sobre 10 problemas: 3 novos e 7 que vinham da semana anterior</span></div>
+   <div class="bad"><b>4h40</b><span>tempo mediano até a 1ª resposta dos problemas novos</span></div>
+   <div><b>2 de 10</b><span>resolvidos; 3 parciais</span></div>`,
+  com:'<p>Três de cada quatro relatos foram sobre o mesmo problema: leads caindo com vendedor em pausa ou deslogado, com 64 relatos e 55 IDs de chat. A primeira resposta veio 4h40 depois do primeiro relato, e a correção só saiu em 22/09, 28 horas depois. Sete problemas da semana anterior continuaram aparecendo, como bloqueios da Meta, bot no meio da conversa e erros de pagamento.</p>'},
+ w3:{rel:WD.w3,days:dl([28,9],7),star:'',starTxt:'',
+  hint:'Segunda 28/09 a domingo 04/10. 59 relatos vieram só como imagem e foram classificados pelo contexto.',
+  mini:`<div class="bad"><b>129 relatos (+50%)</b><span>de 38 vendedores, sobre 8 problemas</span></div>
+   <div class="bad"><b>2 quedas gerais</b><span>GUP fora em 02/10 e Conecta e Contrate fora em todo o país em 03/10</span></div>
+   <div><b>1 de 8</b><span>resolvido; 3 parciais. Mediana até a 1ª resposta: 15 min</span></div>`,
+  com:'<p>A semana teve as duas falhas mais graves do período. Na sexta, 02/10, a GUP parou de enviar mensagens: voltou em 36 minutos, mas seguiu lenta e sem mover chats para "aguardando resposta". No sábado, 03/10, Conecta e Contrate ficaram fora em todo o país, ninguém conseguiu subir venda e o plantão terminou sem o sistema voltar.</p><p>Também apareceram problemas ligados ao marketing: leads de WhatsApp Business que repetem a mesma mensagem todos os dias e uma campanha com preço de CNPJ que fez clientes acusarem os vendedores de enganação.</p>'}
+};
+/* comparativo semanal */
+(function(){const S=WD.S;const W=[
+  {l:'14 a 20/09',...S[0],rows:WD.w1},{l:'21 a 27/09*',...S[1],rows:WD.w2},{l:'28/09 a 04/10',...S[2],rows:WD.w3}];
+ W.forEach(w=>{if(w.rows){w.cats={};w.rows.forEach(r=>w.cats[r.c]=(w.cats[r.c]||0)+r.rel);}});
+ const cats=[0,1,2,3,4,5].filter(c=>W.some(w=>w.cats[c]));
+ $('#wkLeg').innerHTML=cats.map(i=>`<span><i style="background:${CCOL[i]}"></i>${CNAME[i]}</span>`).join('');
+ const Wd=480,H=260,l=36,b=34,t=18,max=140;const s=svg(Wd,H);const y=v=>H-b-(v/max)*(H-b-t);const gw=(Wd-l)/W.length;
+ for(let g=0;g<=max;g+=20){el(s,'line',{x1:l,x2:Wd,y1:y(g),y2:y(g),class:'ax'});el(s,'text',{x:l-6,y:y(g)+4,'text-anchor':'end'},g);}
+ W.forEach((w,i)=>{let acc=0;const x=l+i*gw+gw*.2,bw=gw*.6;
+  cats.forEach(c=>{const v=w.cats[c]||0;if(!v)return;el(s,'rect',{x,y:y(acc+v),width:bw,height:Math.max(1.5,y(acc)-y(acc+v)),fill:CCOL[c],'data-tip':`<b>${w.l} · ${CNAME[c]}</b><br>${v} relato${v>1?'s':''}`+(w.note?`<br>${w.note}`:'')});acc+=v;});
+  el(s,'text',{x:x+bw/2,y:y(acc)-6,'text-anchor':'middle',style:'font-weight:700;fill:var(--ink)'},acc);
+  el(s,'text',{x:x+bw/2,y:H-16,'text-anchor':'middle',style:'font-size:10px'},w.l.split(' a ')[0]);
+  el(s,'text',{x:x+bw/2,y:H-4,'text-anchor':'middle',style:'font-size:10px'},'a '+w.l.split(' a ')[1]);});
+ mount('chWk',s);
+ const vr=(a,b)=>!a?'—':`<span class="${b>a?'dn':'up'}" style="color:var(--${b>a?'bad':'good'});font-weight:600">${b>a?'+':'−'}${Math.abs(Math.round((b/a-1)*100))}%</span>`;
+ const mm=m=>m==null?'—':m>=60?Math.floor(m/60)+'h'+String(Math.round(m%60)).padStart(2,'0'):Math.round(m)+' min';
+ $('#wkTbl').innerHTML='<thead><tr><th>Semana</th><th>Relatos</th><th>Var.</th><th>Vend.</th><th>Problemas</th><th>Resolvidos</th><th>1ª resp.</th></tr></thead><tbody>'+
+  W.map((w,i)=>`<tr><td>${w.l}</td><td><b>${w.rel}</b></td><td>${i>0?vr(W[i-1].rel,w.rel):'—'}</td><td>${w.vend}</td><td>${w.prob}${w.rows?` <span style="color:var(--ink2);font-size:11px">(${w.novos} novos)</span>`:''}</td><td>${w.rows?w.res+' + '+w.parc+' parc.':'—'}</td><td>${mm(w.med)}</td></tr>`).join('')+'</tbody>';
+})();
+let wk='w3';
+function drawRelChart(){const W=WK[wk],REL=W.rel,D=W.days;const cats=[...new Set(REL.map(r=>r.c))].sort();
+ $('#relLeg').innerHTML=cats.map(i=>`<span><i style="background:${CCOL[i]}"></i>${CNAME[i]}</span>`).join('');
+ const Wd=720,H=250,l=36,b=30,t=16;const tot=D.map(d=>REL.reduce((a,r)=>a+(r.days[d]||0),0));const max=Math.ceil(Math.max(...tot)*1.12/10)*10;
+ const s=svg(Wd,H);const y=v=>H-b-(v/max)*(H-b-t);const gw=(Wd-l)/D.length;
+ for(let g=0;g<=max;g+=10){el(s,'line',{x1:l,x2:Wd,y1:y(g),y2:y(g),class:'ax'});el(s,'text',{x:l-6,y:y(g)+4,'text-anchor':'end'},g);}
+ D.forEach((d,i)=>{let acc=0;const x=l+i*gw+gw*.2,w=gw*.6;
+  cats.forEach(c=>{const rs=REL.filter(r=>r.c===c&&r.days[d]);const v=rs.reduce((a,r)=>a+r.days[d],0);if(!v)return;
+   el(s,'rect',{x,y:y(acc+v),width:w,height:y(acc)-y(acc+v),fill:CCOL[c],'data-tip':`<b>${d} · ${CNAME[c]}</b><br>`+rs.map(r=>`${r.n}: ${r.days[d]}`).join('<br>')});acc+=v;});
+  el(s,'text',{x:x+w/2,y:y(acc)-5,'text-anchor':'middle',style:'font-weight:700;fill:var(--ink)'},acc);
+  el(s,'text',{x:x+w/2,y:H-10,'text-anchor':'middle'},d+(d===W.star?'*':''));});
+ el(s,'text',{x:Wd-4,y:t,'text-anchor':'end',style:'font-size:10px'},W.starTxt);
+ mount('chRel',s);}
+let rK='rel',rA=false;
+const RCOL=[['n','Problema'],['rel','Relatos'],['vend','Vendedores'],['first','1º relato'],['rm','1ª resposta'],['rs','Resolução'],['st','Situação']];
+function drawRel(){const a=[...WK[wk].rel].sort((x,y)=>{let u=x[rK],v=y[rK];if(rK==='rm'){u=u??1e9;v=v??1e9;}return(u>v?1:u<v?-1:0)*(rA?1:-1);});
+ $('#relTbl').innerHTML='<thead><tr>'+RCOL.map(([k,l])=>`<th class="s${['n','rs','st','first'].includes(k)?' l':''}" data-k="${k}">${l}${rK===k?(rA?' ▲':' ▼'):''}</th>`).join('')+'</tr></thead><tbody>'+
+  a.map(r=>`<tr><td class="l wrap"><span style="color:${CCOL[r.c]};margin-right:4px">●</span>${r.n}</td><td><b>${r.rel}</b></td><td>${r.vend}</td><td class="l">${r.first}</td><td class="${r.rm==null||r.rm>60?'dn':''}">${r.rt}</td><td class="l wrap">${r.rs}</td><td class="l"><span class="pillst ${r.st==='Resolvido'?'r':r.st==='Parcial'?'p':'s'}">${r.st}</span></td></tr>`).join('')+'</tbody>';
+ $('#relTbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;rA=rK===k?!rA:(k==='n'||k==='first');rK=k;drawRel();});}
+function drawWeek(){const W=WK[wk];$('#relHint').textContent=W.hint;$('#relMini').innerHTML=W.mini;$('#relCom').innerHTML=W.com;drawRelChart();drawRel();}
+$('#wkSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{wk=b.dataset.w;$('#wkSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawWeek();});
+drawWeek();
+
+/* ---------- mapa de falhas por dia ---------- */
+const ROWS=[
+ ['Distribuição e filas (GUP)','var(--bad)','Leads distribuídos errado, filas, lentidão e chats que não mudam de status na GUP.'],
+ ['Bot e Eugênia','var(--warn)','Bot ou Eugênia com informação errada, entrando no meio da conversa ou falando com cliente já fechado.'],
+ ['Bloqueio da Meta','var(--sky)','Mensagens, follow-ups ou PDFs que não saem por bloqueio ou falha da Meta.'],
+ ['Sistemas fora do ar','var(--petrol)','Conecta, Contrate, portal ou GUP indisponíveis, total ou parcialmente.'],
+ ['Pagamento, boleto e Conecta','var(--ink2)','Erros de pagamento, boleto, carência, cadastro e propostas travadas no Conecta ou Bitix.'],
+ ['Perda de leads em andamento','#8b2c25','Conversas encerradas pelo sistema e leads que somem com documentos já enviados.'],
+ ['Marketing','var(--p2)','Leads repetidos ou sem conteúdo e campanhas que geram reclamação dos clientes.']];
+const TROW={'Leads caindo com vendedor em pausa ou deslogado':0,'GUP encerrando conversas e leads sumindo (19/09)':5,'Bloqueio da Meta no follow-up':2,'Eugênia e bot com informação errada':1,'Conecta ou Contrate fora do ar':3,'GUP lenta, mídia sem carregar e chats fora do status':0,'Leads "sem interesse" transferidos':0,'Bot entrando no meio da conversa':1,'Leads antigos caindo fechados':0,'Pagamento, boleto e erros no Conecta/Bitix':4,'Declaração de permanência':4,'PDF não enviado':2,'Rede de atendimento travando':3,
+ 'GUP fora do ar e instável (02/10)':0,'Conecta e Contrate fora em nível nacional (03/10)':3,'Pendências e erros no Conecta':4,'Leads repetidos, só com imagens ou links (WhatsApp Business)':6,'Contrate: cliente não recebe link ou senha':3,'Campanha CNPJ do marketing gerando reclamação':6,'GUP: bot com cliente já pago e vínculo de lead':1,'Portal do corretor fora do ar':3};
+const INC3={
+ '29/09':[[6,'Leads de WhatsApp Business chegam repetindo a mesma informação várias vezes; marketing acionado.'],[4,'Nome do cliente acima do limite de caracteres travou a proposta no Sigo; resolvido em 26 min.']],
+ '30/09':[[6,'Campanha com preço de CNPJ: clientes que já tinham cotação voltam cobrando o valor e acusam os vendedores de enganação.'],[3,'Contrate não envia link nem código ao cliente; um vendedor tentava fechar havia uma semana. Ajustes informados às 18h20 (RITM004205159).'],[4,'Proposta em dados divergentes por uma cidade que não estava na contratação.']],
+ '01/10':[[1,'Bot mandando mensagem para cliente que já pagou; cliente vinculado a outro vendedor pedindo desvínculo.'],[6,'Lead que só envia links, sem conversar.'],[4,'Orçamentos pendenciando.']],
+ '02/10':[[0,'GUP fora do ar às 11h33: nenhuma mensagem saía. Voltou às 12h09, mas lenta e sem mover chats para "aguardando resposta"; leads caíram enquanto estava fora (INC002227879).'],[3,'Portal do corretor fora do ar das 12h55 às 14h25.'],[4,'Orçamentos pendenciando por cadastro duplicado e orçamentos de dependentes que não finalizam, encaminhados ao Conecta.'],[6,'Lead que só envia imagens, todos os dias.']],
+ '03/10':[[3,'Conecta e Contrate fora em todo o país desde 09h08. Cotação só pelo cotador e nenhuma venda subiu. Falha nas APIs identificada às 14h16; plantão encerrado às 16h sem retorno.']]};
+const HW={w1:{l:'14 a 20/09',days:dl([14,9],7)},w2:{l:'21 a 27/09',days:dl([21,9],7),na:['24/09','25/09','26/09','27/09']},w3:{l:'28/09 a 04/10',days:dl([28,9],7)}};
+const WCOL={w1:'var(--sky)',w2:'var(--accent)',w3:'var(--p2)'};
+const CELL={};
+['w1','w2','w3'].forEach(k=>WD[k].forEach(t=>{const r=TROW[t.n];Object.entries(t.days).forEach(([d,v])=>{const c=((CELL[d]=CELL[d]||{})[r]=CELL[d][r]||{n:0,th:[],txt:[]});c.n+=v;c.th.push([t.n,v]);});}));
+Object.entries(INC).forEach(([d,o])=>{const key=String(d).padStart(2,'0')+'/09';o.it.forEach(([r,t])=>{const c=((CELL[key]=CELL[key]||{})[r]=CELL[key][r]||{n:0,th:[],txt:[]});c.txt.push(t);});});
+Object.entries(INC3).forEach(([d,a])=>a.forEach(([r,t])=>{const c=((CELL[d]=CELL[d]||{})[r]=CELL[d][r]||{n:0,th:[],txt:[]});c.txt.push(t);}));
+const WDN=['seg','ter','qua','qui','sex','sáb','dom'];
+let hw='w3',hRow=-1,hSel=null;
+const lvl=n=>n>=10?'c3':n>=3?'c2':n>=1?'c1':'c0';
+function cellTip(d,r,c){return `<b>${d} · ${ROWS[r][0]}</b>`+(c.n?`<br>${c.n} relato${c.n>1?'s':''}`:'<br>Falha relatada, sem contagem')+(c.th.length?'<br>'+c.th.map(([n,v])=>`${n}: ${v}`).join('<br>'):'');}
+function drawHeat(){const W=HW[hw],h=$('#heat');h.innerHTML='';
+ h.insertAdjacentHTML('beforeend','<div></div>');
+ W.days.forEach((d,i)=>{const b=document.createElement('button');b.className='hd'+(hSel&&hSel.d===d&&hSel.r==null?' on':'');b.innerHTML=`${d.slice(0,5)}<small>${WDN[i]}</small>`;b.onclick=()=>{hSel={d};drawHeat();showDet();};h.appendChild(b);});
+ ROWS.forEach(([n,col,desc],r)=>{const b=document.createElement('button');b.className='rl'+(hRow===r?' on':'');b.innerHTML=`<i style="background:${col}"></i>${n}<em class="q" data-tip="${desc}">i</em>`;
+  b.onclick=()=>{hRow=hRow===r?-1:r;hSel=hRow<0?null:{r};drawHeat();drawCat();showDet();};h.appendChild(b);
+  W.days.forEach(d=>{const c=(CELL[d]||{})[r];const x=document.createElement('button');const na=(W.na||[]).includes(d)&&!c;
+   x.className='cell'+(c?' '+lvl(c.n):'')+(na?' na':'')+(hRow>=0&&hRow!==r?' off':'')+(hSel&&hSel.d===d&&hSel.r===r?' sel':'');
+   x.textContent=c?(c.n||'•'):'';
+   if(c)x.setAttribute('data-tip',cellTip(d,r,c));else if(na)x.setAttribute('data-tip','Fora da exportação disponível');
+   x.setAttribute('aria-label',`${n}, ${d}: ${c?(c.n||'falha')+' relatos':'sem relato'}`);
+   if(c)x.onclick=()=>{hSel={d,r};drawHeat();showDet();};h.appendChild(x);});});}
+function showDet(){const W=HW[hw],det=$('#heatDet');
+ if(!hSel){const tot=W.days.reduce((a,d)=>a+Object.values(CELL[d]||{}).reduce((s,c)=>s+c.n,0),0);const nd=W.days.filter(d=>CELL[d]).length;
+  const top=W.days.map(d=>[d,Object.values(CELL[d]||{}).reduce((s,c)=>s+c.n,0)]).sort((a,b)=>b[1]-a[1])[0];
+  det.innerHTML=`<h3>Semana de ${W.l}</h3><div class="sub">${nd} dias com falha · ${tot} relatos · dia com mais relatos: ${top[0]} (${top[1]})</div><p class="hint" style="margin:0">Clique em uma data, em um tipo ou em uma célula para ver o que foi relatado.</p>`;return;}
+ if(hSel.r!=null&&!hSel.d){const r=hSel.r;const ds=W.days.filter(d=>(CELL[d]||{})[r]);
+  det.innerHTML=`<h3>${ROWS[r][0]} · ${W.l}</h3><div class="sub">${ds.length} dia${ds.length!==1?'s':''} com falha · ${ds.reduce((a,d)=>a+CELL[d][r].n,0)} relatos</div>`+
+   (ds.length?ds.map(d=>{const c=CELL[d][r];return `<div class="item"><span class="tag" style="background:var(--muted);color:var(--ink)">${d}</span><span>${(c.txt.length?c.txt:c.th.map(([n,v])=>`${n} (${v})`)).join(' ')}</span></div>`;}).join(''):'<p class="empty-state">Nenhuma falha deste tipo na semana.</p>');return;}
+ if(hSel.d&&hSel.r==null){const d=hSel.d,cs=CELL[d]||{};const i=W.days.indexOf(d);
+  det.innerHTML=`<h3>${d} · ${['segunda','terça','quarta','quinta','sexta','sábado','domingo'][i]}</h3><div class="sub">${Object.values(cs).reduce((a,c)=>a+c.n,0)} relatos</div>`+
+   (Object.keys(cs).length?Object.entries(cs).map(([r,c])=>`<div class="item"><span class="tag" style="background:var(--muted);color:${ROWS[r][1]}">${ROWS[r][0]}</span><span>${(c.txt.length?c.txt:c.th.map(([n,v])=>`${n} (${v})`)).join(' ')}${c.n?` <span style="color:var(--ink2)">· ${c.n} relato${c.n>1?'s':''}</span>`:''}</span></div>`).join(''):'<p class="empty-state">Sem falhas relatadas neste dia.</p>');return;}
+ const {d,r}=hSel,c=CELL[d][r];
+ det.innerHTML=`<h3>${d} · ${ROWS[r][0]}</h3><div class="sub">${c.n?c.n+' relato'+(c.n>1?'s':''):'Falha relatada, sem contagem disponível'}</div>`+
+  (c.txt.length?c.txt.map(t=>`<p style="margin:0 0 6px;font-size:14px">${t}</p>`).join(''):'')+(c.th.length?`<div class="sub" style="margin-top:6px">${c.th.map(([n,v])=>`${n}: ${v}`).join(' · ')}</div>`:'');}
+function drawCat(){const ks=['w1','w2','w3'];const cnt=ROWS.map((_,r)=>ks.map(k=>HW[k].days.filter(d=>(CELL[d]||{})[r]).length));
+ const W=380,gh=40,H=ROWS.length*gh+6,x0=96,sc=(W-x0-24)/7;const s=svg(W,H);
+ const SH=['GUP','Bot','Meta','Sistemas','Pagamento','Perda','Marketing'];
+ cnt.forEach((v,r)=>{const y=r*gh+4;const g=el(s,'g',{style:`cursor:pointer;opacity:${hRow>=0&&hRow!==r?.3:1}`});g.onclick=()=>{hRow=hRow===r?-1:r;hSel=hRow<0?null:{r};drawHeat();drawCat();showDet();};
+  el(g,'text',{x:x0-8,y:y+17,'text-anchor':'end',style:hRow===r?'font-weight:700;fill:var(--ink)':''},SH[r]);
+  v.forEach((n,j)=>{const k=ks[j];el(g,'rect',{x:x0,y:y+j*11,width:Math.max(n*sc,1.5),height:9,rx:2,fill:WCOL[k],opacity:k===hw?1:.55,'data-tip':`<b>${SH[r]} · ${HW[k].l}</b><br>${n} dia${n!==1?'s':''} com falha`});
+   el(g,'text',{x:x0+Math.max(n*sc,1.5)+4,y:y+j*11+8,style:'font-size:9.5px'+(k===hw?';font-weight:700;fill:var(--ink)':'')},n);});});
+ mount('chCat',s);
+ $('#catLeg').innerHTML=ks.map(k=>`<span><i style="background:${WCOL[k]}"></i>${HW[k].l}${k==='w2'?'*':''}</span>`).join('');
+ $('#catCom').innerHTML={w1:'<p>As falhas começaram em 16/09 e já atingiram todas as etapas: distribuição, bot, Meta, sistemas e pagamento. O pior dia foi 19/09, com leads perdidos no plantão.</p>',
+  w2:'<p>A distribuição da GUP passou a ser o problema central, com leads caindo para vendedores em pausa. Pagamento e Conecta apareceram em 4 dias. A contagem de relatos vai até 23/09; 24 e 25/09 aparecem só como falha relatada.</p>',
+  w3:'<p>Erros no Conecta e problemas de marketing apareceram em 4 dos 5 dias com falha, e o marketing entrou na lista pela primeira vez. Foi a semana com as falhas mais graves: GUP fora em 02/10 e Conecta e Contrate fora em todo o país em 03/10.</p>'}[hw];}
+function setHw(k){hw=k;hSel=hRow>=0?{r:hRow}:null;$('#hwSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.w===k));drawHeat();drawCat();showDet();}
+$('#hwSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>setHw(b.dataset.w));
+setHw('w3');
+
+/* ---------- VPC ---------- */
+let sortK='d',sortA=true;
+const day=c=>{const[d,m]=c.d.split('/').map(Number);return m===10?d+30:d;};
+function sum(a,k){return a.reduce((s,c)=>s+(c[k]||0),0);}
+const VPCC=CAMP.filter(c=>c.t==='VPC');
+const VPER={s2:[[1,6],[7,13]],s3:[[7,13],[14,20]],s4:[[14,20],[21,27]],s5:[[21,27],[28,34]],s6:[[28,34],[35,41]]};
+let vper='s5';
+const od=o=>o>30?String(o-30).padStart(2,'0')+'/10':String(o).padStart(2,'0')+'/09';const rl=r=>{if(r[0]===1)return'31/08 a 06/09';const a=od(r[0]),b=od(r[1]);return a.slice(3)===b.slice(3)?`${a.slice(0,2)} a ${b}`:`${a} a ${b}`;};
+$('#vpSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{vper=b.dataset.p;$('#vpSeg').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));applyVpc();});
+function vst(a){const days=new Set(a.map(day)).size,n=a.length,e=sum(a,'e'),en=sum(a,'en'),l=sum(a,'l');return{n,e,en,l,days,dd:days?n/days:0,ed:days?en/days:0,ep:n?en/n:0,ent:e?en/e:0,lei:en?l/en:0};}
+let RA,RB,V1,V2,LA,LB;
+const sg=(v,suf)=>!isFinite(v)?'—':(v>=0?'+':'−')+Math.abs(v).toLocaleString('pt-BR',{maximumFractionDigits:1})+suf;
+const vv=k=>(V2[k]/V1[k]-1)*100, vpp=k=>(V2[k]-V1[k])*100;
+const f1=v=>v.toLocaleString('pt-BR',{maximumFractionDigits:1});
+const VMET=[['Clientes acionados','en',0],['Disparos','n',0],['Acionados por disparo','ep',0],['Acionados por dia','ed',0],['Taxa de entrega','ent',1],['Taxa de leitura','lei',1]];
+let vmi=0;const vseg=$('#vMetSeg');VMET.forEach((m,i)=>{const b=document.createElement('button');b.textContent=m[0];b.setAttribute('aria-pressed',i===0);b.onclick=()=>{vmi=i;vseg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawVMet();};vseg.appendChild(b);});
+const isDef=()=>vper==='q';
+function metCom(i){const[l,k,isP]=VMET[i];if(!V1.n||!V2.n)return'<p>Um dos períodos não tem disparos VPC. Escolha outro intervalo.</p>';
+ if(isDef())return['<p>Os acionados subiram 25%, sem o salto de quase o dobro visto no total. Não houve compensação por volume no VPC.</p>','<p>Foram só dois disparos a mais na 2ª quinzena, espalhados por mais dias.</p>','<p>O tamanho de cada disparo quase não mudou (+5%), enquanto no total cresceu 58%. As listas VPC não foram ampliadas.</p>','<p>O ritmo diário até caiu levemente. A pressão sobre filas veio de outros disparos, não do VPC.</p>','<p>A entrega das mensagens enviadas ficou acima de 97% nos dois períodos. O problema VPC não é entrega, e sim a parte do público que chega a receber o envio.</p>','<p>A leitura ficou estável perto de 58%. Quem recebeu continuou lendo as mensagens no mesmo nível.</p>'][i];
+ const v=isP?vpp(k):vv(k);const f=x=>isP?pct(x):(k==='n'?x:fmt(x));
+ return `<p>${l}: ${f(V1[k])} de ${LA} e ${f(V2[k])} de ${LB}, ${Math.abs(v)<(isP?1:5)?'praticamente estável':v>0?'alta de '+sg(v,isP?' p.p.':'%').slice(1):'queda de '+sg(v,isP?' p.p.':'%').slice(1)}.</p>`;}
+function drawVMet(){const[l,k,isP]=VMET[vmi];const a=V1[k],b=V2[k];const f=v=>isP?pct(v):(k==='n'?String(v):fmt(v));
+ const W=460,H=230,bt=30,t=24,max=Math.max(a,b,1e-9)*1.15;const s=svg(W,H);const y=v=>H-bt-(v/max)*(H-bt-t);
+ el(s,'line',{x1:20,x2:W-20,y1:H-bt,y2:H-bt,class:'ax'});
+ [[a,LA,'b1'],[b,LB,'b2']].forEach(([v,lab,cls],j)=>{const x=90+j*170,w=110;
+  el(s,'rect',{x,y:y(v),width:w,height:H-bt-y(v),rx:4,class:cls,'data-tip':`<b>${lab}</b><br>${l}: ${f(v)}`});
+  el(s,'text',{x:x+w/2,y:y(v)-7,'text-anchor':'middle',style:'font-size:15px;font-weight:700;fill:var(--ink)'},f(v));
+  el(s,'text',{x:x+w/2,y:H-10,'text-anchor':'middle',style:'font-size:12px'},lab);});
+ const d=isP?sg((b-a)*100,' p.p.'):sg((b/a-1)*100,'%');
+ el(s,'text',{x:W/2,y:14,'text-anchor':'middle',style:`font-size:13px;font-weight:700;fill:${b>=a?'var(--accent)':'var(--bad)'}`},d);
+ mount('chVMet',s);$('#vMetCom').innerHTML=metCom(vmi);}
+function drawKpi(){$('#vpcKpi').innerHTML=`
+ <div class="panel kpi"><div class="lab">Clientes acionados</div><div class="val">${sg(vv('en'),'%')}</div><div class="det">${fmt(V1.en)} → ${fmt(V2.en)}</div></div>
+ <div class="panel kpi ${vv('ed')<0?'bad':''}"><div class="lab">Acionados por dia</div><div class="val">${sg(vv('ed'),'%')}</div><div class="det">${fmt(V1.ed)} → ${fmt(V2.ed)}</div></div>
+ <div class="panel kpi"><div class="lab">Acionados por disparo</div><div class="val">${sg(vv('ep'),'%')}</div><div class="det">${fmt(V1.ep)} → ${fmt(V2.ep)}</div></div>
+ <div class="panel kpi ${vpp('lei')<-2?'bad':''}"><div class="lab">Taxa de leitura</div><div class="val">${sg(vpp('lei'),' p.p.')}</div><div class="det">${pct(V1.lei)} → ${pct(V2.lei)}</div></div>`;}
+function drawVar(){$('#vVarTitle').textContent=`Variação de ${LA} para ${LB}`;
+ const data=[['Clientes acionados',vv('en'),`${fmt(V1.en)} → ${fmt(V2.en)}`],['Disparos',vv('n'),`${V1.n} → ${V2.n}`],['Acionados por disparo',vv('ep'),`${fmt(V1.ep)} → ${fmt(V2.ep)}`],['Acionados por dia',vv('ed'),`${fmt(V1.ed)} → ${fmt(V2.ed)}`],['Disparos por dia',vv('dd'),`${f1(V1.dd)} → ${f1(V2.dd)}`],['Taxa de leitura',vpp('lei'),`${pct(V1.lei)} → ${pct(V2.lei)}`,1]];
+ const lim=Math.max(30,...data.map(d=>isFinite(d[1])?Math.abs(d[1]):0));const cap=Math.min(lim,300);
+ const W=480,row=34,H=data.length*row+8,neg=data.some(d=>d[1]<0),pos=data.some(d=>d[1]>0),x0=neg&&pos?325:neg?420:160,sc=(neg&&pos?100:neg?205:255)/cap;const s=svg(W,H);
+ el(s,'line',{x1:x0,x2:x0,y1:0,y2:H,class:'ax'});
+ data.forEach(([l,v,d,pp],i)=>{const y=i*row+6,w=isFinite(v)?Math.min(Math.abs(v),cap)*sc:0;el(s,'text',{x:150,y:y+15,'text-anchor':'end'},l);
+  el(s,'rect',{x:v<0?x0-w:x0,y,width:Math.max(w,1),height:20,rx:3,class:v<0?'bbad':'b2','data-tip':`<b>${l}</b><br>${d}`});
+  el(s,'text',{x:v<0?x0-w-6:x0+w+6,y:y+15,'text-anchor':v<0?'end':'start',style:'font-weight:700;fill:var(--ink)'},sg(v,pp?' p.p.':'%'));});
+ mount('chVVar',s);
+ $('#vVarCom').innerHTML=isDef()?'<p>Diferente do total da operação, o VPC não aumentou o retrabalho para compensar a falta de leads. O volume subiu só 25% e o ritmo diário até caiu.</p><p>Tamanho de cada disparo, entrega e leitura ficaram praticamente iguais. O ponto de atenção está depois do disparo, no atendimento e no Contrate, exclusivo do VPC desde 17/09 e fora do ar em 17 e 23/09.</p>'
+  :(!V1.n||!V2.n?'<p>Um dos períodos não tem disparos VPC.</p>':`<p>De ${LA} para ${LB}, os acionados ${vv('en')>=0?'subiram':'caíram'} ${sg(vv('en'),'%').slice(1)} e o tamanho médio de cada disparo ${Math.abs(vv('ep'))<5?'ficou estável':vv('ep')>0?'aumentou '+sg(vv('ep'),'%').slice(1):'diminuiu '+sg(vv('ep'),'%').slice(1)}. A leitura ${Math.abs(vpp('lei'))<1.5?'se manteve':vpp('lei')>0?'melhorou':'piorou'} (${pct(V1.lei)} → ${pct(V2.lei)}).</p>`);}
+function drawRatio(){const inA=c=>day(c)>=RA[0]&&day(c)<=RA[1],inB=c=>day(c)>=RB[0]&&day(c)<=RB[1];
+ const pts=VPCC.filter(c=>/BASE VPC D ?-30/.test(c.n)&&(inA(c)||inB(c))).map(c=>({c,v:c.e/c.p,p:inB(c)?'B':'A'}));
+ const W=460,H=250,l=40,r=12,b=44,t=16,min=.4,max=.8;const s=svg(W,H);
+ [.4,.5,.6,.7,.8].forEach(v=>{el(s,'line',{x1:l,x2:W-r,y1:H-b-(v-min)/(max-min)*(H-b-t),y2:H-b-(v-min)/(max-min)*(H-b-t),class:'ax'});el(s,'text',{x:l-6,y:H-b-(v-min)/(max-min)*(H-b-t)+4,'text-anchor':'end'},Math.round(v*100)+'%');});
+ if(!pts.length){el(s,'text',{x:W/2,y:H/2,'text-anchor':'middle'},'Sem campanhas BASE D-30 nos períodos escolhidos');mount('chRatio',s);$('#vRatCom').innerHTML='';return;}
+ const x=i=>pts.length>1?l+i*(W-l-r)/(pts.length-1):(l+W-r)/2,y=v=>H-b-(Math.max(min,Math.min(max,v))-min)/(max-min)*(H-b-t);
+ const i1=pts.findIndex(p=>p.c.d==='22/09'),i2=pts.map(p=>p.c.d).lastIndexOf('24/09');
+ if(i1>=0&&i2>=0){el(s,'rect',{x:x(i1)-8,y:t,width:x(i2)-x(i1)+16,height:H-b-t,class:'band',opacity:.6});el(s,'text',{x:x(i1)-4,y:t+11,style:'fill:var(--bad);font-weight:700;font-size:10px'},'22 a 24/09');}
+ if(pts.length>1)el(s,'path',{d:pts.map((p,i)=>(i?'L':'M')+x(i)+' '+y(p.v)).join(' '),fill:'none',stroke:'var(--line)','stroke-width':2});
+ pts.forEach((p,i)=>{el(s,'circle',{cx:x(i),cy:y(p.v),r:5.5,fill:p.v<.6?'var(--bad)':p.p==='B'?'var(--accent)':'var(--sky)',stroke:p.p==='B'?'var(--accent)':'var(--sky)','stroke-width':2,'data-tip':`<b>${p.c.d} ${p.c.h}</b><br>${p.c.n}<br>Público ${fmt(p.c.p)}, enviadas ${fmt(p.c.e)}<br>Recebeu: ${pct(p.v,0)}`});
+  el(s,'text',{x:x(i),y:H-b+14,'text-anchor':'end',transform:`rotate(-45 ${x(i)} ${H-b+14})`,style:'font-size:10px'},p.c.d);});
+ mount('chRatio',s);
+ const av=P=>{const q=pts.filter(p=>p.p===P);return q.length?sum(q.map(p=>({e:p.c.e})),'e')/sum(q.map(p=>({p:p.c.p})),'p'):null;};const a=av('A'),bb=av('B');
+ $('#vRatCom').innerHTML=`<p>Em média, ${a!=null?pct(a,0)+' do público recebeu a mensagem de '+LA:'o período anterior não tem campanhas BASE D-30'}${bb!=null?' e '+pct(bb,0)+' de '+LB:''}.`+(i1>=0?' Entre 22 e 24/09 a proporção caiu para 48% a 60%, junto com os bloqueios da Meta; vale confirmar com a GUP se houve limite de envio ou restrição do número.':'')+'</p>';}
+const COLS=[['d','Data'],['n','Campanha'],['per','Período'],['p','Público'],['en','Acionados'],['r','Recebeu'],['lr','Leitura']];
+function drawTable(){const inA=c=>day(c)>=RA[0]&&day(c)<=RA[1],inB=c=>day(c)>=RB[0]&&day(c)<=RB[1];
+ let a=VPCC.filter(c=>inA(c)||inB(c)).map(c=>({...c,per:(inA(c)?'A':'')+(inB(c)?'B':''),r:c.e/c.p,lr:c.l/c.en,ds:c.d.split('/').reverse().join('')+c.h}));
+ a.sort((x,y)=>{const k=sortK==='d'?'ds':sortK;const u=x[k],v=y[k];return (u>v?1:u<v?-1:0)*(sortA?1:-1);});
+ $('#tbl').innerHTML='<thead><tr>'+COLS.map(([k,l])=>`<th class="s${k==='n'||k==='per'?' l':''}" data-k="${k}">${l}${sortK===k?(sortA?' ▲':' ▼'):''}</th>`).join('')+'</tr></thead><tbody>'+
+  (a.length?a.map(c=>`<tr><td>${c.d}</td><td class="l">${c.n}</td><td class="l"><b style="color:${c.per.includes('B')?'var(--accent)':'var(--sky)'}">${c.per.includes('B')?LB:LA}</b></td><td>${fmt(c.p)}</td><td>${fmt(c.en)}</td><td class="${c.r<.6?'dn':''}">${pct(c.r,0)}</td><td>${pct(c.lr)}</td></tr>`).join(''):'<tr><td colspan="7" class="l">Nenhuma campanha nos períodos escolhidos.</td></tr>')+'</tbody>';
+ $('#tbl').querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;sortA=sortK===k?!sortA:true;sortK=k;drawTable();});}
+function applyVpc(){[RA,RB]=VPER[vper];LA=rl(RA);LB=rl(RB);
+ V1=vst(VPCC.filter(c=>day(c)>=RA[0]&&day(c)<=RA[1]));V2=vst(VPCC.filter(c=>day(c)>=RB[0]&&day(c)<=RB[1]));
+ $('#fInfo').innerHTML=`Comparando com a semana anterior, ${LA} · ${V1.n} × ${V2.n} disparos`+(vper==='s6'?' · semana em andamento (só 05/10)':'');
+ drawKpi();drawVMet();drawVar();drawRatio();drawTable();}
+applyVpc();
+
+/* ---------- botões ---------- */
+const BT=[{"n":"FOLLOW UP - 3108","c":"PF","o":"COMERCIAL","v":2137,"ni":114,"fa":124,"d":31.0,"m":8.0,"per":"ago","fa%":5.8025269069,"acc":52.1008403361},{"n":"FOLLOW UP rep - 0109","c":"PF","o":"COMERCIAL","v":2000,"ni":124,"fa":82,"d":1.0,"m":9.0,"per":"1","fa%":4.1,"acc":39.8058252427},{"n":"FOLLOW UP REP 02 - 0109","c":"PF","o":"COMERCIAL","v":3000,"ni":121,"fa":74,"d":1.0,"m":9.0,"per":"1","fa%":2.4666666667,"acc":37.9487179487},{"n":"FOLLOW UP REP 1 - 0209","c":"PF","o":"COMERCIAL","v":3102,"ni":191,"fa":254,"d":2.0,"m":9.0,"per":"1","fa%":8.1882656351,"acc":57.0786516854},{"n":"FOLLOW UP REP - 0209","c":"PF","o":"COMERCIAL","v":1439,"ni":110,"fa":63,"d":2.0,"m":9.0,"per":"1","fa%":4.3780403058,"acc":36.4161849711},{"n":"FOLLOW UP REP - 0309","c":"PF","o":"COMERCIAL","v":2666,"ni":183,"fa":215,"d":3.0,"m":9.0,"per":"1","fa%":8.064516129,"acc":54.0201005025},{"n":"REPIQUE COMERCIAL PME 0409","c":"PME","o":"COMERCIAL","v":977,"ni":25,"fa":31,"d":4.0,"m":9.0,"per":"1","fa%":3.1729785056,"acc":55.3571428571},{"n":"Repique comercial SIntro","c":"PROJETO","o":"COMERCIAL","v":152,"ni":14,"fa":9,"d":null,"m":null,"per":"?","fa%":5.9210526316,"acc":39.1304347826},{"n":"FOLLOW UP REP 0809","c":"PF","o":"COMERCIAL","v":2491,"ni":147,"fa":195,"d":8.0,"m":9.0,"per":"1","fa%":7.8281814532,"acc":57.0175438596},{"n":"Repique Comercial VPC 0809","c":"VPC","o":"COMERCIAL","v":49,"ni":7,"fa":2,"d":8.0,"m":9.0,"per":"1","fa%":4.0816326531,"acc":22.2222222222},{"n":"Repique comercial pf 0809","c":"PF","o":"COMERCIAL","v":2500,"ni":187,"fa":252,"d":8.0,"m":9.0,"per":"1","fa%":10.08,"acc":57.4031890661},{"n":"Repique comercial pf 01 0809","c":"PF","o":"COMERCIAL","v":2500,"ni":323,"fa":179,"d":8.0,"m":9.0,"per":"1","fa%":7.16,"acc":35.6573705179},{"n":"Repique comercial pf 02 0809","c":"PF","o":"COMERCIAL","v":2500,"ni":270,"fa":173,"d":8.0,"m":9.0,"per":"1","fa%":6.92,"acc":39.0519187359},{"n":"Repique comercial pf 0909","c":"PF","o":"COMERCIAL","v":2500,"ni":172,"fa":166,"d":9.0,"m":9.0,"per":"1","fa%":6.64,"acc":49.1124260355},{"n":"Repique comercial SIntro 0909","c":"PROJETO","o":"COMERCIAL","v":245,"ni":20,"fa":14,"d":9.0,"m":9.0,"per":"1","fa%":5.7142857143,"acc":41.1764705882},{"n":"Repique comercial SIntro 1009","c":"PROJETO","o":"COMERCIAL","v":500,"ni":24,"fa":27,"d":10.0,"m":9.0,"per":"1","fa%":5.4,"acc":52.9411764706},{"n":"BASE VPC D-30 M 1009","c":"VPC","o":"COMERCIAL","v":500,"ni":31,"fa":32,"d":10.0,"m":9.0,"per":"1","fa%":6.4,"acc":50.7936507937},{"n":"FOLLOW UP REP 1009","c":"PF","o":"COMERCIAL","v":2165,"ni":149,"fa":135,"d":10.0,"m":9.0,"per":"1","fa%":6.2355658199,"acc":47.5352112676},{"n":"Repique comercial pf 1009","c":"PF","o":"COMERCIAL","v":1136,"ni":94,"fa":47,"d":10.0,"m":9.0,"per":"1","fa%":4.1373239437,"acc":33.3333333333},{"n":"BASE VPC D-30 M1 1009","c":"VPC","o":"COMERCIAL","v":1055,"ni":146,"fa":35,"d":10.0,"m":9.0,"per":"1","fa%":3.317535545,"acc":19.3370165746},{"n":"Repique comercial pf 4 1009","c":"PF","o":"COMERCIAL","v":1000,"ni":72,"fa":30,"d":10.0,"m":9.0,"per":"1","fa%":3.0,"acc":29.4117647059},{"n":"BASE VPC D-30 M2 1009","c":"VPC","o":"COMERCIAL","v":1908,"ni":176,"fa":92,"d":10.0,"m":9.0,"per":"1","fa%":4.821802935,"acc":34.328358209},{"n":"BASE VPC D -30 M 1409","c":"VPC","o":"COMERCIAL","v":3821,"ni":282,"fa":143,"d":14.0,"m":9.0,"per":"1","fa%":3.7424757917,"acc":33.6470588235},{"n":"FOLLOW UP REP 1509","c":"PF","o":"COMERCIAL","v":2147,"ni":174,"fa":133,"d":15.0,"m":9.0,"per":"2","fa%":6.1946902655,"acc":43.32247557},{"n":"FOLLOW UP BASE CANCELADOS 1509","c":"VPC","o":"COMERCIAL","v":178,"ni":17,"fa":18,"d":15.0,"m":9.0,"per":"2","fa%":10.1123595506,"acc":51.4285714286},{"n":"BASE REPIQUE VPC 1509","c":"VPC","o":"COMERCIAL","v":415,"ni":48,"fa":17,"d":15.0,"m":9.0,"per":"2","fa%":4.0963855422,"acc":26.1538461538},{"n":"Repique adesao 1509","c":"ADESÃO","o":"COMERCIAL","v":1000,"ni":26,"fa":85,"d":15.0,"m":9.0,"per":"2","fa%":8.5,"acc":76.5765765766},{"n":"Repique adesao 1509 2","c":"ADESÃO","o":"COMERCIAL","v":2000,"ni":66,"fa":222,"d":15.0,"m":9.0,"per":"2","fa%":11.1,"acc":77.0833333333},{"n":"FOLLOW UP REP 1609","c":"PF","o":"COMERCIAL","v":2407,"ni":149,"fa":146,"d":16.0,"m":9.0,"per":"2","fa%":6.0656418779,"acc":49.4915254237},{"n":"BASE VPC D -30 M 1609 13h 30min","c":"VPC","o":"COMERCIAL","v":2792,"ni":209,"fa":97,"d":16.0,"m":9.0,"per":"2","fa%":3.4742120344,"acc":31.6993464052},{"n":"Repique comercial SIntro 1609 13h 30m","c":"PROJETO","o":"COMERCIAL","v":500,"ni":29,"fa":15,"d":16.0,"m":9.0,"per":"2","fa%":3.0,"acc":34.0909090909},{"n":"Repique comercial SIntro 1609 16h 30m","c":"PROJETO","o":"COMERCIAL","v":500,"ni":23,"fa":24,"d":16.0,"m":9.0,"per":"2","fa%":4.8,"acc":51.0638297872},{"n":"BASE VPC D -30 M 1709 10h 30min","c":"VPC","o":"COMERCIAL","v":1727,"ni":151,"fa":83,"d":17.0,"m":9.0,"per":"2","fa%":4.8060220035,"acc":35.4700854701},{"n":"BASE VPC D -30 M 1809 11h 40min","c":"VPC","o":"COMERCIAL","v":1402,"ni":109,"fa":43,"d":18.0,"m":9.0,"per":"2","fa%":3.0670470756,"acc":28.2894736842},{"n":"Repique adesao 2109","c":"ADESÃO","o":"COMERCIAL","v":1000,"ni":23,"fa":117,"d":21.0,"m":9.0,"per":"2","fa%":11.7,"acc":83.5714285714},{"n":"BASE VPC D -30 M 2209 10h 40min","c":"VPC","o":"COMERCIAL","v":2000,"ni":132,"fa":85,"d":22.0,"m":9.0,"per":"2","fa%":4.25,"acc":39.1705069124},{"n":"BASE VPC D -30 M 2209 13h 00min","c":"VPC","o":"COMERCIAL","v":2139,"ni":150,"fa":95,"d":22.0,"m":9.0,"per":"2","fa%":4.4413277232,"acc":38.7755102041},{"n":"FOLLOW UP REP 2209","c":"PF","o":"COMERCIAL","v":1586,"ni":83,"fa":86,"d":22.0,"m":9.0,"per":"2","fa%":5.4224464061,"acc":50.8875739645},{"n":"Repique comercial pf 2209","c":"PF","o":"COMERCIAL","v":1000,"ni":86,"fa":51,"d":22.0,"m":9.0,"per":"2","fa%":5.1,"acc":37.2262773723},{"n":"Repique comercial pf 2309","c":"PF","o":"COMERCIAL","v":1000,"ni":82,"fa":49,"d":23.0,"m":9.0,"per":"2","fa%":4.9,"acc":37.4045801527},{"n":"Repique comercial pf 01 2309","c":"PF","o":"COMERCIAL","v":2000,"ni":176,"fa":75,"d":23.0,"m":9.0,"per":"2","fa%":3.75,"acc":29.8804780876},{"n":"Repique comercial pf 03 2309","c":"PF","o":"COMERCIAL","v":805,"ni":61,"fa":43,"d":23.0,"m":9.0,"per":"2","fa%":5.3416149068,"acc":41.3461538462},{"n":"Repique comercial pf 03 2309 (b)","c":"PF","o":"COMERCIAL","v":847,"ni":79,"fa":40,"d":23.0,"m":9.0,"per":"2","fa%":4.7225501771,"acc":33.6134453782},{"n":"Repique comercial pf 04 2309","c":"PF","o":"COMERCIAL","v":2000,"ni":78,"fa":37,"d":23.0,"m":9.0,"per":"2","fa%":1.85,"acc":32.1739130435},{"n":"Repique comercial pf 05 2309","c":"PF","o":"MARKETING","v":2000,"ni":129,"fa":136,"d":23.0,"m":9.0,"per":"2","fa%":6.8,"acc":51.320754717},{"n":"Repique comercial adm 2309","c":"PROJETO","o":"COMERCIAL","v":1092,"ni":74,"fa":31,"d":23.0,"m":9.0,"per":"2","fa%":2.8388278388,"acc":29.5238095238},{"n":"FOLLOW UP REP 2409","c":"PF","o":"MARKETING","v":3095,"ni":213,"fa":259,"d":24.0,"m":9.0,"per":"2","fa%":8.3683360258,"acc":54.8728813559},{"n":"Repique comercial pf 2409","c":"PF","o":"MARKETING","v":2000,"ni":176,"fa":75,"d":24.0,"m":9.0,"per":"2","fa%":3.75,"acc":29.8804780876},{"n":"Repique comercial pf 01 2409","c":"PF","o":"MARKETING","v":3000,"ni":143,"fa":171,"d":24.0,"m":9.0,"per":"2","fa%":5.7,"acc":54.4585987261},{"n":"BASE VPC D -30 M 2309 11h 00min","c":"VPC","o":"MARKETING","v":1091,"ni":31,"fa":92,"d":23.0,"m":9.0,"per":"2","fa%":8.4326306141,"acc":74.7967479675},{"n":"BASE VPC D -30 M 2409","c":"VPC","o":"MARKETING","v":1000,"ni":51,"fa":67,"d":24.0,"m":9.0,"per":"2","fa%":6.7,"acc":56.7796610169},{"n":"BASE VPC D -30 M 2509","c":"VPC","o":"MARKETING","v":671,"ni":75,"fa":7,"d":25.0,"m":9.0,"per":"2","fa%":1.043219076,"acc":8.5365853659},{"n":"FOLLOW UP REP 2509","c":"PF","o":"MARKETING","v":2727,"ni":155,"fa":165,"d":25.0,"m":9.0,"per":"2","fa%":6.0506050605,"acc":51.5625},{"n":"FOLLOW UP REP 2809","c":"PF","o":"COMERCIAL","v":2049,"ni":102,"fa":153,"d":28.0,"m":9.0,"per":"2","fa%":7.467057101,"acc":60.0},{"n":"Repique comercial pf 2809","c":"PF","o":"COMERCIAL","v":3000,"ni":207,"fa":129,"d":28.0,"m":9.0,"per":"2","fa%":4.3,"acc":38.3928571429}];
+const TYPE=n=>{const u=n.toUpperCase();return u.includes('FOLLOW')?'Follow up':(u.replace(/ /g,'').includes('D-30')?'Base D-30':'Repique');};
+BT.forEach(b=>b.tipo=TYPE(b.n));
+const BTP=BT.filter(b=>b.per==='1'||b.per==='2');
+function gst(f,p){const a=BTP.filter(b=>f(b)&&b.per===p);if(!a.length)return null;const v=sum(a,'v'),fa=sum(a,'fa'),ni=sum(a,'ni');return{n:a.length,v,fa,ni,pfa:fa/v,acc:fa/(fa+ni)};}
+function grouped(id,groups,max,step,key){const W=760,H=250,l=40,b=34,t=18;const s=svg(W,H);const y=v=>H-b-(v/max)*(H-b-t);
+ for(let g=0;g<=max+1e-9;g+=step){el(s,'line',{x1:l,x2:W,y1:y(g),y2:y(g),class:'ax'});el(s,'text',{x:l-6,y:y(g)+4,'text-anchor':'end'},Math.round(g*100)+'%');}
+ const gw=(W-l)/groups.length;
+ groups.forEach(([lab,f,k],i)=>{k=k||key;[['1','b1'],['2','b2']].forEach(([p,cls],j)=>{const st=gst(f,p);const x=l+i*gw+gw*.14+j*gw*.36,w=gw*.32;
+   if(!st){el(s,'text',{x:x+w/2,y:H-b-6,'text-anchor':'middle',style:'font-size:10px'},'—');return;}
+   const v=st[k];
+   el(s,'rect',{x,y:y(v),width:w,height:H-b-y(v),rx:3,class:cls,'data-tip':`<b>${lab} · ${p==='1'?'1ª':'2ª'} quinzena</b><br>${st.n} disparos, ${fmt(st.v)} visados<br>Falar agora: ${fmt(st.fa)} (${pct(st.pfa)})<br>Não tenho interesse: ${fmt(st.ni)}<br>Aceitação: ${pct(st.acc)}`});
+   el(s,'text',{x:x+w/2,y:y(v)-4,'text-anchor':'middle',style:'font-size:10px;font-weight:700;fill:var(--ink)'},pct(v));});
+  el(s,'text',{x:l+i*gw+gw/2,y:H-b+16,'text-anchor':'middle'},lab);});
+ mount(id,s);}
+grouped('chBtType',[['Total manual',b=>b.c!=='VPC'],['PF follow up',b=>b.c==='PF'&&b.tipo==='Follow up'],['PF repique',b=>b.c==='PF'&&b.tipo==='Repique'],['Projetos',b=>b.c==='PROJETO'],['Adesão',b=>b.c==='ADESÃO']],.12,.02,'pfa');
+/* botões VPC por semana */
+const VB=[['Repique Comercial VPC 0809','C',49,7,2,'08/09'],['BASE VPC D-30 M 1009','C',500,31,32,'10/09'],['BASE VPC D-30 M1 1009','C',1055,146,35,'10/09'],['BASE VPC D-30 M2 1009','C',1908,176,92,'10/09'],['BASE VPC D -30 M 1409','C',3821,282,143,'14/09'],['FOLLOW UP BASE CANCELADOS 1509','C',178,17,18,'15/09'],['BASE REPIQUE VPC 1509','C',415,48,17,'15/09'],['BASE VPC D -30 M 1609 13h30','C',2792,209,97,'16/09'],['BASE VPC D -30 M 1709 10h30','C',1727,151,83,'17/09'],['BASE VPC D -30 M 1809 11h40','C',1402,109,43,'18/09'],['BASE VPC D -30 M 2209 10h40','C',2000,132,85,'22/09'],['BASE VPC D -30 M 2209 13h00','C',2139,150,95,'22/09'],['BASE VPC D -30 M 2309 11h00','C',1091,31,92,'24/09'],['BASE VPC D -30 M 2409','C',1000,51,67,'25/09'],['BASE VPC D -30 M 2509','C',671,75,7,'25/09'],['BASE VPC D -30 M 2909','C',604,56,14,'29/09'],['BASE VPC D -30 M 3009','C',1000,51,87,'30/09'],['BASE VPC D -30 M 01 3009','C',558,50,14,'30/09'],['BASE VPC D -30 M 0110','C',753,67,19,'01/10'],['BASE VPC D -30 M 0510','C',1057,117,51,'05/10']].map(([n,o,v,ni,fa,d])=>({n,o,v,ni,fa,d}));
+const VW=[['v1','07 a 13/09',[7,9]],['v2','14 a 20/09',[14,9]],['v3','21 a 27/09',[21,9]],['v4','28/09 a 04/10',[28,9]],['v5','05 a 11/10',[5,10],1]].map(([k,l,ini,parc])=>({k,l,days:dl(ini,7),parc}));
+VW.forEach(w=>{w.rows=VB.filter(r=>w.days.includes(r.d));w.v=sum(w.rows,'v');w.fa=sum(w.rows,'fa');w.ni=sum(w.rows,'ni');w.pfa=w.fa/w.v;w.acc=w.fa/(w.fa+w.ni);});
+let vbk='v4';
+const vbSeg=$('#vbSeg');VW.forEach(w=>{const b=document.createElement('button');b.textContent=w.l+(w.parc?' ▸':'');b.title=w.parc?'Semana em andamento':'';b.setAttribute('aria-pressed',w.k===vbk);b.onclick=()=>{vbk=w.k;vbSeg.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));drawVb();};vbSeg.appendChild(b);});
+const VCOM={
+ v1:'<p>Primeira semana das bases D-30 com botão: 4 disparos e 3,5 mil visados, com 4,6% de "Falar agora". A aceitação entre quem respondeu ficou em 31%.</p>',
+ v2:'<p>A semana com maior volume: 6 disparos e 10,3 mil visados, três vezes a anterior. O "Falar agora" caiu para 3,9%, o menor do período. Mais volume trouxe proporcionalmente menos interesse.</p>',
+ v3:'<p>Melhor semana: 5,0% de "Falar agora" e 44% de aceitação. Os disparos de 24/09 (8,4%) e o "M 2409" de 25/09 (6,7%) puxaram o resultado, enquanto o "M 2509", no mesmo dia, ficou em 1,0%.</p>',
+ v4:'<p>O volume caiu 58%, para 2,9 mil visados, na semana das quedas da GUP (02/10) e de Conecta e Contrate (03/10). O "Falar agora" ficou em 4,6%, mas variou muito: 8,7% em um dos disparos de 30/09 e cerca de 2,5% nos outros três.</p>',
+ v5:'<p>Semana em andamento: até agora, 1 disparo em 05/10, com 4,8% de "Falar agora".</p>'};
+function drawVb(){const i=VW.findIndex(w=>w.k===vbk),w=VW[i],p=VW[i-1];
+ const dv=(a,b,pp)=>!p?'':(pp?` <span style="color:var(--${b>=a?'good':'bad'})">${b>=a?'+':'−'}${Math.abs((b-a)*100).toLocaleString('pt-BR',{maximumFractionDigits:1})} p.p.</span>`:` <span style="color:var(--ink2)">${b>=a?'+':'−'}${Math.abs(Math.round((b/a-1)*100))}%</span>`);
+ $('#vbMini').innerHTML=`<div><b>${fmt(w.v)} visados</b><span>${w.rows.length} disparo${w.rows.length>1?'s':''}${p?' · vs semana anterior'+dv(p.v,w.v):''}</span></div>
+  <div class="${p&&w.pfa<p.pfa?'bad':'good'}"><b>${pct(w.pfa)} Falar agora</b><span>${w.fa} cliques${p?' · '+dv(p.pfa,w.pfa,1):''}</span></div>
+  <div><b>${pct(w.acc,0)} aceitação</b><span>entre quem respondeu${p?' · '+dv(p.acc,w.acc,1):''}</span></div>`;
+ const W=760,H=240,l=40,r=40,b=40,t=20,max=.07;const s=svg(W,H);const y=v=>H-b-(v/max)*(H-b-t);const ya=v=>H-b-(v/.6)*(H-b-t);const gw=(W-l-r)/VW.length;
+ [0,.02,.04,.06].forEach(g=>{el(s,'line',{x1:l,x2:W-r,y1:y(g),y2:y(g),class:'ax'});el(s,'text',{x:l-6,y:y(g)+4,'text-anchor':'end'},Math.round(g*100)+'%');});
+ [0,.2,.4,.6].forEach(g=>el(s,'text',{x:W-r+6,y:ya(g)+4,style:'font-size:10px'},Math.round(g*100)+'%'));
+ VW.forEach((x,j)=>{const cx=l+j*gw+gw/2,bw=gw*.46;const on=x.k===vbk;
+  const g=el(s,'g',{style:'cursor:pointer'});g.onclick=()=>{vbk=x.k;vbSeg.querySelectorAll('button').forEach((bb,q)=>bb.setAttribute('aria-pressed',q===j));drawVb();};
+  el(g,'rect',{x:cx-bw/2,y:y(x.pfa),width:bw,height:H-b-y(x.pfa),rx:4,fill:on?'var(--accent)':'var(--sky)',opacity:x.parc?.6:1,'data-tip':`<b>${x.l}${x.parc?' (em andamento)':''}</b><br>${x.rows.length} disparos · ${fmt(x.v)} visados<br>Falar agora: ${x.fa} (${pct(x.pfa)})<br>Não tenho interesse: ${x.ni}<br>Aceitação: ${pct(x.acc)}`});
+  el(g,'text',{x:cx,y:y(x.pfa)-6,'text-anchor':'middle',style:`font-weight:700;fill:var(--ink);font-size:${on?13:11}px`},pct(x.pfa));
+  el(g,'text',{x:cx,y:H-b+16,'text-anchor':'middle',style:on?'font-weight:700;fill:var(--ink)':''},x.l);});
+ el(s,'path',{d:VW.map((x,j)=>(j?'L':'M')+(l+j*gw+gw/2)+' '+ya(x.acc)).join(' '),fill:'none',stroke:'var(--p2)','stroke-width':2,'stroke-dasharray':'5 4'});
+ VW.forEach((x,j)=>el(s,'circle',{cx:l+j*gw+gw/2,cy:ya(x.acc),r:4,fill:'var(--p2)','data-tip':`<b>${x.l}</b><br>Aceitação: ${pct(x.acc)}`}));
+ mount('chBtVpc',s);
+ $('#vbTbl').innerHTML='<thead><tr><th>Envio</th><th class="l">Campanha</th><th>Visado</th><th>Falar agora</th><th>Não tenho int.</th><th>% Falar</th><th>Aceitação</th></tr></thead><tbody>'+
+  w.rows.map(r=>`<tr><td>${r.d}</td><td class="l">${r.n}</td><td>${r.v.toLocaleString('pt-BR')}</td><td>${r.fa}</td><td>${r.ni}</td><td class="${r.fa/r.v<.03?'dn':r.fa/r.v>=.06?'up':''}">${pct(r.fa/r.v)}</td><td>${pct(r.fa/(r.fa+r.ni),0)}</td></tr>`).join('')+'</tbody>';
+ $('#vbCom').innerHTML=VCOM[vbk];}
+drawVb();
+
+/* ---------- próximos passos (nota sutil) ---------- */
+const nx=$('#next'),nb=$('#nextBtn');
+function openNext(o){nx.classList.toggle('show',o);nb.classList.toggle('show',!o);nb.setAttribute('aria-expanded',o);}
+$('#nextClose').onclick=()=>openNext(false);nb.onclick=()=>openNext(true);
+setTimeout(()=>openNext(true),2500);
+applyG();
 </script>
-
 </body>
 </html>
