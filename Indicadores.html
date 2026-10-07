@@ -116,14 +116,21 @@ footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
   <p class="sub" id="subt"></p>
 </header>
 <nav class="sec" aria-label="Seções">
-  <a href="#resumo">Resumo</a><a href="#origem">Origem do lead</a><a href="#sla">SLA 2 min</a><a href="#conversao">Conversão</a>
-  <a href="#temperatura">Lead quente x frio</a><a href="#eugenia">EugenIA Seller</a><a href="#vendas">Vendas</a><a href="#orcamentos">Orçamentos PF</a>
+  <a href="#resumo">Resumo</a><a href="#vendas">Vendas</a><a href="#origem">Origem do lead</a><a href="#temperatura">Lead quente x frio</a><a href="#conversao">Conversão</a><a href="#eugenia">EugenIA Seller</a><a href="#sla">SLA 2 min</a><a href="#orcamentos">Orçamentos PF</a>
 </nav>
 
 <section id="resumo">
   <div class="kpis" id="kpis"></div>
 </section>
-
+<section id="vendas">
+  <div class="sec-head"><h2>Vendas do período</h2><p class="sub">Levantamento de Vendas: BASE_PF, BASE PME e BASE ADESAO, com data de venda entre 28/09 e 02/10 (dias úteis).</p></div>
+  <div class="kpis" id="salesKpis"></div>
+  <div class="grid g3">
+    <div class="panel"><h3>Vendas por plano (PF e Adesão)</h3><div class="hbars" id="salesPlano"></div></div>
+    <div class="panel"><h3>Vendas por região</h3><div class="hbars" id="salesReg"></div><p class="note">PF pela UF do endereço e PME pelo DDD do telefone. A base de Adesão não tem telefone nem UF do cliente, então a região vem da unidade de venda.</p></div>
+    <div class="panel"><h3>Ranking de vendedores</h3><div class="hbars" id="salesRank"></div></div>
+  </div>
+</section>
 <section id="origem">
   <div class="sec-head"><h2>Onde o lead nasce</h2><p class="sub">Origem definida pela coluna Session Team. Sessões em dias úteis, sem as encerradas sem tag.</p></div>
   <div class="grid g23">
@@ -137,16 +144,14 @@ footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
     <div class="panel"><h3>Sessões por dia útil</h3><div id="dayLeads"></div></div>
   </div>
 </section>
-
-<section id="sla">
-  <div class="sec-head"><h2>SLA de atendimento: resposta em até 2 minutos</h2><p class="sub">Tempo entre Time of Chat Assignment e Agent First Response at. Meta: 90% dos clientes de cada vendedor atendidos em até 2 min.</p></div>
-  <div class="kpis" id="slaKpis"></div>
-  <div class="panel"><div class="controls" style="justify-content:space-between"><h3>SLA por vendedor</h3>
-    <div class="controls"><div class="seg" id="slaSeg" role="group" aria-label="Filtrar vendedores"><button aria-pressed="true" data-f="all">Todos</button><button aria-pressed="false" data-f="ok">Na meta</button><button aria-pressed="false" data-f="no">Fora da meta</button></div><input type="search" id="slaQ" placeholder="Buscar vendedor" aria-label="Buscar vendedor"></div></div>
-    <div class="tbl-wrap"><table id="slaTbl"></table></div>
-    <p class="note">Base do percentual: chats do vendedor com tempo de resposta válido. Chats sem 1ª resposta aparecem na coluna "Sem resposta" e não entram no cálculo.</p></div>
+<section id="temperatura">
+  <div class="panel" style="gap:16px">
+    <div class="sec-head"><h2>O que é um lead quente e o que é um lead frio</h2><p class="sub">Classificação feita a partir da tag de encerramento de cada sessão</p></div>
+    <p>A temperatura mede o engajamento do cliente com a oferta. O lead é quente quando conversou com o promotor e chegou a receber a cotação, mesmo que não tenha fechado ou não tenha dado retorno depois. É frio quando não se engajou ou não pôde receber a oferta: não respondeu à abordagem, era resposta automática, estava fora da área de cobertura ou fora da regra PME. Os contatos que não são oportunidade de venda ficam fora da classificação. Sessões ainda sem tag não são classificadas.</p>
+    <div class="grid g3" id="tcards"></div>
+    <p class="note" id="tnote"></p>
+  </div>
 </section>
-
 <section id="conversao">
   <div class="sec-head"><h2>Conversão: leads x vendas</h2><p class="sub">Vendas do período (Levantamento de Vendas) ÷ clientes atendidos na Tabela de Leads. Meta: 10% por vendedor.</p></div>
   <div class="kpis" id="convKpis"></div>
@@ -157,16 +162,6 @@ footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
       <div class="tbl-wrap"><table id="convTbl"></table></div></div>
   </div>
 </section>
-
-<section id="temperatura">
-  <div class="panel" style="gap:16px">
-    <div class="sec-head"><h2>O que é um lead quente e o que é um lead frio</h2><p class="sub">Classificação feita a partir da tag de encerramento de cada sessão</p></div>
-    <p>A temperatura mede o engajamento do cliente com a oferta. O lead é quente quando conversou com o promotor e chegou a receber a cotação, mesmo que não tenha fechado ou não tenha dado retorno depois. É frio quando não se engajou ou não pôde receber a oferta: não respondeu à abordagem, era resposta automática, estava fora da área de cobertura ou fora da regra PME. Os contatos que não são oportunidade de venda ficam fora da classificação. Sessões ainda sem tag não são classificadas.</p>
-    <div class="grid g3" id="tcards"></div>
-    <p class="note" id="tnote"></p>
-  </div>
-</section>
-
 <section id="eugenia">
   <div class="panel" style="gap:16px">
     <div class="grid g2 eu">
@@ -200,17 +195,14 @@ footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
     </div>
   </div>
 </section>
-
-<section id="vendas">
-  <div class="sec-head"><h2>Vendas do período</h2><p class="sub">Levantamento de Vendas: BASE_PF, BASE PME e BASE ADESAO, com data de venda entre 28/09 e 02/10 (dias úteis).</p></div>
-  <div class="kpis" id="salesKpis"></div>
-  <div class="grid g3">
-    <div class="panel"><h3>Vendas por plano (PF e Adesão)</h3><div class="hbars" id="salesPlano"></div></div>
-    <div class="panel"><h3>Vendas por região</h3><div class="hbars" id="salesReg"></div><p class="note">PF pela UF do endereço e PME pelo DDD do telefone. A base de Adesão não tem telefone nem UF do cliente, então a região vem da unidade de venda.</p></div>
-    <div class="panel"><h3>Ranking de vendedores</h3><div class="hbars" id="salesRank"></div></div>
-  </div>
+<section id="sla">
+  <div class="sec-head"><h2>SLA de atendimento: resposta em até 2 minutos</h2><p class="sub">Tempo entre Time of Chat Assignment e Agent First Response at. Meta: 90% dos clientes de cada vendedor atendidos em até 2 min.</p></div>
+  <div class="kpis" id="slaKpis"></div>
+  <div class="panel"><div class="controls" style="justify-content:space-between"><h3>SLA por vendedor</h3>
+    <div class="controls"><div class="seg" id="slaSeg" role="group" aria-label="Filtrar vendedores"><button aria-pressed="true" data-f="all">Todos</button><button aria-pressed="false" data-f="ok">Na meta</button><button aria-pressed="false" data-f="no">Fora da meta</button></div><input type="search" id="slaQ" placeholder="Buscar vendedor" aria-label="Buscar vendedor"></div></div>
+    <div class="tbl-wrap"><table id="slaTbl"></table></div>
+    <p class="note">Base do percentual: chats do vendedor com tempo de resposta válido. Chats sem 1ª resposta aparecem na coluna "Sem resposta" e não entram no cálculo.</p></div>
 </section>
-
 <section id="orcamentos">
   <div class="sec-head"><h2>Orçamentos PF</h2><p class="sub">Relatório de propostas PF por data de digitação em dias úteis. Venda concluída = Data Processamento preenchida.</p></div>
   <div class="kpis" id="propKpis"></div>
@@ -227,6 +219,7 @@ footer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
   <div class="panel"><div class="controls" style="justify-content:space-between"><h3>Orçamentos por vendedor</h3><input type="search" id="propQ" placeholder="Buscar vendedor" aria-label="Buscar vendedor nos orçamentos"></div>
     <div class="tbl-wrap"><table id="propTbl"></table></div><p class="note">Vendedores com mais de um código foram somados pelo nome.</p></div>
 </section>
+
 
 <footer id="foot"></footer>
 <div id="tip" role="tooltip" hidden></div>
