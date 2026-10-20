@@ -78,14 +78,14 @@ iframe {
 <button onclick="loadPage('Performance.html', this)">Performance</button>
 <button onclick="loadPage('Indicadores.html', this)">Indicadores</button>
 
-
 </div>
 
-<iframe id="frame" src="Operacional.html"></iframe>
+<iframe id="frame"></iframe>
 
 <script>
 function loadPage(page, element){
-  document.getElementById('frame').src = encodeURI(page);
+  // o "?v=" muda a cada clique e obriga o navegador a buscar a versão mais recente
+  document.getElementById('frame').src = encodeURI(page) + '?v=' + Date.now();
 
   // remover ativo de todos
   document.querySelectorAll('.menu button').forEach(btn => {
@@ -95,6 +95,9 @@ function loadPage(page, element){
   // ativar o clicado
   element.classList.add('active');
 }
+
+// carrega a página inicial já sem cache
+loadPage('Operacional.html', document.querySelector('.menu button.active'));
 </script>
 
 </body>
